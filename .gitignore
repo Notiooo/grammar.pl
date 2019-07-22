@@ -1,0 +1,12 @@
+
+grammar_pl/db\.sqlite3
+
+grammar_pl/secret_settings\.py
+
+grammar_pl/\.idea/
+
+grammar_pl/grammar_pl/__pycache__/
+
+grammar_pl/__pycache__/
+
+grammar_pl/pages/migrations/
