@@ -14,3 +14,8 @@ html{
 	background-color: #FFC96C;
 	color: white;
 }
+
+.block-title{
+	font-size: 20px;
+	font-weight: 600;
+}

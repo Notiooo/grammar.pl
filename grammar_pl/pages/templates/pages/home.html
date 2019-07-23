@@ -8,17 +8,18 @@
     <div>
         <div class="uk-background-cover uk-height-large uk-panel uk-flex uk-flex-center uk-flex-middle uk-flex-column" style="background-image: url({% static 'pages/img/background-cover.jpg' %});">
             <p class="promote-text uk-heading-medium uk-text-bold uk-text-uppercase">Grammar.pl</p>
+            <!-- The Card -->
             <div class="uk-card uk-card-default uk-card-small uk-card-body uk-width-large uk-border-rounded">
             	<h3 class="uk-card-title">Śpieszy ci się?</h3>
             	<p>Skorzystaj z opcji losowania zadań. Daj sie zaskoczyć! Jest to przede wszystkim szybka opcja, ale równie efektywna a do tego zaskakująca!</p>
-            	<div class="uk-flex-inline">
-            		<button class="uk-button uk-button-primary">Losuj zadanie</button>
-            		<button class="uk-button yellow-button">Losuj zadanie maturalne!</button>
-            	</div>
+            	<p class="uk-text-center" uk-margin>
+            		<button class="uk-button uk-button-small uk-border-rounded uk-button-primary">Losuj zadanie</button>
+            		<button class="uk-button uk-button-small uk-border-rounded yellow-button">Losuj zadanie maturalne!</button>
+            	</p>
             </div>
         </div>
     </div>
-    <div style="background-color: white">
+    <div class="uk-section-default">
     	<!-- Login panel -->
     	<div class="uk-flex uk-flex-center uk-flex-middle uk-flex-column uk-height-large uk-text-center">
     		<div class="uk-h1">Zaloguj sie aby dodawać zadania</div>
@@ -27,31 +28,134 @@
     			Pozwala zapisywać ulubione zadania i oceniać prace innych<br>
     			Dołącz do społeczności, rozwijaj umiejętności swoje i innych!</p>
     		</div>
-	    	<form class="">
-	    		<div class="uk-fieldset uk-width-medium">
-	    			<div class="uk-margin">
-	    				<div class="uk-inline uk-width-1-1">
-	    					<span class="uk-form-icon uk-form-icon-flip uk-icon" data-uk-icon="icon: user"></span>
-	    					<input class="uk-input uk-border-rounded" placeholder="Nazwa użytkownika" type="text">
-	    				</div>
-	    			</div>
-	    			<div class="uk-margin">
-						<div class="uk-inline uk-width-1-1">
-							<span class="uk-form-icon uk-form-icon-flip uk-icon" data-uk-icon="icon: lock"></span>
-							<input class="uk-input uk-border-rounded" placeholder="Hasło" type="password">
-						</div>
-					</div>
-					<div class="uk-margin">
-						<label><input class="uk-checkbox uk-margin-small-right" type="checkbox">Nie wylogowywuj mnie</label>
-					</div>
-					<div class="uk-width-large">
-						<button type="submit" class="uk-button uk-button-primary uk-border-rounded">Zaloguj mnie</button>
-						<button type="submit" class="uk-button uk-button-secondary uk-border-rounded">Zarejestruj mnie</button>
-					</div>
-	    		</div>
-	    	</form>
+			<p uk-margin>
+				<button type="submit" class="uk-button uk-button-primary uk-border-rounded">Zaloguj mnie</button>
+				<button type="submit" class="uk-button uk-button-secondary uk-border-rounded">Zarejestruj mnie</button>
+			</p>
     	</div>
     </div>
+</div>
+
+<div class="uk-section uk-section-small uk-section-muted">
+    <div class="uk-container uk-container-large">
+
+        <p class="uk-h2 uk-heading-divider">Zadania z poszczególnymi czasami</p>
+
+        <p class="uk-text-large uk-heading-bullet">Teraźniejsze</p>
+		<div class="uk-grid-small uk-flex-center uk-grid-match" uk-grid>
+			<div>
+				<div class="uk-width-medium uk-card uk-card-hover uk-card-small uk-card-default uk-card-body">
+				    <div class="block-title">Present Simple</div>
+				    <p class="uk-text-meta">Lorem ipsum sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+				</div>
+			</div>
+			<div>
+				<div class="uk-width-medium uk-card uk-card-hover uk-card-small uk-card-default uk-card-body">
+				    <div class="block-title">Present Continuous</div>
+				    <p class="uk-text-meta">Lorem ipsum sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+				</div>
+			</div>
+			<div>
+				<div class="uk-width-medium uk-card uk-card-hover uk-card-small uk-card-default uk-card-body">
+				    <div class="block-title">Present Perfect</div>
+				    <p class="uk-text-meta">Lorem ipsum sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+				</div>
+			</div>
+			<div>
+				<div class="uk-width-medium uk-card uk-card-hover uk-card-small uk-card-default uk-card-body">
+				    <div class="block-title">Present Perfect Continuous</div>
+				    <p class="uk-text-meta">Lorem ipsum sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+				</div>
+			</div>
+		</div>
+
+        <p class="uk-text-large uk-heading-bullet">Przeszłe</p>
+		<div class="uk-grid-small uk-flex-center uk-grid-match" uk-grid>
+			<div>
+				<div class="uk-width-medium uk-card uk-card-hover uk-card-small uk-card-default uk-card-body">
+				    <div class="block-title">Past Simple</div>
+				    <p class="uk-text-meta">Lorem ipsum sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+				</div>
+			</div>
+			<div>
+				<div class="uk-width-medium uk-card uk-card-hover uk-card-small uk-card-default uk-card-body">
+				    <div class="block-title">Past Continuous</div>
+				    <p class="uk-text-meta">Lorem ipsum sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+				</div>
+			</div>
+			<div>
+				<div class="uk-width-medium uk-card uk-card-hover uk-card-small uk-card-default uk-card-body">
+				    <div class="block-title">Past Perfect</div>
+				    <p class="uk-text-meta">Lorem ipsum sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+				</div>
+			</div>
+			<div>
+				<div class="uk-width-medium uk-card uk-card-hover uk-card-small uk-card-default uk-card-body">
+				    <div class="block-title">Past Perfect Continuous</div>
+				    <p class="uk-text-meta">Lorem ipsum sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+				</div>
+			</div>
+		</div>
+
+        <p class="uk-text-large uk-heading-bullet">Przyszłe</p>
+		<div class="uk-grid-small uk-flex-center uk-grid-match" uk-grid>
+			<div>
+				<div class="uk-width-medium uk-card uk-card-hover uk-card-small uk-card-default uk-card-body">
+				    <div class="block-title">Future Simple</div>
+				    <p class="uk-text-meta">Lorem ipsum sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+				</div>
+			</div>
+			<div>
+				<div class="uk-width-medium uk-card uk-card-hover uk-card-small uk-card-default uk-card-body">
+				    <div class="block-title">Future Continuous</div>
+				    <p class="uk-text-meta">Lorem ipsum sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+				</div>
+			</div>
+			<div>
+				<div class="uk-width-medium uk-card uk-card-hover uk-card-small uk-card-default uk-card-body">
+				    <div class="block-title">Future Perfect</div>
+				    <p class="uk-text-meta">Lorem ipsum sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+				</div>
+			</div>
+			<div>
+				<div class="uk-width-medium uk-card uk-card-hover uk-card-small uk-card-default uk-card-body">
+				    <div class="block-title">Future Perfect Continuous</div>
+				    <p class="uk-text-meta">Lorem ipsum sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+				</div>
+			</div>
+		</div>
+    </div>
+</div>
+<div class="uk-section uk-section-muted">
+    <div class="uk-container uk-container-large">
+        <p class="uk-h2 uk-heading-divider uk-margin-medium-bottom">Zadania z trybami warunkowymi</p>
+		<div class="uk-grid-small uk-flex-center uk-grid-match" uk-grid>
+			<div>
+				<div class="uk-width-medium uk-card uk-card-hover uk-card-small uk-card-default uk-card-body">
+				    <div class="block-title">Zerowy tryb warunkowy</div>
+				    <p class="uk-text-meta">Lorem ipsum sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+				</div>
+			</div>
+			<div>
+				<div class="uk-width-medium uk-card uk-card-hover uk-card-small uk-card-default uk-card-body">
+				    <div class="block-title">Pierwszy tryb warunkowy</div>
+				    <p class="uk-text-meta">Lorem ipsum sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+				</div>
+			</div>
+			<div>
+				<div class="uk-width-medium uk-card uk-card-hover uk-card-small uk-card-default uk-card-body">
+				    <div class="block-title">Drugi tryb warunkowy</div>
+				    <p class="uk-text-meta">Lorem ipsum sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+				</div>
+			</div>
+			<div>
+				<div class="uk-width-medium uk-card uk-card-hover uk-card-small uk-card-default uk-card-body">
+				    <div class="block-title">Trzeci tryb warunkowy</div>
+				    <p class="uk-text-meta">Lorem ipsum sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
 
 {% endblock content %}
