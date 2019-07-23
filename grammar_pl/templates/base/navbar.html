@@ -1,11 +1,11 @@
 {% load static %}
-<nav class="uk-navbar-container uk-box-shadow-medium" uk-navbar="mode: click; offset: 0">
+<nav class="uk-navbar-container uk-box-shadow-medium" uk-navbar="mode: click; offset: 0" uk-sticky>
     <div class="uk-navbar-right">
 
         <ul class="uk-navbar-nav uk-text-uppercase">
-            <li class="uk-active"><a href="#">Strona Główna</a></li>
-            <li><a href="#">Czasy</a></li>
-            <li><a href="#">Tryby warunkowe</a></li>
+            <li><a href="{% url 'home' %}">Strona Główna</a></li>
+            <li><a href="#czasy" uk-scroll>Czasy</a></li>
+            <li><a href="#tryby" uk-scroll>Tryby warunkowe</a></li>
             <li><a href="#">Zadania maturalne</a></li>
             <li><a href="#">Kontakt</a></li>
 
@@ -13,10 +13,16 @@
                 <a href="#"><img src="{% static 'img/avatar.png' %}" class="uk-border-circle profile-img" alt="avatar"></a>
                 <div class="uk-navbar-dropdown uk-navbar-container">
                     <ul class="uk-nav uk-navbar-dropdown-nav uk-list-divider">
+                        {% if user.is_authenticated %}
+                        <p>Hej, {{ user.username }}</p>
                         <li><a href="#">Dodaj zadanie</a></li>
                         <li><a href="#">Twój profil</a></li>
                         <li><a href="#">Ulubione</a></li>
-                        <li><a href="#">Wyloguj się</a></li>
+                        <li><a href="{% url 'logout' %}">Wyloguj się</a></li>
+                        {% else %}
+                        <li><a href="{% url 'login' %}">Zaloguj się</a></li>
+                        <li><a href="{% url 'signup' %}">Zarejestruj sie</a></li>
+                        {% endif %}
                     </ul>
                 </div>
             </li>

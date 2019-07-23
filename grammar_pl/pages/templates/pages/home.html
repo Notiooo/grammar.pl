@@ -3,9 +3,9 @@
 {% load static %}
 
 {% block content %}
-<div class="uk-child-width-1-2@s" uk-grid>
+<div class="" uk-grid>
 	<!-- Promotion screen -->
-    <div>
+    <div class="uk-width-expand@s">
         <div class="uk-background-cover uk-height-large uk-panel uk-flex uk-flex-center uk-flex-middle uk-flex-column" style="background-image: url({% static 'pages/img/background-cover.jpg' %});">
             <p class="promote-text uk-heading-medium uk-text-bold uk-text-uppercase">Grammar.pl</p>
             <!-- The Card -->
@@ -19,7 +19,8 @@
             </div>
         </div>
     </div>
-    <div class="uk-section-default">
+	{% if not user.is_authenticated %}
+    <div class="uk-section-default uk-width-1-2@s">
     	<!-- Login panel -->
     	<div class="uk-flex uk-flex-center uk-flex-middle uk-flex-column uk-height-large uk-text-center">
     		<div class="uk-h1">Zaloguj sie aby dodawać zadania</div>
@@ -29,15 +30,20 @@
     			Dołącz do społeczności, rozwijaj umiejętności swoje i innych!</p>
     		</div>
 			<p uk-margin>
-				<button type="submit" class="uk-button uk-button-primary uk-border-rounded">Zaloguj mnie</button>
-				<button type="submit" class="uk-button uk-button-secondary uk-border-rounded">Zarejestruj mnie</button>
+				<a href="{% url 'login' %}">
+					<button type="submit" class="uk-button uk-button-primary uk-border-rounded">Zaloguj mnie</button>
+				</a>
+				<a href="{% url 'signup' %}">
+					<button type="submit" class="uk-button uk-button-secondary uk-border-rounded">Zarejestruj mnie</button>
+				</a>
 			</p>
     	</div>
     </div>
+	{% endif %}
 </div>
 
-<div class="uk-section uk-section-small uk-section-muted">
-    <div class="uk-container uk-container-large">
+<div id="czasy" uk-scrollspy="cls: uk-animation-fade" class="uk-section uk-section-small uk-section-muted">
+    <div uk-scrollspy="target: > div; cls: uk-animation-slide-bottom; delay: 200" class="uk-container uk-container-large">
 
         <p class="uk-h2 uk-heading-divider">Zadania z poszczególnymi czasami</p>
 
@@ -126,10 +132,10 @@
 		</div>
     </div>
 </div>
-<div class="uk-section uk-section-muted">
+<div id="tryby" class="uk-section uk-section-muted">
     <div class="uk-container uk-container-large">
         <p class="uk-h2 uk-heading-divider uk-margin-medium-bottom">Zadania z trybami warunkowymi</p>
-		<div class="uk-grid-small uk-flex-center uk-grid-match" uk-grid>
+		<div uk-scrollspy="target: > div; cls: uk-animation-fade; delay: 150" class="uk-grid-small uk-flex-center uk-grid-match" uk-grid>
 			<div>
 				<div class="uk-width-medium uk-card uk-card-hover uk-card-small uk-card-default uk-card-body">
 				    <div class="block-title">Zerowy tryb warunkowy</div>

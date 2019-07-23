@@ -1,3 +1,5 @@
+{% load static %}
+
 html{
 	background-color: #F6F8F9;
 }
@@ -18,4 +20,17 @@ html{
 .block-title{
 	font-size: 20px;
 	font-weight: 600;
+}
+
+#newsletter-img
+{
+	background: url("../img/bongocat.png");
+	width: 78px;
+	height: 45px;
+	margin-top: -32px;
+}
+
+#newsletter:hover + #newsletter-img
+{
+	background: url("../img/bongocat.png") -78px;
 }
