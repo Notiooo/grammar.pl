@@ -1,0 +1,26 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %} Grammar.pl {% endblock title %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{% static 'css/uikit.min.css' %}"/>
+    <link rel="stylesheet" href="{% static 'css/base.css' %}"/>
+    <script src="{% static 'js/uikit.min.js' %}"></script>
+    <script src="{% static 'js/uikit-icons.min.js' %}"></script>
+</head>
+<header>
+    {% include 'base/navbar.html' %}
+</header>
+<body>
+    {% block content %}
+    {% endblock content %}
+</body>
+
+<footer>
+    {% block footer %}
+    {% endblock footer %}
+</footer>
+</html>

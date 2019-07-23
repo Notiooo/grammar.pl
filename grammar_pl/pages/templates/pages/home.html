@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block content %}
+<div class="uk-child-width-1-2@s" uk-grid>
+	<!-- Promotion screen -->
+    <div>
+        <div class="uk-background-cover uk-height-large uk-panel uk-flex uk-flex-center uk-flex-middle uk-flex-column" style="background-image: url({% static 'pages/img/background-cover.jpg' %});">
+            <p class="promote-text uk-heading-medium uk-text-bold uk-text-uppercase">Grammar.pl</p>
+            <div class="uk-card uk-card-default uk-card-small uk-card-body uk-width-large uk-border-rounded">
+            	<h3 class="uk-card-title">Śpieszy ci się?</h3>
+            	<p>Skorzystaj z opcji losowania zadań. Daj sie zaskoczyć! Jest to przede wszystkim szybka opcja, ale równie efektywna a do tego zaskakująca!</p>
+            	<div class="uk-flex-inline">
+            		<button class="uk-button uk-button-primary">Losuj zadanie</button>
+            		<button class="uk-button yellow-button">Losuj zadanie maturalne!</button>
+            	</div>
+            </div>
+        </div>
+    </div>
+    <div style="background-color: white">
+    	<!-- Login panel -->
+    	<div class="uk-flex uk-flex-center uk-flex-middle uk-flex-column uk-height-large uk-text-center">
+    		<div class="uk-h1">Zaloguj sie aby dodawać zadania</div>
+    		<div class="uk-heading-primary uk-text-center">
+    			<p>Konto daje możliwość dodawania własnych zadań.<br>
+    			Pozwala zapisywać ulubione zadania i oceniać prace innych<br>
+    			Dołącz do społeczności, rozwijaj umiejętności swoje i innych!</p>
+    		</div>
+	    	<form class="">
+	    		<div class="uk-fieldset uk-width-medium">
+	    			<div class="uk-margin">
+	    				<div class="uk-inline uk-width-1-1">
+	    					<span class="uk-form-icon uk-form-icon-flip uk-icon" data-uk-icon="icon: user"></span>
+	    					<input class="uk-input uk-border-rounded" placeholder="Nazwa użytkownika" type="text">
+	    				</div>
+	    			</div>
+	    			<div class="uk-margin">
+						<div class="uk-inline uk-width-1-1">
+							<span class="uk-form-icon uk-form-icon-flip uk-icon" data-uk-icon="icon: lock"></span>
+							<input class="uk-input uk-border-rounded" placeholder="Hasło" type="password">
+						</div>
+					</div>
+					<div class="uk-margin">
+						<label><input class="uk-checkbox uk-margin-small-right" type="checkbox">Nie wylogowywuj mnie</label>
+					</div>
+					<div class="uk-width-large">
+						<button type="submit" class="uk-button uk-button-primary uk-border-rounded">Zaloguj mnie</button>
+						<button type="submit" class="uk-button uk-button-secondary uk-border-rounded">Zarejestruj mnie</button>
+					</div>
+	    		</div>
+	    	</form>
+    	</div>
+    </div>
+</div>
+
+{% endblock content %}

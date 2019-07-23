@@ -10,3 +10,5 @@ grammar_pl/grammar_pl/__pycache__/
 grammar_pl/__pycache__/
 
 grammar_pl/pages/migrations/
+
+*.pyc

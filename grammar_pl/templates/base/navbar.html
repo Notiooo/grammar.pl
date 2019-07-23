@@ -1,0 +1,25 @@
+{% load static %}
+<nav class="uk-navbar-container" uk-navbar="mode: click; offset: 0">
+    <div class="uk-navbar-right">
+
+        <ul class="uk-navbar-nav uk-text-uppercase">
+            <li class="uk-active"><a href="#">Strona Główna</a></li>
+            <li><a href="#">Czasy</a></li>
+            <li><a href="#">Tryby warunkowe</a></li>
+            <li><a href="#">Zadania maturalne</a></li>
+            <li><a href="#">Kontakt</a></li>
+
+            <li>
+                <a href="#"><img src="{% static 'img/avatar.png' %}" class="uk-border-circle profile-img" alt="avatar"></a>
+                <div class="uk-navbar-dropdown uk-navbar-container">
+                    <ul class="uk-nav uk-navbar-dropdown-nav uk-list-divider">
+                        <li><a href="#">item</a></li>
+                        <li><a href="#">Item</a></li>
+                        <li><a href="#">Item</a></li>
+                    </ul>
+                </div>
+            </li>
+        </ul>
+
+    </div>
+</nav>
