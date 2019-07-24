@@ -1,13 +1,18 @@
 {% load static %}
 <nav class="uk-navbar-container uk-box-shadow-medium" uk-navbar="mode: click; offset: 0" uk-sticky>
-    <div class="uk-navbar-right">
+    <div class="uk-navbar-left nav-overlay">
+        <a class="uk-navbar-item uk-logo" href="#"><img src="http://gantry-1927.kxcdn.com/user/pages/02.blog/gantry-logo-competition/grav-logo.png" alt="logo" width="64"/></a>
+    </div>
 
-        <ul class="uk-navbar-nav uk-text-uppercase">
+    <div class="uk-navbar-right nav-overlay">
+
+        <ul class="uk-navbar-nav uk-visible@s">
             <li><a href="{% url 'home' %}">Strona Główna</a></li>
             <li><a href="#czasy" uk-scroll>Czasy</a></li>
             <li><a href="#tryby" uk-scroll>Tryby warunkowe</a></li>
             <li><a href="#">Zadania maturalne</a></li>
             <li><a href="#">Kontakt</a></li>
+            <li><a class="uk-navbar-toggle" uk-search-icon uk-toggle="target: .nav-overlay; animation: uk-animation-fade" href="#"></a></li>
 
             <li>
                 <a href="#"><img src="{% static 'img/avatar.png' %}" class="uk-border-circle profile-img" alt="avatar"></a>
@@ -27,6 +32,43 @@
                 </div>
             </li>
         </ul>
+        <ul class="uk-navbar-nav uk-hidden@s">
+            <li><a class="uk-navbar-toggle" uk-search-icon uk-toggle="target: .nav-overlay; animation: uk-animation-fade" href="#"></a></li>
+            <li><a class="uk-navbar-toggle" uk-navbar-toggle-icon uk-toggle="target: #mobile-navbar"></a></li>
+        </ul>
+    </div>
 
+    <!--- SEARCH -->
+    <div class="nav-overlay uk-navbar-left uk-flex-1" hidden>
+        <div class="uk-navbar-item uk-width-expand">
+            <form class="uk-search uk-search-navbar uk-width-1-1">
+                <input class="uk-search-input" type="search" placeholder="Szukaj..." autofocus>
+            </form>
+        </div><a class="uk-navbar-toggle" uk-close uk-toggle="target: .nav-overlay; animation: uk-animation-fade" href="#"></a>
     </div>
 </nav>
+
+<!--- MOBILE -->
+<div id="mobile-navbar" uk-offcanvas="flip: true">
+    <div class="uk-offcanvas-bar">
+        <button class="uk-offcanvas-close" type="button" uk-close></button>
+        <ul class="uk-nav-primary uk-nav-center uk-list-divider" uk-nav>
+            <li class="uk-padding"><img src="{% static 'img/avatar.png' %}" class="uk-border-circle" alt="avatar"></li>
+            {% if user.is_authenticated %}
+            <li><a href="#">Twój profil</li></li>
+            <li><a href="#">Dodaj zadanie</a></li>
+            <li><a href="#">Ulubione</a></li>
+            <li><a href="{% url 'logout' %}">Wyloguj się</a></li>
+            {% else %}
+            <li><a href="{% url 'login' %}">Zaloguj się</a></li>
+            <li><a href="{% url 'signup' %}">Zarejestruj sie</a></li>
+            {% endif %}
+            <li class="uk-padding"></li>
+            <li><a href="{% url 'home' %}">Strona Główna</a></li>
+            <li><a href="#czasy" uk-scroll>Czasy</a></li>
+            <li><a href="#tryby" uk-scroll>Tryby warunkowe</a></li>
+            <li><a href="#">Zadania maturalne</a></li>
+            <li><a href="#">Kontakt</a></li>
+        </ul>
+    </div>
+</div>

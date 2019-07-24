@@ -1,8 +1,9 @@
 {% extends 'base.html' %}
+{% load widget_tweaks %}
 
 {% block content %}
 
-<div class="uk-flex uk-flex-center uk-flex-middle uk-flex-column uk-height-large uk-text-center">
+<div class="uk-flex uk-flex-center uk-flex-middle uk-flex-column uk-height-expand uk-padding-large uk-text-center">
 
 <div class="uk-h1">Zaloguj sie aby dodawać zadania</div>
 <div class="uk-heading-primary uk-text-center">
@@ -13,23 +14,23 @@
 <!-- Login form -->
 <form class="" method="post">
     {% csrf_token %}
-    <div class="uk-fieldset uk-width-medium">
+    <div class="uk-fieldset uk-width-medium@s">
         <div class="uk-margin">
             <div class="uk-inline uk-width-1-1">
                 <span class="uk-form-icon uk-form-icon-flip uk-icon" data-uk-icon="icon: user"></span>
-                <input class="uk-input uk-border-rounded" autofocus name="{{ form.username.html_name }}" placeholder="Nazwa użytkownika" type="text">
+                {% render_field form.username|attr:"autofocus" class+="uk-input uk-border-rounded" placeholder="Nazwa użytkownika" %}
             </div>
         </div>
         <div class="uk-margin">
             <div class="uk-inline uk-width-1-1">
                 <span class="uk-form-icon uk-form-icon-flip uk-icon" data-uk-icon="icon: lock"></span>
-                <input class="uk-input uk-border-rounded" name="{{ form.password.html_name }}" placeholder="Hasło" type="password">
+                {% render_field form.password class+="uk-input uk-boder-rounded" placeholder="Hasło" %}
             </div>
         </div>
         <button type="submit" class="uk-button uk-button-primary uk-border-rounded" value="login">Zaloguj sie</button>
-        <input type="hidden" name="next" value="{{ next }}" />
     </div>
 </form>
+
 
 {% if form.non_field_errors %}
     <div class="uk-alert-danger" uk-alert>
