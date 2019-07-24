@@ -12,3 +12,5 @@ grammar_pl/__pycache__/
 grammar_pl/pages/migrations/
 
 *.pyc
+
+grammar_pl/users/migrations/

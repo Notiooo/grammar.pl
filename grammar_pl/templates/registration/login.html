@@ -1,9 +1,43 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<form method="post">
+
+<div class="uk-flex uk-flex-center uk-flex-middle uk-flex-column uk-height-large uk-text-center">
+
+<div class="uk-h1">Zaloguj sie aby dodawać zadania</div>
+<div class="uk-heading-primary uk-text-center">
+    <p>Konto daje możliwość dodawania własnych zadań.<br>
+    Pozwala zapisywać ulubione zadania i oceniać prace innych<br>
+    Dołącz do społeczności, rozwijaj umiejętności swoje i innych!</p>
+</div>
+<!-- Login form -->
+<form class="" method="post">
     {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="uk-button uk-button-primary">Zaloguj się</button>
+    <div class="uk-fieldset uk-width-medium">
+        <div class="uk-margin">
+            <div class="uk-inline uk-width-1-1">
+                <span class="uk-form-icon uk-form-icon-flip uk-icon" data-uk-icon="icon: user"></span>
+                <input class="uk-input uk-border-rounded" autofocus name="{{ form.username.html_name }}" placeholder="Nazwa użytkownika" type="text">
+            </div>
+        </div>
+        <div class="uk-margin">
+            <div class="uk-inline uk-width-1-1">
+                <span class="uk-form-icon uk-form-icon-flip uk-icon" data-uk-icon="icon: lock"></span>
+                <input class="uk-input uk-border-rounded" name="{{ form.password.html_name }}" placeholder="Hasło" type="password">
+            </div>
+        </div>
+        <button type="submit" class="uk-button uk-button-primary uk-border-rounded" value="login">Zaloguj sie</button>
+        <input type="hidden" name="next" value="{{ next }}" />
+    </div>
 </form>
+
+{% if form.non_field_errors %}
+    <div class="uk-alert-danger" uk-alert>
+        {% for error in form.non_field_errors %}
+            {{ error }}
+        {% endfor %}
+    </div>
+{% endif %}
+
+</div>
 {% endblock content %}
