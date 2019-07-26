@@ -1,7 +1,7 @@
 {% load static %}
 <nav class="uk-navbar-container uk-box-shadow-medium" uk-navbar="mode: click; offset: 0" uk-sticky>
     <div class="uk-navbar-left nav-overlay">
-        <a class="uk-navbar-item uk-logo" href="#"><img src="http://gantry-1927.kxcdn.com/user/pages/02.blog/gantry-logo-competition/grav-logo.png" alt="logo" width="64"/></a>
+        <a class="uk-navbar-item uk-logo" href="#"><img src="{% static 'img/logo.png' %}" alt="logo" width="100"/></a>
     </div>
 
     <div class="uk-navbar-right nav-overlay">
@@ -15,13 +15,13 @@
             <li><a class="uk-navbar-toggle" uk-search-icon uk-toggle="target: .nav-overlay; animation: uk-animation-fade" href="#"></a></li>
 
             <li>
-                <a href="#"><img src="{% static 'img/avatar.png' %}" class="uk-border-circle profile-img" alt="avatar"></a>
+                <a href="#"><img src="{% if user.is_authenticated %} {{ user.avatar.url }} {% else %} {% static 'img/avatar.png' %} {% endif %}" class="uk-border-circle profile-img" alt="avatar"></a>
                 <div class="uk-navbar-dropdown uk-navbar-container">
                     <ul class="uk-nav uk-navbar-dropdown-nav uk-list-divider">
                         {% if user.is_authenticated %}
                         <p>Hej, {{ user.username }}</p>
                         <li><a href="#">Dodaj zadanie</a></li>
-                        <li><a href="#">Twój profil</a></li>
+                        <li><a href="{% url 'profile' user.pk %}">Twój profil</a></li>
                         <li><a href="#">Ulubione</a></li>
                         <li><a href="{% url 'logout' %}">Wyloguj się</a></li>
                         {% else %}
@@ -53,9 +53,9 @@
     <div class="uk-offcanvas-bar">
         <button class="uk-offcanvas-close" type="button" uk-close></button>
         <ul class="uk-nav-primary uk-nav-center uk-list-divider" uk-nav>
-            <li class="uk-padding"><img src="{% static 'img/avatar.png' %}" class="uk-border-circle" alt="avatar"></li>
+            <li class="uk-padding"><img src="{% if user.is_authenticated %} {{ user.avatar.url }} {% else %} {% static 'img/avatar.png' %} {% endif %}" class="uk-border-circle" alt="avatar"></li>
             {% if user.is_authenticated %}
-            <li><a href="#">Twój profil</li></li>
+            <li><a href="{% url 'profile' user.pk %}">Twój profil</li></li>
             <li><a href="#">Dodaj zadanie</a></li>
             <li><a href="#">Ulubione</a></li>
             <li><a href="{% url 'logout' %}">Wyloguj się</a></li>
