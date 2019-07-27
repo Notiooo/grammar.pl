@@ -1,9 +1,18 @@
-from django.core.files.storage import get_storage_class
+from django.core.files.storage import FileSystemStorage
+from django.conf import settings
+import os
 
-class OverwriteStorage(get_storage_class()):
-    def _save(self, name, content):
+class OverwriteStorage(FileSystemStorage):
+    def get_available_name(self, name, max_length=None):
         self.delete(name)
-        return super(OverwriteStorage, self)._save(name, content)
-
-    def get_available_name(self, name, *args, **kwargs):
         return name
+    # def get_available_name(self, name, *args, **kwargs):
+    #     """Returns a filename that's free on the target storage system, and
+    #     available for new content to be written to.
+    #
+    #     Found at http://djangosnippets.org/snippets/976/
+    #     """
+    #     # If the filename already exists, remove it as if it was a true file system
+    #     if self.exists(name):
+    #         os.remove(os.path.join(settings.MEDIA_ROOT, name))
+    #     return name

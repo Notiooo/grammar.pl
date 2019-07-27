@@ -20,6 +20,11 @@
                 <div class="uk-text-meta">Imie: {% if object.first_name %} {{ object.first_name }} {% else %} brak :c {% endif %}</div>
                 <div class="uk-text-meta">Data urodzenia: {% if object.birth %} {{ object.birth }} {% else %} nie urodził się :c {% endif %}
                 </div>
+                {% if user == object %}
+                <p class="uk-text-center">
+                    <a href="{% url 'changeprofile' %}"><button class="uk-button uk-button-primary">Edytuj swoje dane</button></a>
+                </p>
+                {% endif %}
             </div>
             <div class="uk-width-1-1 uk-text-center uk-visible@s">
                 <img src="{% static 'img/books.png' %}" class="uk-width-small">

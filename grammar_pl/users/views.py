@@ -12,11 +12,11 @@ class SignUpView(generic.CreateView):
     success_url = reverse_lazy('login')
     template_name = 'users/signup.html'
 
+
 class ChangeProfileView(LoginRequiredMixin, generic.UpdateView):
     model = CustomUser
-    success_url = reverse_lazy('login')
     template_name = 'users/changeprofile.html'
-    fields = ('username', 'email', 'about', 'birth', 'first_name', 'last_name')
+    fields = ('email', 'about', 'birth', 'first_name', 'last_name', 'avatar')
     login_url = 'login'
 
     def get_object(self):
