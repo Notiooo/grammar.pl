@@ -43,8 +43,8 @@ INSTALLED_APPS = [
     'widget_tweaks',
 
     #local
-    'pages',
     'users',
+    'tasks',
 ]
 
 MIDDLEWARE = [

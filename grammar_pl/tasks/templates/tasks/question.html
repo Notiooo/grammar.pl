@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="uk-section">
+    <div class="uk-container uk-container-large">
+        <div class="uk-heading-small uk-heading-divide"">{{ object.title }}</div>
+        <div class="uk-text-lead">{{ object.text }}</div>
+    {% for anwser in object.anwsers.all %}
+    {% if anwser.correct %}
+        <p style="color: green">{{ anwser }}</p>
+    {% else %}
+        <p style="color: red">{{ anwser }}</p>
+    {% endif %}
+    {% endfor %}
+    </div>
+</div>
+{% endblock %}
