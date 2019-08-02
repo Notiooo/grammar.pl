@@ -14,3 +14,9 @@ grammar_pl/pages/migrations/
 *.pyc
 
 grammar_pl/users/migrations/
+
+grammar_pl/tasks/migrations/
+
+grammar_pl/matura/migrations/
+
+grammar_pl/uploads/avatars/avatar_Notio\.jpg

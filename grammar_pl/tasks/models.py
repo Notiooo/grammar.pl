@@ -38,7 +38,7 @@ class Anwser(models.Model):
         return self.anwser
 
 class Comment(models.Model):
-    article = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='comments')
+    question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='comments')
     comment = models.CharField(max_length=140)
     date = models.DateTimeField(auto_now_add=True)
     author = models.ForeignKey(

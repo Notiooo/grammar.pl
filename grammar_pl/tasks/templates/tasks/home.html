@@ -99,7 +99,7 @@
 <div id="tryby" class="uk-section uk-section-muted">
     <div class="uk-container uk-container-large">
         <p class="uk-h2 uk-heading-divider uk-margin-medium-bottom">Zadania z trybami warunkowymi</p>
-		<div uk-scrollspy="target: > div; cls: uk-animation-fade; delay: 150" class="uk-grid-small uk-flex-center uk-grid-match" uk-grid>
+		<div uk-scrollspy="target: > a; cls: uk-animation-fade; delay: 150" class="uk-grid-small uk-flex-center uk-grid-match" uk-grid>
 			{% for category in object_list %}
 			{% if 'warunkowy' in category.title %}
 			<a href="{% url 'category' category.slug %}" class="uk-link-reset">
