@@ -1,6 +1,9 @@
 from django.db import models
 from django.urls.base import reverse
 from django.conf import settings
+from .helpers import rename_sound_file
+from .storage import OverwriteStorage
+from datetime import datetime
 
 
 # Create your models here.
@@ -16,7 +19,20 @@ class Matura_Task(models.Model):
         choices=types,
         default='audio',
     )
-    year = models.IntegerField(null=True)
+    layouts = [
+        ('tnf', "Prawda i Fałsz"),
+        ('letter', 'Dopasuj literę do osoby'),
+        ('quiz', 'Quiz ABC'),
+        ('reading-title', 'Dopasuj tytuł do tekstu'),
+        ('image', 'Wybierz odpowiedź do obrazka'),
+        ('fill-gap', 'Dopasuj odpowiedź do luki w tekście')
+    ]
+    layout = models.CharField(
+        max_length=15,
+        choices=layouts,
+        default='tnf',
+    )
+    year = models.IntegerField(default=datetime.now().year)
     MONTHS = [
         ('MAJ', 'Maj'),
         ('CZE', 'Czerwiec'),
@@ -27,9 +43,9 @@ class Matura_Task(models.Model):
         default='MAJ',
     )
     LEVELS = [
-        ('ROZ', 'Rozszerzony'),
-        ('POD', 'Podstawowy'),
-        ('DWU', 'Dwujęzyczny'),
+        ('roz', 'Rozszerzony'),
+        ('pod', 'Podstawowy'),
+        ('dwu', 'Dwujęzyczny'),
     ]
     level = models.CharField(
         max_length=3,
@@ -38,7 +54,7 @@ class Matura_Task(models.Model):
     )
     title = models.CharField(max_length=80)
     text = models.TextField()
-    sound_file = models.FileField(blank=True)
+    sound_file = models.FileField(blank=True, upload_to=rename_sound_file, storage=OverwriteStorage())
     image = models.ImageField(blank=True)
 
     def __str__(self):
@@ -48,7 +64,15 @@ class Matura_Task(models.Model):
         return reverse('matura_detail', args=[str(self.id)])
 
 
+class Matura_Question(models.Model):
+    task = models.ForeignKey(Matura_Task, on_delete=models.CASCADE, related_name='question')
+    text = models.TextField()
+
+    def __str__(self):
+        return "{} - {}".format(self.task.__str__(), self.task.text)
+
+
 class Matura_Anwser(models.Model):
-    task = models.ForeignKey(Matura_Task, on_delete=models.CASCADE, related_name='anwser')
+    question = models.ForeignKey(Matura_Question, on_delete=models.CASCADE, related_name='anwser', null=True)
     text = models.CharField(max_length=150)
     correct_anwser = models.BooleanField(default=False)

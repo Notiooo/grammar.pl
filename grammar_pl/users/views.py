@@ -14,9 +14,8 @@ class SignUpView(generic.CreateView):
 
 
 class ChangeProfileView(LoginRequiredMixin, generic.UpdateView):
-    model = CustomUser
+    form_class = CustomUserChangeForm
     template_name = 'users/changeprofile.html'
-    fields = ('email', 'about', 'birth', 'first_name', 'last_name', 'avatar')
     login_url = 'login'
 
     def get_object(self):

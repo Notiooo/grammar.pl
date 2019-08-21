@@ -22,7 +22,14 @@ class CustomUser(AbstractUser):
         return reverse('profile', kwargs={'pk': self.pk})
 
     def save(self, *args, **kwargs):
+        #if user/superuser is created
+        if self.id is None:
+            #it allows me to avoid situation from below where it tries to get id of not existing user
+            super(CustomUser, self).save()
+
+        # gets the avatar of the userc
         this = CustomUser.objects.get(id=self.id)
+        # checks if there is a change
         if this.avatar != self.avatar:
             # Opening the uploaded image
             im = Image.open(self.avatar).convert('RGB')

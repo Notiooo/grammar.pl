@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+{% load next_field %}
+
+{% block content %}
+
+<div class="uk-section">
+    <div class="uk-container uk-container-small">
+        <div class="uk-text-large">{{ task.title }}</div>
+        <div class="uk-article-meta">{{ task.text }}</div>
+
+        {% if task.sound_file %}
+        <!-- AUDIO -->
+        <p>
+            <audio id="Player" class="uk-width-1-1" controls>
+                 <source src="{{ task.sound_file.url }}"/>
+            </audio>
+        </p>
+        {% endif %}
+        <form method="post">
+        {{ formset.management_form }}
+        {% csrf_token %}
+            {% for question in task.question.all %}
+            <div class="uk-article-meta">{{ question.text }}</div>
+                    <table class="uk-table uk-table-striped">
+                        <thead>
+                            <tr>
+                                <th>Tekst</th>
+                                <th class="uk-table-shrink">Prawda/Fałsz</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for anwser in question.anwser.all %}
+                                {% with correct_anwser=anwsers|next_field:"correct_anwser" %}
+                                    <tr>
+                                        {% if formset.is_valid %}
+                                            {% if anwser.correct_anwser == correct_anwser.value %}
+                                                <td style="background-color: palegreen"><p class="uk-align-right uk-text-success">DOBRZE!</p>
+                                            {% else %}
+                                                <td style="background-color: pink"><p class="uk-align-right uk-text-danger">ŹLE!</p>
+                                            {% endif %}
+                                        {% else %}
+                                            <td>
+                                        {% endif %}
+                                        {{ anwser.text }}
+                                        </td>
+                                        <td>
+                                            <label>
+                                                {% render_field correct_anwser class+="uk-checkbox" %}
+                                            </label>
+                                        </td>
+                                    </tr>
+                                {% endwith %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+            {% endfor %}
+            <button class="uk-button uk-button-primary uk-align-right" type="submit">Zatwierdź odpowiedzi</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

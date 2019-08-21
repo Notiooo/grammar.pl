@@ -13,8 +13,8 @@
             	<h3 class="uk-card-title">Śpieszy ci się?</h3>
             	<p>Skorzystaj z opcji losowania zadań. Daj sie zaskoczyć! Jest to przede wszystkim szybka opcja, ale równie efektywna a do tego zaskakująca!</p>
             	<p class="uk-text-center" uk-margin>
-            		<button class="uk-button uk-button-small uk-border-rounded uk-button-primary">Losuj zadanie</button>
-            		<button class="uk-button uk-button-small uk-border-rounded yellow-button">Losuj zadanie maturalne!</button>
+            		<button class="uk-button uk-button-small uk-border-rounded uk-button-primary" uk-tooltip="Prace wciąż trwają 😅" disabled>Losuj zadanie</button>
+            		<a href="{% url 'matura_random' %}"><button class="uk-button uk-button-small uk-border-rounded yellow-button">Losuj zadanie maturalne!</button></a>
             	</p>
             </div>
         </div>
@@ -43,19 +43,19 @@
 </div>
 
 <div id="czasy" uk-scrollspy="cls: uk-animation-fade" class="uk-section uk-section-small uk-section-muted">
-    <div uk-scrollspy="target: > div; cls: uk-animation-slide-bottom; delay: 200" class="uk-container uk-container-large">
+	<div class="uk-container uk-container-large">
 
-        <p class="uk-h2 uk-heading-divider">Zadania z poszczególnymi czasami</p>
+		<p class="uk-h2 uk-heading-divider">Zadania z poszczególnymi czasami</p>
 
-        <p class="uk-text-large uk-heading-bullet">Teraźniejsze</p>
-		<div class="uk-grid-small uk-flex-center uk-grid-match" uk-grid>
+		<p class="uk-text-large uk-heading-bullet">Teraźniejsze</p>
+		<div uk-scrollspy="target: > a; cls: uk-animation-slide-bottom; delay: 200" class="uk-grid-small uk-flex-center uk-grid-match" uk-grid>
 			{% for category in object_list %}
 			{% if 'Present' in category.title %}
 			<a href="{% url 'category' category.slug %}" class="uk-link-reset">
 			<div>
 				<div class="uk-width-medium uk-card uk-card-hover uk-card-small uk-card-default uk-card-body">
-				    <div class="block-title">{{ category.title }}</div>
-				    <p class="uk-text-meta">{{ category.description }}</p>
+					<div class="block-title">{{ category.title }}</div>
+					<p class="uk-text-meta">{{ category.description }}</p>
 				</div>
 			</div>
 			</a>
@@ -63,15 +63,15 @@
 			{% endfor %}
 		</div>
 
-        <p class="uk-text-large uk-heading-bullet">Przeszłe</p>
-		<div class="uk-grid-small uk-flex-center uk-grid-match" uk-grid>
+		<p class="uk-text-large uk-heading-bullet">Przeszłe</p>
+		<div uk-scrollspy="target: > a; cls: uk-animation-slide-bottom; delay: 200" class="uk-grid-small uk-flex-center uk-grid-match" uk-grid>
 			{% for category in object_list %}
 			{% if 'Past' in category.title %}
 			<a href="{% url 'category' category.slug %}" class="uk-link-reset">
 			<div>
 				<div class="uk-width-medium uk-card uk-card-hover uk-card-small uk-card-default uk-card-body">
-				    <div class="block-title">{{ category.title }}</div>
-				    <p class="uk-text-meta">{{ category.description }}</p>
+					<div class="block-title">{{ category.title }}</div>
+					<p class="uk-text-meta">{{ category.description }}</p>
 				</div>
 			</div>
 			</a>
@@ -79,34 +79,15 @@
 			{% endfor %}
 		</div>
 
-        <p class="uk-text-large uk-heading-bullet">Przyszłe</p>
-		<div class="uk-grid-small uk-flex-center uk-grid-match" uk-grid>
+		<p class="uk-text-large uk-heading-bullet">Przyszłe</p>
+		<div uk-scrollspy="target: > a; cls: uk-animation-slide-bottom; delay: 200" class="uk-grid-small uk-flex-center uk-grid-match" uk-grid>
 			{% for category in object_list %}
 			{% if 'Future' in category.title %}
 			<a href="{% url 'category' category.slug %}" class="uk-link-reset">
 			<div>
 				<div class="uk-width-medium uk-card uk-card-hover uk-card-small uk-card-default uk-card-body">
-				    <div class="block-title">{{ category.title }}</div>
-				    <p class="uk-text-meta">{{ category.description }}</p>
-				</div>
-			</div>
-			</a>
-			{% endif %}
-			{% endfor %}
-		</div>
-    </div>
-</div>
-<div id="tryby" class="uk-section uk-section-muted">
-    <div class="uk-container uk-container-large">
-        <p class="uk-h2 uk-heading-divider uk-margin-medium-bottom">Zadania z trybami warunkowymi</p>
-		<div uk-scrollspy="target: > a; cls: uk-animation-fade; delay: 150" class="uk-grid-small uk-flex-center uk-grid-match" uk-grid>
-			{% for category in object_list %}
-			{% if 'warunkowy' in category.title %}
-			<a href="{% url 'category' category.slug %}" class="uk-link-reset">
-			<div>
-				<div class="uk-width-medium uk-card uk-card-hover uk-card-small uk-card-default uk-card-body">
-				    <div class="block-title">{{ category.title }}</div>
-				    <p class="uk-text-meta">{{ category.description }}</p>
+					<div class="block-title">{{ category.title }}</div>
+					<p class="uk-text-meta">{{ category.description }}</p>
 				</div>
 			</div>
 			</a>
@@ -115,5 +96,23 @@
 		</div>
 	</div>
 </div>
-
+<div id="tryby" class="uk-section uk-section-muted">
+	<div class="uk-container uk-container-large">
+		<p class="uk-h2 uk-heading-divider uk-margin-medium-bottom">Zadania z trybami warunkowymi</p>
+		<div uk-scrollspy="target: > a; cls: uk-animation-fade; delay: 150" class="uk-grid-small uk-flex-center uk-grid-match" uk-grid>
+			{% for category in object_list %}
+			{% if 'warunkowy' in category.title %}
+			<a href="{% url 'category' category.slug %}" class="uk-link-reset">
+			<div>
+				<div class="uk-width-medium uk-card uk-card-hover uk-card-small uk-card-default uk-card-body">
+					<div class="block-title">{{ category.title }}</div>
+					<p class="uk-text-meta">{{ category.description }}</p>
+				</div>
+			</div>
+			</a>
+			{% endif %}
+			{% endfor %}
+		</div>
+	</div>
+</div>
 {% endblock content %}
