@@ -53,7 +53,7 @@ class Matura_Task(models.Model):
         default='POD',
     )
     title = models.CharField(max_length=80)
-    text = models.TextField()
+    text = models.TextField(default="", blank=True)
     sound_file = models.FileField(blank=True, upload_to=rename_sound_file, storage=OverwriteStorage())
     image = models.ImageField(blank=True)
 
@@ -69,10 +69,10 @@ class Matura_Question(models.Model):
     text = models.TextField()
 
     def __str__(self):
-        return "{} - {}".format(self.task.__str__(), self.task.text)
+        return self.task.__str__()
 
 
 class Matura_Anwser(models.Model):
     question = models.ForeignKey(Matura_Question, on_delete=models.CASCADE, related_name='anwser', null=True)
-    text = models.CharField(max_length=150)
+    text = models.CharField(max_length=150, blank=True, default="")
     correct_anwser = models.BooleanField(default=False)

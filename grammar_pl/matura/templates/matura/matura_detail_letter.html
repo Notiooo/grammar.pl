@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+{% load next_field %}
+
+{% block content %}
+
+<div class="uk-section">
+    <div class="uk-container uk-container-small uk-article">
+        <p class="uk-text-lead">{{ task.title }}</p>
+        <p>{{ task.text }}</p>
+        {% if task.sound_file %}
+        <!-- AUDIO -->
+        <p>
+            <audio id="Player" class="uk-width-1-1" controls>
+                 <source src="{{ task.sound_file.url }}"/>
+            </audio>
+        </p>
+        {% endif %}
+        <form method="post">
+            {{ formset.management_form }}
+            {% csrf_token %}
+            {% for question in task.question.all %}
+            <p>{{ question.text | safe | linebreaks }}</p>
+                    <table class="uk-table uk-table-striped uk-text-center">
+                        <thead>
+                            <tr>
+                                {% for anwser in question.anwser.all %}
+                                <th class="uk-text-center">{{ forloop.counter }}</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            {% for anwser in question.anwser.all %}
+                                {% with text_field=anwsers|next_field:"text" %}
+                                    {% if formset.is_valid %}
+                                        {% if anwser.text == text_field.value|upper %}
+                                            <td>{% render_field text_field class+="uk-input uk-form-width-xsmall uk-form-success uk-text-center uk-text-uppercase" maxlength="1" %}</td>
+                                        {% else %}
+                                            <td>{% render_field text_field class+="uk-input uk-form-width-xsmall uk-form-danger uk-text-center uk-text-uppercase" maxlength="1" %}</td>
+                                        {% endif %}
+                                    {% else %}
+                                        <td>{% render_field text_field class+="uk-input uk-form-width-xsmall uk-text-center uk-text-uppercase" maxlength="1" %}</td>
+                                    {% endif %}
+                                {% endwith %}
+                            {% endfor %}
+                        </tr>
+                        </tbody>
+                    </table>
+            {% endfor %}
+            <button class="uk-button uk-button-primary uk-align-right" type="submit">Zatwierdź odpowiedzi</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

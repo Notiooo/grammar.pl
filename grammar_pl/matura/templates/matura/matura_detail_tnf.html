@@ -6,7 +6,7 @@
 
 <div class="uk-section">
     <div class="uk-container uk-container-small">
-        <div class="uk-text-large">{{ task.title }}</div>
+        <p class="uk-text-large">{{ task.title }}</p>
         <div class="uk-article-meta">{{ task.text }}</div>
 
         {% if task.sound_file %}
@@ -21,7 +21,7 @@
         {{ formset.management_form }}
         {% csrf_token %}
             {% for question in task.question.all %}
-            <div class="uk-article-meta">{{ question.text }}</div>
+            <p>{{ question.text | safe | linebreaks }}</p>
                     <table class="uk-table uk-table-striped">
                         <thead>
                             <tr>

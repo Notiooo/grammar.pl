@@ -71,10 +71,9 @@ def MaturaDetail(request, year, pk):
         number_of_anwsers += question.anwser.all().count()
 
     # creates a formset with as many fields as the anwsers is
-    anwsers_field = modelformset_factory(models.Matura_Anwser, fields=('correct_anwser',), extra=number_of_anwsers)
+    anwsers_field = modelformset_factory(models.Matura_Anwser, fields=('correct_anwser', 'text',), extra=number_of_anwsers)
 
     if request.method == "POST":
-        print("POST!!!!")
         # gets user anwsers by POST method
         # queryset_anwsers = [question.anwser.all() for question in task.question.all()]
         # queryset = queryset_anwsers[0].union(*queryset_anwsers[1:])
