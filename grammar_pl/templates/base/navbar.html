@@ -12,7 +12,7 @@
             <li><a href="{% url 'home' %}#czasy" {% if request.path == home_url %}uk-scroll{% endif %}>Czasy</a></li>
             <li><a href="{% url 'home' %}#tryby" {% if request.path == home_url %}uk-scroll{% endif %}>Tryby warunkowe</a></li>
             <li><a href="{% url 'matura_home' %}">Zadania maturalne</a></li>
-            <li><a href="#">Kontakt</a></li>
+            <li><a href="{% url 'contact' %}">Kontakt</a></li>
             <li><a class="uk-navbar-toggle" uk-search-icon uk-toggle="target: .nav-overlay; animation: uk-animation-fade" href="#"></a></li>
 
             <li>
@@ -69,7 +69,7 @@
             <li><a href="{% url 'home' %}#czasy" {% if request.path == home_url %}uk-scroll{% endif %}>Czasy</a></li>
             <li><a href="{% url 'home' %}#tryby" {% if request.path == home_url %}uk-scroll{% endif %}>Tryby warunkowe</a></li>
             <li><a href="{% url 'matura_home' %}">Zadania maturalne</a></li>
-            <li><a href="#">Kontakt</a></li>
+            <li><a href="{% url 'contact' %}">Kontakt</a></li>
         </ul>
     </div>
 </div>

@@ -20,3 +20,7 @@ grammar_pl/tasks/migrations/
 grammar_pl/matura/migrations/
 
 grammar_pl/uploads/avatars/avatar_Notio\.jpg
+
+grammar_pl/uploads/sound_files/
+
+grammar_pl/uploads/
