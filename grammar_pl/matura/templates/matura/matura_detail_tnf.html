@@ -55,7 +55,10 @@
                         </tbody>
                     </table>
             {% endfor %}
-            <button class="uk-button uk-button-primary uk-align-right" type="submit">Zatwierdź odpowiedzi</button>
+            <div class="uk-float-center">
+                <button class="uk-button uk-button-primary uk-float-right" type="submit">Zatwierdź odpowiedzi</button>
+                {% include 'matura/go_back_button.html' %}
+            </div>
         </form>
     </div>
 </div>

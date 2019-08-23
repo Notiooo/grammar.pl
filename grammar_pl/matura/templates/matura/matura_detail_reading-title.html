@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+{% load next_field %}
+
+{% block content %}
+{% include 'matura/matura_help_menu.html' %}
+<style>
+table, th, td {
+  border: 1px solid grey;
+  border-collapse: collapse;
+}
+th, td {
+  padding: 5px;
+  text-align: left;
+}
+</style>
+
+<div class="uk-section">
+    <div class="uk-container uk-container-small uk-article">
+        <p class="uk-text-lead">{{ task.title }}</p>
+        <p>{{ task.text }}</p>
+        {% if task.sound_file %}
+        <!-- AUDIO -->
+        <p>
+            <audio id="Player" class="uk-width-1-1" controls>
+                 <source src="{{ task.sound_file.url }}"/>
+            </audio>
+        </p>
+        {% endif %}
+
+        {% if task.image %}
+        <!-- Image -->
+        <p class="uk-text-center">
+            <img src="{{ task.image.url }}"/>
+        </p>
+        {% endif %}
+        <form method="post">
+            {{ formset.management_form }}
+            {% csrf_token %}
+            {% for question in task.question.all %}
+                {% for anwser in question.anwser.all %}
+                    {% with text_field=anwsers|next_field:"text" %}
+                <table>
+                    <tr>
+                        <td class="uk-padding-small">{{ forloop.parentloop.counter }}</td>
+                        {% if formset.is_valid %}
+                            {% if anwser.text == text_field.value|upper %}
+                                <td style="background-color: palegreen" class="uk-form-success">{% render_field text_field class+="uk-input uk-form-width-xsmall uk-form-blank uk-text-center uk-text-uppercase" maxlength="1" %}</td>
+                            {% else %}
+                                <td style="background-color: pink" class="uk-form-danger">{% render_field text_field class+="uk-input uk-form-width-xsmall uk-form-blank uk-text-center uk-text-uppercase" maxlength="1" %}</td>
+                            {% endif %}
+                        {% else %}
+                            <td>{% render_field text_field class+="uk-input uk-form-width-xsmall uk-form-blank uk-text-center uk-text-uppercase" maxlength="1" %}</td>
+                        {% endif %}
+                    </tr>
+                </table>
+                <p>{{ question.text | safe | linebreaks }}</p>
+                    {% endwith %}
+                {% endfor %}
+            {% endfor %}
+            <div>
+                <button class="uk-button uk-button-primary uk-float-right" type="submit">Zatwierdź odpowiedzi</button>
+                {% include 'matura/go_back_button.html' %}
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,7 +1,30 @@
 {% load static %}
 
 html{
+    height: 100%;
+    box-sizing: border-box;
 	background-color: #F6F8F9;
+}
+
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+}
+
+body {
+  position: relative;
+  margin: 0;
+  padding-bottom: 300px;
+  min-height: 100%;
+}
+
+
+/* #Fixes the navbar padding on mobile */
+@media screen and (max-width: 640px) {
+  body {
+    padding-bottom: 500px;
+  }
 }
 
 .profile-img{

@@ -7,9 +7,10 @@
     <div class="uk-navbar-right nav-overlay">
 
         <ul class="uk-navbar-nav uk-visible@s">
+            {% url 'home' as home_url %}
             <li><a href="{% url 'home' %}">Strona Główna</a></li>
-            <li><a href="#czasy" uk-scroll>Czasy</a></li>
-            <li><a href="#tryby" uk-scroll>Tryby warunkowe</a></li>
+            <li><a href="{% url 'home' %}#czasy" {% if request.path == home_url %}uk-scroll{% endif %}>Czasy</a></li>
+            <li><a href="{% url 'home' %}#tryby" {% if request.path == home_url %}uk-scroll{% endif %}>Tryby warunkowe</a></li>
             <li><a href="{% url 'matura_home' %}">Zadania maturalne</a></li>
             <li><a href="#">Kontakt</a></li>
             <li><a class="uk-navbar-toggle" uk-search-icon uk-toggle="target: .nav-overlay; animation: uk-animation-fade" href="#"></a></li>
@@ -20,9 +21,9 @@
                     <ul class="uk-nav uk-navbar-dropdown-nav uk-list-divider">
                         {% if user.is_authenticated %}
                         <p>Hej, {{ user.username }}</p>
-                        <li><a href="#">Dodaj zadanie</a></li>
+                        <li><a uk-tooltip="title: Prace wciąż trwają 😥; pos: left">Dodaj zadanie</a></li>
                         <li><a href="{% url 'profile' user.pk %}">Twój profil</a></li>
-                        <li><a href="#">Ulubione</a></li>
+                        <li><a uk-tooltip="title: Prace wciąż trwają 😥; pos: left">Ulubione</a></li>
                         <li><a href="{% url 'logout' %}">Wyloguj się</a></li>
                         {% else %}
                         <li><a href="{% url 'login' %}">Zaloguj się</a></li>
@@ -56,8 +57,8 @@
             <li class="uk-padding"><img src="{% if user.is_authenticated %} {{ user.avatar.url }} {% else %} {% static 'img/avatar.png' %} {% endif %}" class="uk-border-circle" alt="avatar"></li>
             {% if user.is_authenticated %}
             <li><a href="{% url 'profile' user.pk %}">Twój profil</li></li>
-            <li><a href="#">Dodaj zadanie</a></li>
-            <li><a href="#">Ulubione</a></li>
+            <li><a uk-tooltip="Prace wciąż trwają 😥">Dodaj zadanie</a></li>
+            <li><a uk-tooltip="Prace wciąż trwają 😥">Ulubione</a></li>
             <li><a href="{% url 'logout' %}">Wyloguj się</a></li>
             {% else %}
             <li><a href="{% url 'login' %}">Zaloguj się</a></li>
@@ -65,8 +66,8 @@
             {% endif %}
             <li class="uk-padding"></li>
             <li><a href="{% url 'home' %}">Strona Główna</a></li>
-            <li><a href="#czasy" uk-scroll>Czasy</a></li>
-            <li><a href="#tryby" uk-scroll>Tryby warunkowe</a></li>
+            <li><a href="{% url 'home' %}#czasy" {% if request.path == home_url %}uk-scroll{% endif %}>Czasy</a></li>
+            <li><a href="{% url 'home' %}#tryby" {% if request.path == home_url %}uk-scroll{% endif %}>Tryby warunkowe</a></li>
             <li><a href="{% url 'matura_home' %}">Zadania maturalne</a></li>
             <li><a href="#">Kontakt</a></li>
         </ul>

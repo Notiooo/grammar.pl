@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.views import generic
-from django.views.generic import ListView
+from django.views.generic import ListView, TemplateView
 
 from .models import Category, Question
 
@@ -9,6 +9,9 @@ from .models import Category, Question
 class HomePageView(ListView):
     model = Category
     template_name = 'tasks/home.html'
+
+class ContactView(TemplateView):
+    template_name = 'tasks/contact.html'
 
 class CategoryDetailView(generic.DetailView):
     model = Category

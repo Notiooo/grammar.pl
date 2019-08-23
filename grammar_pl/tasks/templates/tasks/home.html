@@ -17,6 +17,7 @@
             		<a href="{% url 'matura_random' %}"><button class="uk-button uk-button-small uk-border-rounded yellow-button">Losuj zadanie maturalne!</button></a>
             	</p>
             </div>
+			<a href="{% url 'matura_home' %}"><button class="uk-button uk-box-shadow-xlarge yellow-button" style="border-radius: 0 0 15px 15px">Wszystkie zadania maturalne</button></a>
         </div>
     </div>
 	{% if not user.is_authenticated %}

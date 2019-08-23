@@ -1,6 +1,7 @@
+<!DOCTYPE html>
 {% load static %}
 
-<!DOCTYPE html>
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -17,12 +18,12 @@
     {% include 'base/navbar.html' %}
 </header>
 
-<body>
+<body class="uk-position-relative">
     {% block content %}
     {% endblock content %}
 </body>
 
-<footer class="uk-section-secondary">
+<footer class="uk-section-secondary uk-position-bottom">
     {% include 'base/footer.html' %}
 </footer>
 </html>
