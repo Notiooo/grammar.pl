@@ -24,7 +24,6 @@ class Matura_Task(models.Model):
         ('letter', 'Dopasuj literę do osoby'),
         ('quiz', 'Quiz ABC'),
         ('reading-title', 'Dopasuj tytuł do tekstu'),
-        ('image', 'Wybierz odpowiedź do obrazka'),
         ('fill-gap', 'Dopasuj odpowiedź do luki w tekście')
     ]
     layout = models.CharField(
@@ -43,8 +42,8 @@ class Matura_Task(models.Model):
         default='MAJ',
     )
     LEVELS = [
-        ('roz', 'Rozszerzony'),
         ('pod', 'Podstawowy'),
+        ('roz', 'Rozszerzony'),
         ('dwu', 'Dwujęzyczny'),
     ]
     level = models.CharField(
@@ -62,6 +61,17 @@ class Matura_Task(models.Model):
 
     def get_absolute_url(self):
         return reverse('matura_detail', kwargs={'pk': self.pk, 'year': self.year})
+
+    def text_fill_blank_list(self):
+        return self.text.split('_')
+
+    def list_of_anwsers(self):
+        "Gets all anwsers from queryset of questions"
+        anwsers = []
+        for question in self.question.all():
+            for anwser in question.anwser.all():
+                anwsers.append(anwser)
+        return anwsers
 
 
 class Matura_Question(models.Model):

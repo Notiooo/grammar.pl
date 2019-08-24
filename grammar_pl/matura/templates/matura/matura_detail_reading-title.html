@@ -39,21 +39,21 @@ th, td {
             {% for question in task.question.all %}
                 {% for anwser in question.anwser.all %}
                     {% with text_field=anwsers|next_field:"text" %}
-                <table>
-                    <tr>
-                        <td class="uk-padding-small">{{ forloop.parentloop.counter }}</td>
-                        {% if formset.is_valid %}
-                            {% if anwser.text == text_field.value|upper %}
-                                <td style="background-color: palegreen" class="uk-form-success">{% render_field text_field class+="uk-input uk-form-width-xsmall uk-form-blank uk-text-center uk-text-uppercase" maxlength="1" %}</td>
-                            {% else %}
-                                <td style="background-color: pink" class="uk-form-danger">{% render_field text_field class+="uk-input uk-form-width-xsmall uk-form-blank uk-text-center uk-text-uppercase" maxlength="1" %}</td>
-                            {% endif %}
-                        {% else %}
-                            <td>{% render_field text_field class+="uk-input uk-form-width-xsmall uk-form-blank uk-text-center uk-text-uppercase" maxlength="1" %}</td>
-                        {% endif %}
-                    </tr>
-                </table>
-                <p>{{ question.text | safe | linebreaks }}</p>
+                        <table>
+                            <tr>
+                                <td class="uk-padding-small">{{ forloop.parentloop.counter }}</td>
+                                {% if formset.is_valid %}
+                                    {% if anwser.text == text_field.value|upper %}
+                                        <td style="background-color: palegreen" class="uk-form-success">{% render_field text_field class+="uk-input uk-form-width-xsmall uk-form-blank uk-text-center uk-text-uppercase" maxlength="1" %}</td>
+                                    {% else %}
+                                        <td style="background-color: pink" class="uk-form-danger">{% render_field text_field class+="uk-input uk-form-width-xsmall uk-form-blank uk-text-center uk-text-uppercase" maxlength="1" %}</td>
+                                    {% endif %}
+                                {% else %}
+                                    <td>{% render_field text_field class+="uk-input uk-form-width-xsmall uk-form-blank uk-text-center uk-text-uppercase" maxlength="1" %}</td>
+                                {% endif %}
+                            </tr>
+                        </table>
+                        <p>{{ question.text | safe | linebreaks }}</p>
                     {% endwith %}
                 {% endfor %}
             {% endfor %}
@@ -61,8 +61,8 @@ th, td {
                 <button class="uk-button uk-button-primary uk-float-right uk-width-medium@s" type="submit">Zatwierdź odpowiedzi</button>
                 {% include 'matura/go_back_button.html' %}
             </div>
-            {% include 'matura/matura_help_menu.html' %}
         </form>
+        {% include 'matura/matura_help_menu.html' %}
     </div>
 </div>
 {% endblock %}

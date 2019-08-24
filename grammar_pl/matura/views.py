@@ -33,6 +33,7 @@ class MaturaHomepage(ListView):
 class MaturaCategory(ListView):
     model = models.Matura_Task
     template_name = 'matura/matura_list.html'
+    paginate_by = 10
 
     def get_queryset(self):
         return models.Matura_Task.objects.filter(type=self.kwargs['type'])
@@ -41,6 +42,7 @@ class MaturaCategory(ListView):
 class MaturaLevel(ListView):
     model = models.Matura_Task
     template_name = 'matura/matura_list.html'
+    paginate_by = 10
 
     def get_queryset(self):
         return models.Matura_Task.objects.filter(year=self.kwargs['year'], level=self.kwargs['level'])

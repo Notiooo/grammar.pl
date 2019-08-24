@@ -34,7 +34,7 @@
                             {% for anwser in question.anwser.all %}
                                 {% with text_field=anwsers|next_field:"text" %}
                                     {% if formset.is_valid %}
-                                        {% if anwser.text == text_field.value|upper %}
+                                        {% if anwser.text|upper == text_field.value|upper %}
                                             <td>{% render_field text_field class+="uk-input uk-form-width-xsmall uk-form-success uk-text-center uk-text-uppercase" maxlength="1" %}</td>
                                         {% else %}
                                             <td>{% render_field text_field class+="uk-input uk-form-width-xsmall uk-form-danger uk-text-center uk-text-uppercase" maxlength="1" %}</td>
@@ -52,8 +52,8 @@
                 <button class="uk-button uk-button-primary uk-float-right uk-width-medium@s" type="submit">Zatwierdź odpowiedzi</button>
                 {% include 'matura/go_back_button.html' %}
             </div>
-            {% include 'matura/matura_help_menu.html' %}
         </form>
+        {% include 'matura/matura_help_menu.html' %}
     </div>
 </div>
 {% endblock %}

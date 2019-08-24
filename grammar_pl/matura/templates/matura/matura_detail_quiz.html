@@ -4,10 +4,20 @@
 
 {% block content %}
 
+<style>
+p > span {
+    display: inline-block;
+}
+
+p > span:first-letter {
+    font-weight: bolder;
+}
+</style>
+
 <div class="uk-section">
     <div class="uk-container uk-container-small">
-        <p class="uk-text-large">{{ task.title }}</p>
-        <div class="uk-article-meta">{{ task.text }}</div>
+        <p class="uk-text-lead">{{ task.title }}</p>
+        <p>{{ task.text | safe | linebreaks }}</p>
 
         {% if task.sound_file %}
         <!-- AUDIO -->
@@ -17,11 +27,17 @@
             </audio>
         </p>
         {% endif %}
+        {% if task.image %}
+        <!-- Image -->
+        <p class="uk-text-center">
+            <img src="{{ task.image.url }}"/>
+        </p>
+        {% endif %}
         <form method="post">
         {{ formset.management_form }}
         {% csrf_token %}
             {% for question in task.question.all %}
-            <p>{{ question.text | safe | linebreaks }}</p>
+            <span class="uk-text-bold"><p>{{ question.text | safe | linebreaks }}</p></span>
                 <div class="uk-margin-left">
                     {% for anwser in question.anwser.all %}
                         {% with correct_anwser=anwsers|next_field:"correct_anwser" %}
@@ -29,23 +45,23 @@
                                 {% if anwser.correct_anwser %}
                                     <p style="background-color: palegreen">
                                         {% render_field correct_anwser class+="uk-checkbox" type="checkbox" %}
-                                        {{ anwser.text }}
+                                        <span>{{ anwser.text }}</span>
                                     </p>
                                 {% elif anwser.correct_anwser != correct_anwser.value %}
                                     <p style="background-color: pink">
                                         {% render_field correct_anwser class+="uk-checkbox" type="checkbox" %}
-                                        {{ anwser.text }}
+                                        <span>{{ anwser.text }}</span>
                                     </p>
                                 {% else %}
                                     <p>
                                         {% render_field correct_anwser class+="uk-checkbox" type="checkbox" %}
-                                        {{ anwser.text }}
+                                        <span>{{ anwser.text }}</span>
                                     </p>
                                 {% endif %}
                             {% else %}
                                 <p>
                                     {% render_field correct_anwser class+="uk-checkbox" type="checkbox" %}
-                                    {{ anwser.text }}
+                                    <span>{{ anwser.text }}</span>
                                 </p>
                             {% endif %}
                         {% endwith %}
@@ -56,8 +72,8 @@
                 <button class="uk-button uk-button-primary uk-float-right uk-width-medium@s" type="submit">Zatwierdź odpowiedzi</button>
                 {% include 'matura/go_back_button.html' %}
             </div>
-            {% include 'matura/matura_help_menu.html' %}
         </form>
+        {% include 'matura/matura_help_menu.html' %}
     </div>
 </div>
 {% endblock %}
