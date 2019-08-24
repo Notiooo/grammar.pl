@@ -1,6 +1,5 @@
 from django.shortcuts import render
-from django.views.generic import ListView, DetailView
-from django.views.generic.edit import FormMixin
+from django.views.generic import ListView
 from django.urls.base import reverse
 from django.http import HttpResponseRedirect
 
@@ -8,8 +7,6 @@ from django.forms import modelformset_factory
 
 from . import models, forms
 
-
-# Create your views here.
 
 class MaturaHomepage(ListView):
     model = models.Matura_Task
@@ -49,18 +46,6 @@ class MaturaLevel(ListView):
         return models.Matura_Task.objects.filter(year=self.kwargs['year'], level=self.kwargs['level'])
 
 
-class MaturaTemplate():
-    "It decides what template should have been used in this task"
-
-
-# class MaturaDetail(FormMixin, DetailView):
-#     form_class = forms.Matura_Task_Anwser_Form
-#     model = models.Matura_Task
-#     template_name = 'matura/matura_detail.html'
-#
-#     def post(self, request, *args, **kwargs):
-#         print(*args, **kwargs)
-
 def MaturaDetail(request, year, pk):
     # gets the question
     task = models.Matura_Task.objects.get(pk=pk)
@@ -71,17 +56,17 @@ def MaturaDetail(request, year, pk):
         number_of_anwsers += question.anwser.all().count()
 
     # creates a formset with as many fields as the anwsers is
-    anwsers_field = modelformset_factory(models.Matura_Anwser, fields=('correct_anwser', 'text',), extra=number_of_anwsers)
+    anwsers_field = modelformset_factory(models.Matura_Anwser, fields=('correct_anwser', 'text',),
+                                         extra=number_of_anwsers)
 
     if request.method == "POST":
         # gets user anwsers by POST method
-        # queryset_anwsers = [question.anwser.all() for question in task.question.all()]
-        # queryset = queryset_anwsers[0].union(*queryset_anwsers[1:])
         formset = anwsers_field(request.POST)
     else:
         # empty anwsers fields for user
         formset = anwsers_field(queryset=models.Matura_Anwser.objects.none())
-    return render(request, 'matura/matura_detail_{0}.html'.format(task.layout), {'formset': formset, 'anwsers': iter(formset), 'task': task, })
+    return render(request, 'matura/matura_detail_{0}.html'.format(task.layout),
+                  {'formset': formset, 'anwsers': iter(formset), 'task': task, 'opts': models.Matura_Task._meta, })
 
 
 def matura_random(request):

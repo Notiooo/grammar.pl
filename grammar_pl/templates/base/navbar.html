@@ -24,9 +24,9 @@
                         <li><a uk-tooltip="title: Prace wciąż trwają 😥; pos: left">Dodaj zadanie</a></li>
                         <li><a href="{% url 'profile' user.pk %}">Twój profil</a></li>
                         <li><a uk-tooltip="title: Prace wciąż trwają 😥; pos: left">Ulubione</a></li>
-                        <li><a href="{% url 'logout' %}">Wyloguj się</a></li>
+                        <li><a href="{% url 'logout' %}?next={% firstof request.path '/' %}">Wyloguj się</a></li>
                         {% else %}
-                        <li><a href="{% url 'login' %}">Zaloguj się</a></li>
+                        <li><a href="{% url 'login' %}?next={% firstof request.path '/' %}">Zaloguj się</a></li>
                         <li><a href="{% url 'signup' %}">Zarejestruj sie</a></li>
                         {% endif %}
                     </ul>
@@ -59,9 +59,9 @@
             <li><a href="{% url 'profile' user.pk %}">Twój profil</li></li>
             <li><a uk-tooltip="Prace wciąż trwają 😥">Dodaj zadanie</a></li>
             <li><a uk-tooltip="Prace wciąż trwają 😥">Ulubione</a></li>
-            <li><a href="{% url 'logout' %}">Wyloguj się</a></li>
+            <li><a href="{% url 'logout' %}?next={% firstof request.path '/' %}">Wyloguj się</a></li>
             {% else %}
-            <li><a href="{% url 'login' %}">Zaloguj się</a></li>
+            <li><a href="{% url 'login' %}?next={% firstof request.path '/' %}">Zaloguj się</a></li>
             <li><a href="{% url 'signup' %}">Zarejestruj sie</a></li>
             {% endif %}
             <li class="uk-padding"></li>

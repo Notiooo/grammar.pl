@@ -1,17 +1,18 @@
 <div class="uk-section uk-section-muted">
-    <div class="uk-container uk-container-small">
-        <h3>Pomocnicze Menu!</h3>
-
+    {% if user.is_staff %}
+        {% load admin_urls %}
+        <h3>Panel admina</h3>
         <div class="uk-grid-match uk-child-width-1-3@m" uk-grid>
             <div>
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.</p>
+                <a href="{% url opts|admin_urlname:'change' task.id %}?next={% firstof request.path '/' %}"><button class="uk-button uk-button-secondary">Edytuj obiekt</button></a>
             </div>
-            <div>
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.</p>
-            </div>
-            <div>
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.</p>
-            </div>
+        </div>
+    {% endif %}
+
+    <h3 class="uk-heading-divider">Pomocnicze Menu!</h3>
+    <div class="uk-text-center" uk-grid>
+        <div class="uk-width-medium">
+            <a href="{% url 'matura_random' %}"><button class="uk-button uk-border-rounded yellow-button">Losuj zadanie maturalne</button></a>
         </div>
     </div>
 </div>

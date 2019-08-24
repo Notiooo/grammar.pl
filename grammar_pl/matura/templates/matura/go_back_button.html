@@ -7,5 +7,5 @@
 {% if request.POST.next %}
     <a href="{{ request.POST.next }}" class="uk-button uk-button-secondary uk-float-left">Wróć</a>
 {% elif request.META.HTTP_REFERER %}
-    <a href="{{ request.META.HTTP_REFERER }}" class="uk-button uk-float-left"><span uk-icon="icon: arrow-left; ratio: 2"></span>Wróć</a>
+    <a href="{{ request.META.HTTP_REFERER }}" class="uk-button uk-float-left uk-width-small@s"><span uk-icon="icon: arrow-left; ratio: 2"></span>Wróć</a>
 {% endif %}

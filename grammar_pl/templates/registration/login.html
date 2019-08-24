@@ -5,40 +5,43 @@
 
 <div class="uk-flex uk-flex-center uk-flex-middle uk-flex-column uk-height-expand uk-padding-large uk-text-center">
 
-<div class="uk-h1">Zaloguj sie aby dodawać zadania</div>
-<div class="uk-heading-primary uk-text-center">
-    <p>Konto daje możliwość dodawania własnych zadań.<br>
-    Pozwala zapisywać ulubione zadania i oceniać prace innych<br>
-    Dołącz do społeczności, rozwijaj umiejętności swoje i innych!</p>
-</div>
-<!-- Login form -->
-<form class="" method="post">
-    {% csrf_token %}
-    <div class="uk-fieldset uk-width-medium@s">
-        <div class="uk-margin">
-            <div class="uk-inline uk-width-1-1">
-                <span class="uk-form-icon uk-form-icon-flip uk-icon" data-uk-icon="icon: user"></span>
-                {% render_field form.username|attr:"autofocus" class+="uk-input uk-border-rounded" placeholder="Nazwa użytkownika" %}
+    <div class="uk-h1">Zaloguj sie aby dodawać zadania</div>
+    <div class="uk-heading-primary uk-text-center">
+        <p>Konto daje możliwość dodawania własnych zadań.<br>
+        Pozwala zapisywać ulubione zadania i oceniać prace innych<br>
+        Dołącz do społeczności, rozwijaj umiejętności swoje i innych!</p>
+    </div>
+    <!-- Login form -->
+    <form class="" method="post">
+        {% csrf_token %}
+        <div class="uk-fieldset uk-width-medium@s">
+            <div class="uk-margin">
+                <div class="uk-inline uk-width-1-1">
+                    <span class="uk-form-icon uk-form-icon-flip uk-icon" data-uk-icon="icon: user"></span>
+                    {% render_field form.username|attr:"autofocus" class+="uk-input uk-border-rounded" placeholder="Nazwa użytkownika" %}
+                </div>
+            </div>
+            <div class="uk-margin">
+                <div class="uk-inline uk-width-1-1">
+                    <span class="uk-form-icon uk-form-icon-flip uk-icon" data-uk-icon="icon: lock"></span>
+                    {% render_field form.password class+="uk-input uk-boder-rounded" placeholder="Hasło" %}
+                </div>
+            </div>
+            <button type="submit" class="uk-button uk-button-primary uk-border-rounded" value="login">Zaloguj sie</button>
+            <div class="uk-margin">
+                <a class="uk-link-reset uk-text-small" href="{% url 'password_reset' %}">Zapomniałeś swojego hasła?</a>
             </div>
         </div>
-        <div class="uk-margin">
-            <div class="uk-inline uk-width-1-1">
-                <span class="uk-form-icon uk-form-icon-flip uk-icon" data-uk-icon="icon: lock"></span>
-                {% render_field form.password class+="uk-input uk-boder-rounded" placeholder="Hasło" %}
-            </div>
+    </form>
+
+
+    {% if form.non_field_errors %}
+        <div class="uk-alert-danger" uk-alert>
+            {% for error in form.non_field_errors %}
+                {{ error }}
+            {% endfor %}
         </div>
-        <button type="submit" class="uk-button uk-button-primary uk-border-rounded" value="login">Zaloguj sie</button>
-    </div>
-</form>
-
-
-{% if form.non_field_errors %}
-    <div class="uk-alert-danger" uk-alert>
-        {% for error in form.non_field_errors %}
-            {{ error }}
-        {% endfor %}
-    </div>
-{% endif %}
+    {% endif %}
 
 </div>
 {% endblock content %}

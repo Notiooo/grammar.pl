@@ -61,7 +61,7 @@ class Matura_Task(models.Model):
         return self.title + ' - ' + str(self.year) + ' ' + self.level
 
     def get_absolute_url(self):
-        return reverse('matura_detail', args=[str(self.id)])
+        return reverse('matura_detail', kwargs={'pk': self.pk, 'year': self.year})
 
 
 class Matura_Question(models.Model):

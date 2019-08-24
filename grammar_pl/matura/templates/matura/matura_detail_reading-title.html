@@ -3,7 +3,6 @@
 {% load next_field %}
 
 {% block content %}
-{% include 'matura/matura_help_menu.html' %}
 <style>
 table, th, td {
   border: 1px solid grey;
@@ -59,9 +58,10 @@ th, td {
                 {% endfor %}
             {% endfor %}
             <div>
-                <button class="uk-button uk-button-primary uk-float-right" type="submit">Zatwierdź odpowiedzi</button>
+                <button class="uk-button uk-button-primary uk-float-right uk-width-medium@s" type="submit">Zatwierdź odpowiedzi</button>
                 {% include 'matura/go_back_button.html' %}
             </div>
+            {% include 'matura/matura_help_menu.html' %}
         </form>
     </div>
 </div>
