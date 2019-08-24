@@ -1,9 +1,10 @@
 from django.shortcuts import render
 from django.views import generic
-from django.views.generic import ListView, TemplateView
+from django.views.generic import ListView, TemplateView, FormView
 from datetime import date
 
 from .models import Category, Question
+from .forms import ContactForm
 
 
 # Create your views here.
@@ -13,8 +14,14 @@ class HomePageView(ListView):
     template_name = 'tasks/home.html'
 
 
-class ContactView(TemplateView):
+class ContactView(FormView):
+    form_class = ContactForm
     template_name = 'tasks/contact.html'
+    success_url = 'success'
+
+    def form_valid(self, form):
+        form.send_email()
+        return super().form_valid(form)
 
     def get_context_data(self, *args, **kwargs):
         context = super(ContactView, self).get_context_data(*args, **kwargs)
@@ -29,6 +36,8 @@ class ContactView(TemplateView):
         else:
             return str(age) + " lat"
 
+class ContactSuccessView(TemplateView):
+    template_name = 'tasks/contact_success.html'
 
 class CategoryDetailView(generic.DetailView):
     model = Category
