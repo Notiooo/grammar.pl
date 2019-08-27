@@ -24,7 +24,9 @@ class Matura_Task(models.Model):
         ('letter', 'Dopasuj literę do osoby'),
         ('quiz', 'Quiz ABC'),
         ('reading-title', 'Dopasuj tytuł do tekstu'),
-        ('fill-gap', 'Dopasuj odpowiedź do luki w tekście')
+        ('reading-table', 'Dopasuj zdanie do tekstu/litery (tabela)'),
+        ('fill-gap-letter', 'Dopasuj literę do luki w tekście'),
+        ('fill-gap', 'Dopasuj słowo/zdanie do luki w tekście')
     ]
     layout = models.CharField(
         max_length=15,
@@ -51,7 +53,7 @@ class Matura_Task(models.Model):
         choices=LEVELS,
         default='POD',
     )
-    title = models.CharField(max_length=80)
+    title = models.CharField(max_length=100)
     text = models.TextField(default="", blank=True)
     sound_file = models.FileField(blank=True, upload_to=rename_sound_file, storage=OverwriteStorage())
     image = models.ImageField(blank=True)
@@ -62,7 +64,7 @@ class Matura_Task(models.Model):
     def get_absolute_url(self):
         return reverse('matura_detail', kwargs={'pk': self.pk, 'year': self.year})
 
-    def text_fill_blank_list(self):
+    def text_fill_blank_list_split(self):
         return self.text.split('_')
 
     def list_of_anwsers(self):
@@ -81,8 +83,19 @@ class Matura_Question(models.Model):
     def __str__(self):
         return self.task.__str__()
 
+    def get_anwsers_text_list(self):
+        anwsers = [question.text for question in self.anwser.all()]
+        return anwsers
+
+    def get_anwsers_boolean_list(self):
+        anwsers = [question.correct_anwser for question in self.anwser.all()]
+        return anwsers
+
 
 class Matura_Anwser(models.Model):
     question = models.ForeignKey(Matura_Question, on_delete=models.CASCADE, related_name='anwser', null=True)
     text = models.CharField(max_length=150, blank=True, default="")
     correct_anwser = models.BooleanField(default=False)
+
+    def slice_anwsers(self):
+        return self.text.split('/')

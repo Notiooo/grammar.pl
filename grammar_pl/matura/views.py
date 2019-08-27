@@ -1,5 +1,5 @@
-from django.shortcuts import render
-from django.views.generic import ListView
+from django.shortcuts import render, get_object_or_404
+from django.views.generic import ListView, FormView, TemplateView
 from django.urls.base import reverse
 from django.http import HttpResponseRedirect
 
@@ -53,9 +53,7 @@ def MaturaDetail(request, year, pk):
     task = models.Matura_Task.objects.get(pk=pk)
 
     # gets how many anwsers every question has
-    number_of_anwsers = 0
-    for question in task.question.all():
-        number_of_anwsers += question.anwser.all().count()
+    number_of_anwsers = len(task.list_of_anwsers())
 
     # creates a formset with as many fields as the anwsers is
     anwsers_field = modelformset_factory(models.Matura_Anwser, fields=('correct_anwser', 'text',),
@@ -69,6 +67,31 @@ def MaturaDetail(request, year, pk):
         formset = anwsers_field(queryset=models.Matura_Anwser.objects.none())
     return render(request, 'matura/matura_detail_{0}.html'.format(task.layout),
                   {'formset': formset, 'anwsers': iter(formset), 'task': task, 'opts': models.Matura_Task._meta, })
+
+
+class MaturaReport(FormView):
+    form_class = forms.MaturaReport_Form
+    template_name = 'matura/matura_report.html'
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(MaturaReport, self).get_context_data(*args, **kwargs)
+        context['obj'] = get_object_or_404(models.Matura_Task, pk=self.kwargs['task_id'])
+        return context
+
+    # def get_context_data(self, *args, **kwargs):
+    #     get_object_or_404(models.Matura_Task, pk=self.kwargs['task_id'])
+    #     return super(MaturaReport, self).get_context_data(*args, **kwargs)
+
+    def form_valid(self, form):
+        form.send_email(self.kwargs['task_id'])
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return 'success' + "?next={}".format(self.request.GET['next'])
+
+
+class MaturaReportSuccess(TemplateView):
+    template_name = 'matura/matura_report_success.html'
 
 
 def matura_random(request):

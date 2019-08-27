@@ -14,5 +14,8 @@
         <div class="uk-width-medium">
             <a href="{% url 'matura_random' %}"><button class="uk-button uk-border-rounded yellow-button">Losuj zadanie maturalne</button></a>
         </div>
+        <div class="uk-width-medium">
+            <a href="{% url 'matura_report' task.id %}?next={% firstof request.path '/' %}"><button class="uk-button uk-border-rounded uk-button-danger">Zgłoś błąd z zadaniem</button></a>
+        </div>
     </div>
 </div>

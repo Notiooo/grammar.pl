@@ -37,7 +37,7 @@ p > span:first-letter {
         {{ formset.management_form }}
         {% csrf_token %}
             {% for question in task.question.all %}
-            <span class="uk-text-bold"><p>{{ question.text | safe | linebreaks }}</p></span>
+            <span class="uk-text-bold"><p>{{ forloop.counter }}. {{ question.text | safe | linebreaksbr }}</p></span>
                 <div class="uk-margin-left">
                     {% for anwser in question.anwser.all %}
                         {% with correct_anwser=anwsers|next_field:"correct_anwser" %}

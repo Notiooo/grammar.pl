@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<script>
+    function redirect(){
+        window.location.href = "{{ request.GET.next }}";
+    }
+    function countdown(seconds){
+        var timer = setInterval(function(){
+          document.getElementById("seconds").innerHTML = seconds;
+          seconds -= 1;
+          if(seconds < 0)
+            clearInterval(timer);
+        }, 1000);
+    }
+
+    setTimeout(redirect, 6000);
+    countdown(5)
+</script>
+
+<div class="uk-section uk-section-small uk-text-center">
+    <div class="uk-container uk-width-large" uk-scrollspy="target: > p; cls: uk-animation-fade; delay: 150;">
+        <span uk-icon="icon: mail; ratio: 10" uk-scrollspy="uk-animation-scale-up"></span>
+        <p class="uk-article-title">Gotowe!</p>
+        <p>Dziękuje za zgłoszenie błędu!</p>
+        <p>Każda pomoc jest szczególnie ważna, jestem ci wdzięczny :3</p>
+        <p class="uk-text-meta">Zostaniesz przekierowany za <span id="seconds">6</span></p>
+    </div>
+</div>
+
+
+
+{% endblock content %}

@@ -4,46 +4,62 @@
 
 <div class="uk-section">
     <div class="uk-container uk-container-large">
+        {{ request.resolver_match.kwargs.year }}
         {% if object_list %}
         <table class="uk-table uk-table-striped uk-table-hover">
             <thead>
                 <tr>
-                    <th>Zadania</th>
+                    <th>Tytuł zadania</th>
+                    <th>Rok</th>
+                    <th>Poziom</th>
+                    <th>Rodzaj zadania</th>
                 </tr>
             </thead>
             <tbody>
             {% for object in object_list %}
                 <tr>
                     <td class="uk-table-link">
-                        <a class="uk-link-reset" href="{% url 'matura_detail' object.year object.pk %}">{{ object.title }} -
-                            {% if object.level == 'roz' %}
-                                <span style="color: red;">
-                            {% elif object.level == 'dwu' %}
-                                <span style="color: darkred;">
-                            {% else %}
-                                <span style="color: grey;">
-                            {% endif %}
-                                {{ object.year }} {{ object.get_level_display }} ({{ object.get_type_display }})</span>
-                        </a>
+                        <a class="uk-link-reset" href="{% url 'matura_detail' object.year object.pk %}">{{ object.title }}</a>
                     </td>
+                    <td>{{ object.year }}</td>
+                    <td>
+                        {% if object.level == 'roz' %}
+                            <span style="color: red;">
+                        {% elif object.level == 'dwu' %}
+                            <span style="color: darkred;">
+                        {% else %}
+                            <span style="color: grey;">
+                        {% endif %}
+                        {{ object.get_level_display }}
+                        </span>
+                    </td>
+                    <td>{{ object.get_type_display }}</td>
                 </tr>
             {% endfor %}
             </tbody>
         </table>
         {% if is_paginated %}
-            <ul class="uk-pagination" uk-margin>
+            <ul class="uk-pagination uk-flex-center" uk-margin>
                 {% if page_obj.has_previous %}
-                    <li><a href="?page={{ page_obj.previous_page_number }}"><span uk-pagination-previous></span></a></li>
+                    <li><a href="?page={{ page_obj.previous_page_number }}"><span class="uk-margin-small-right" uk-pagination-previous></span> Poprzednia</a></li>
+                    {% if page_obj.number > 3 %}
+                        <li><a href="?page=1">1</a></li>
+                        <li class="uk-disabled"><span>...</span></li>
+                    {% endif %}
                 {% endif %}
                 {% for i in paginator.page_range %}
                     {% if page_obj.number == i %}
                         <li class="uk-active"><span>{{ i }}</span></li>
-                    {% else %}
+                    {% elif i > page_obj.number|add:'-3' and i < page_obj.number|add:'3' %}
                         <li><a href="?page={{ i }}">{{ i }}</a></li>
                     {% endif %}
                 {% endfor %}
                 {% if page_obj.has_next %}
-                    <li><a href="?page={{ page_obj.next_page_number }}"><span uk-pagination-next></span></a></li>
+                    {% if page_obj.number <= page_obj.paginator.num_pages|add:'-3' %}
+                        <li class="uk-disabled"><span>...</span></li>
+                        <li><a href="?page={{ page_obj.paginator.num_pages }}">{{ page_obj.paginator.num_pages }}</a></li>
+                    {% endif %}
+                    <li><a href="?page={{ page_obj.next_page_number }}">Następna <span class="uk-margin-small-left" uk-pagination-next></span></a></li>
                 {% endif %}
             </ul>
         {% endif %}
