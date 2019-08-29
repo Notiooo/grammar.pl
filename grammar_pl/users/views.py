@@ -3,8 +3,10 @@ from django.urls import reverse_lazy
 from django.views import generic
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from .forms import CustomUserCreationForm, CustomUserChangeForm
+from .forms import CustomUserCreationForm, CustomUserChangeForm, CustomAuthenticationForm
 from .models import CustomUser
+
+from django.contrib.auth import views as auth_views
 
 
 class SignUpView(generic.CreateView):
@@ -20,6 +22,11 @@ class ChangeProfileView(LoginRequiredMixin, generic.UpdateView):
 
     def get_object(self):
         return self.request.user
+
+
+class CustomLoginView(auth_views.LoginView):
+    authentication_form = CustomAuthenticationForm
+
 
 class ProfileDetailView(generic.DetailView):
     model = CustomUser
