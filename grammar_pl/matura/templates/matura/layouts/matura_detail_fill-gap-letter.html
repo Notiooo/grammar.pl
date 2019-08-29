@@ -36,18 +36,28 @@
                     {% with text_field=anwsers|next_field:"text" %}
                         {{ text | safe | linebreaksbr }}
                         {% if formset.is_valid %}
-                            {% if text_field.value in anwser.slice_anwsers %}
-                                {% render_field text_field class+="uk-input uk-form-width-medium uk-form-success uk-text-center uk-remove-padding" %}
+                            {% if text_field.value|upper in anwser.slice_anwsers|upper %}
+                                {% render_field text_field class="uk-input uk-form-width-xsmall uk-form-success uk-text-center uk-text-uppercase uk-remove-padding" maxlength="1" %}
                             {% else %}
-                                {% render_field text_field class+="uk-input uk-form-width-medium uk-form-danger uk-text-center uk-remove-padding" %}
+                                {% render_field text_field class="uk-input uk-form-width-xsmall uk-form-danger uk-text-center uk-text-uppercase uk-remove-padding" maxlength="1" %}
                             {% endif %}
                         {% else %}
-                            {% render_field text_field class+="uk-input uk-form-width-medium uk-text-center uk-remove-padding" %}
+                            {% render_field text_field class="uk-input uk-form-width-xsmall uk-text-center uk-text-uppercase uk-remove-padding" maxlength="1" %}
                         {% endif %}
                     {% endwith %}
                 {% endfor %}
             </div>
-            <div class="uk-section">
+            <div class="uk-section uk-section-muted">
+                <div class="uk-container">
+                    <p class="uk-text-lead">Odpowiedzi:</p>
+                    <div class="uk-grid-match uk-grid-large" uk-grid>
+                        {% for question in task.question.all %}
+                            <div>{{ forloop.counter }}. {{ question.text | safe | linebreaks }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div>
                 <button class="uk-button uk-button-primary uk-float-right uk-width-medium@s" type="submit">Zatwierdź odpowiedzi</button>
                 {% include 'matura/go_back_button.html' %}
             </div>

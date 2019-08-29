@@ -14,9 +14,14 @@ class Matura_Question_Inline(admin.TabularInline):
     show_change_link = True
     extra = 0
 
+class Matura_Task_Inline(admin.TabularInline):
+    model = models.Matura_Task
+    show_change_link = True
+    extra = 0
 
 @admin.register(models.Matura_Task)
 class MaturaTask(admin.ModelAdmin):
+    readonly_fields = ('category_link',)
     inlines = [
         Matura_Question_Inline,
     ]
@@ -27,6 +32,11 @@ class MaturaTask(admin.ModelAdmin):
         if "next" in request.GET:
             return redirect(request.GET['next'])
         return result
+
+    def category_link(self, obj):
+        url = reverse("admin:{}_{}_change".format(obj.category._meta.app_label, obj.category._meta.model_name),
+                      args=(obj.category.id,))
+        return format_html('<a href="{}">Edit the category</a>'.format(url))
 
 
 @admin.register(models.Matura_Question)
@@ -40,4 +50,10 @@ class MaturaQuestion(admin.ModelAdmin):
 
     inlines = [
         Matura_Anwser_Inline,
+    ]
+@admin.register(models.Matura_Category)
+class MaturaCategory(admin.ModelAdmin):
+    prepopulated_fields = {'slug_url': ('year', 'level', 'month')}
+    inlines = [
+        Matura_Task_Inline,
     ]

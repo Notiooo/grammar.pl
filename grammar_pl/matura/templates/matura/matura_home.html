@@ -11,10 +11,10 @@
                 </tr>
             </thead>
             <tbody>
-            {% for type, name in object_list.types %}
+            {% for type, type_verb in types %}
                 <tr>
                     <td class="uk-table-link">
-                        <a class="uk-link-reset" href="{% url 'matura_category' type %}">{{ name }}</a>
+                        <a class="uk-link-reset" href="{% url 'matura_type' type %}">{{ type_verb }}</a>
                     </td>
                 </tr>
             {% endfor %}
@@ -24,18 +24,33 @@
             <thead>
                 <tr>
                     <th>Rok</th>
+                    <th>Poziom</th>
+                    <th>Miesiąc</th>
                 </tr>
             </thead>
             <tbody>
-            {% for object in object_list.queryset %}
+            {% for object in object_list %}
                 <tr>
                     <td class="uk-table-link">
-                        <a class="uk-link-reset" href="{% url 'matura_level' object.year object.level %}">Matura {{ object.year }} {{ object.level_verbal }}</a>
+                        <a class="uk-link-reset" href="{% url 'matura_level' object.slug_url %}">Matura {{ object.year }}</a>
                     </td>
+                    <td>
+                        {% if object.level == 'roz' %}
+                            <span style="color: red;">
+                        {% elif object.level == 'dwu' %}
+                            <span style="color: darkred;">
+                        {% else %}
+                            <span style="color: grey;">
+                        {% endif %}
+                        {{ object.get_level_display }}
+                            </span>
+                    </td>
+                    <td>{{ object.get_month_display }}</td>
                 </tr>
             {% endfor %}
             </tbody>
         </table>
+        {% include 'base/paginator.html' %}
     </div>
 </div>
 {% endblock %}

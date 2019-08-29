@@ -15,6 +15,14 @@ class Category(models.Model):
         return self.title
 
 
+class Task_Type(models.Model):
+    image = models.ImageField()
+    title = models.CharField(max_length=40)
+    description = models.CharField(max_length=150)
+
+    def __str__(self):
+        return self.title
+
 class Question(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='questions')
     title = models.CharField(max_length=80)
@@ -29,6 +37,7 @@ class Question(models.Model):
     def __str__(self):
         return self.title
 
+
 class Anwser(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='anwsers')
     anwser = models.CharField(max_length=100)
@@ -36,6 +45,7 @@ class Anwser(models.Model):
 
     def __str__(self):
         return self.anwser
+
 
 class Comment(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='comments')

@@ -4,67 +4,59 @@
 
 <div class="uk-section">
     <div class="uk-container uk-container-large">
-        {{ request.resolver_match.kwargs.year }}
         {% if object_list %}
-        <table class="uk-table uk-table-striped uk-table-hover">
-            <thead>
-                <tr>
-                    <th>Tytuł zadania</th>
-                    <th>Rok</th>
-                    <th>Poziom</th>
-                    <th>Rodzaj zadania</th>
-                </tr>
-            </thead>
-            <tbody>
-            {% for object in object_list %}
-                <tr>
-                    <td class="uk-table-link">
-                        <a class="uk-link-reset" href="{% url 'matura_detail' object.year object.pk %}">{{ object.title }}</a>
-                    </td>
-                    <td>{{ object.year }}</td>
-                    <td>
-                        {% if object.level == 'roz' %}
-                            <span style="color: red;">
-                        {% elif object.level == 'dwu' %}
-                            <span style="color: darkred;">
-                        {% else %}
-                            <span style="color: grey;">
-                        {% endif %}
-                        {{ object.get_level_display }}
-                        </span>
-                    </td>
-                    <td>{{ object.get_type_display }}</td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-        {% if is_paginated %}
-            <ul class="uk-pagination uk-flex-center" uk-margin>
-                {% if page_obj.has_previous %}
-                    <li><a href="?page={{ page_obj.previous_page_number }}"><span class="uk-margin-small-right" uk-pagination-previous></span> Poprzednia</a></li>
-                    {% if page_obj.number > 3 %}
-                        <li><a href="?page=1">1</a></li>
-                        <li class="uk-disabled"><span>...</span></li>
+            {% if category %}
+                <div class="uk-grid-large uk-link-heading uk-child-width-1-2@s uk-text-center" uk-grid>
+                    {% if category.exam_file %}
+                        <div>
+                            <span uk-icon="icon: file-pdf; ratio: 2"></span>
+                            <a href="{{ category.exam_file.url }}" target="_blank">Arkusz egzaminacyjny</a>
+                        </div>
                     {% endif %}
-                {% endif %}
-                {% for i in paginator.page_range %}
-                    {% if page_obj.number == i %}
-                        <li class="uk-active"><span>{{ i }}</span></li>
-                    {% elif i > page_obj.number|add:'-3' and i < page_obj.number|add:'3' %}
-                        <li><a href="?page={{ i }}">{{ i }}</a></li>
+                    {% if category.exam_anwsers_file %}
+                        <div>
+                            <span uk-icon="icon: file-pdf; ratio: 2"></span>
+                            <a href="{{ category.exam_anwsers_file.url }}" target="_blank">Odpowiedzi do arkusza egzaminacyjnego</a>
+                        </div>
                     {% endif %}
+                </div>
+                <hr/>
+            {% endif %}
+            <table class="uk-table uk-table-striped uk-table-hover">
+                <thead>
+                    <tr>
+                        <th>Tytuł zadania</th>
+                        <th>Rok</th>
+                        <th>Poziom</th>
+                        <th>Rodzaj zadania</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for task in object_list %}
+                    <tr>
+                        <td class="uk-table-link">
+                            <a class="uk-link-reset" href="{% url 'matura_detail' task.get_year task.pk %}">{{ task.title }}</a>
+                        </td>
+                        <td>{{ task.get_year }}</td>
+                        <td>
+                            {% if task.get_level == 'roz' %}
+                                <span style="color: red;">
+                            {% elif task.get_.level == 'dwu' %}
+                                <span style="color: darkred;">
+                            {% else %}
+                                <span style="color: grey;">
+                            {% endif %}
+                            {{ task.get_level_display }}
+                            </span>
+                        </td>
+                        <td>{{ task.get_type_display }}</td>
+                    </tr>
                 {% endfor %}
-                {% if page_obj.has_next %}
-                    {% if page_obj.number <= page_obj.paginator.num_pages|add:'-3' %}
-                        <li class="uk-disabled"><span>...</span></li>
-                        <li><a href="?page={{ page_obj.paginator.num_pages }}">{{ page_obj.paginator.num_pages }}</a></li>
-                    {% endif %}
-                    <li><a href="?page={{ page_obj.next_page_number }}">Następna <span class="uk-margin-small-left" uk-pagination-next></span></a></li>
-                {% endif %}
-            </ul>
-        {% endif %}
-        {% else %}
-            <div class="uk-article-title uk-section-large">Sorcia, nie mamy czegoś takiego 😢</div>
+                </tbody>
+            </table>
+            {% include 'base/paginator.html' %}
+            {% else %}
+                <div class="uk-article-title uk-section-large">Sorcia, nie mamy czegoś takiego 😢</div>
         {% endif %}
     </div>
 </div>

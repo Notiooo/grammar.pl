@@ -1,7 +1,8 @@
 from django.shortcuts import render, get_object_or_404
-from django.views.generic import ListView, FormView, TemplateView
+from django.views.generic import ListView, FormView, TemplateView, DetailView
 from django.urls.base import reverse
 from django.http import HttpResponseRedirect
+from django.views.generic.list import MultipleObjectMixin
 
 from django.forms import modelformset_factory
 
@@ -9,43 +10,40 @@ from . import models, forms
 
 
 class MaturaHomepage(ListView):
-    model = models.Matura_Task
+    model = models.Matura_Category
     template_name = 'matura/matura_home.html'
+    paginate_by = 10
+    ordering = '-year'
 
-    def get_queryset(self):
-        queryset = models.Matura_Task.objects.values('year', 'level').distinct()
-        MaturaHomepage.append_verbal(self, queryset)
-        return {'queryset': queryset,
-                'types': models.Matura_Task.types}
-
-    def get_types(self):
-        types = [obj[1] for obj in models.Matura_Task.types]
-        return types
-
-    def append_verbal(self, queryset):
-        LEVELS = models.Matura_Task.LEVELS
-        for column in queryset:
-            for tup in LEVELS:
-                if column['level'] == tup[0]:
-                    column['level_verbal'] = tup[1]
+    def get_context_data(self, **kwargs):
+        types = self.model.get_types()
+        context = super(MaturaHomepage, self).get_context_data(types=types, **kwargs)
+        return context
 
 
-class MaturaCategory(ListView):
+class MaturaType(ListView):
     model = models.Matura_Task
     template_name = 'matura/matura_list.html'
-    paginate_by = 10
+    context_object_name = 'tasks'
+    paginate_by = 15
 
     def get_queryset(self):
-        return models.Matura_Task.objects.filter(type=self.kwargs['type'])
+        return self.model.objects.filter(type=self.kwargs['type']).order_by('pk')
 
 
-class MaturaLevel(ListView):
-    model = models.Matura_Task
+class MaturaLevel(DetailView, MultipleObjectMixin):
+    model = models.Matura_Category
     template_name = 'matura/matura_list.html'
-    paginate_by = 10
+    slug_url_kwarg = 'slug_url'
+    slug_field = 'slug_url'
+    context_object_name = 'category'
+    paginate_by = 15
 
-    def get_queryset(self):
-        return models.Matura_Task.objects.filter(year=self.kwargs['year'], level=self.kwargs['level'])
+    def get_context_data(self, **kwargs):
+        object_list = self.object.task.all().order_by('pk')
+        context = super(MaturaLevel, self).get_context_data(object_list=object_list, **kwargs)
+        # context['tasks'] = context['object'].task.all()
+        return context
 
 
 def MaturaDetail(request, year, pk):
@@ -53,7 +51,10 @@ def MaturaDetail(request, year, pk):
     task = models.Matura_Task.objects.get(pk=pk)
 
     # gets how many anwsers every question has
-    number_of_anwsers = len(task.list_of_anwsers())
+    if task.layout == "fill-gap":  # fillgaps anwsers are equal to number of questions
+        number_of_anwsers = task.question.all().count()
+    else:
+        number_of_anwsers = len(task.list_of_anwsers())
 
     # creates a formset with as many fields as the anwsers is
     anwsers_field = modelformset_factory(models.Matura_Anwser, fields=('correct_anwser', 'text',),
@@ -65,7 +66,7 @@ def MaturaDetail(request, year, pk):
     else:
         # empty anwsers fields for user
         formset = anwsers_field(queryset=models.Matura_Anwser.objects.none())
-    return render(request, 'matura/matura_detail_{0}.html'.format(task.layout),
+    return render(request, 'matura/layouts/matura_detail_{0}.html'.format(task.layout),
                   {'formset': formset, 'anwsers': iter(formset), 'task': task, 'opts': models.Matura_Task._meta, })
 
 
@@ -96,4 +97,4 @@ class MaturaReportSuccess(TemplateView):
 
 def matura_random(request):
     random = models.Matura_Task.objects.order_by('?').first()
-    return HttpResponseRedirect(reverse('matura_detail', kwargs={'pk': random.pk, 'year': random.year}))
+    return HttpResponseRedirect(reverse('matura_detail', kwargs={'pk': random.pk, 'year': random.get_year()}))

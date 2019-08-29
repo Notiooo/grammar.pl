@@ -17,20 +17,21 @@ th, td {
 <div class="uk-section">
     <div class="uk-container uk-container-small uk-article">
         <p class="uk-text-lead">{{ task.title }}</p>
-        <p>{{ task.text }}</p>
+
+        {% if task.image %}
+        <!-- Image -->
+        <p class="uk-text-center">
+            <img src="{{ task.image.url }}"/>
+        </p>
+        {% endif %}
+
+        <p>{{ task.text | safe | linebreaks}}</p>
         {% if task.sound_file %}
         <!-- AUDIO -->
         <p>
             <audio id="Player" class="uk-width-1-1" controls>
                  <source src="{{ task.sound_file.url }}"/>
             </audio>
-        </p>
-        {% endif %}
-
-        {% if task.image %}
-        <!-- Image -->
-        <p class="uk-text-center">
-            <img src="{{ task.image.url }}"/>
         </p>
         {% endif %}
         <form method="post">
