@@ -21,6 +21,8 @@ class CustomUserChangeForm(UserChangeForm):
 
 
 class CustomAuthenticationForm(AuthenticationForm):
+    invalid_attempt_time = 5  # in minutes
+
     def clean(self):
         # username = self.cleaned_data.get('username')
         ip_address = self.request.META['REMOTE_ADDR']
@@ -31,7 +33,7 @@ class CustomAuthenticationForm(AuthenticationForm):
 
         # clear any invalid login attempts from the timestamp bucket that were longer ago than the range
         invalid_attempt_timestamps = [timestamp for timestamp in invalid_attempt_timestamps if
-                                      timestamp > (now - 5 * 60)]  # 5 minutes (5 * 60 sec)
+                                      timestamp > (now - self.invalid_attempt_time * 60)]  # 5 minutes (5 * 60 sec)
 
         # adds this attempt as an invalid (cause if it's correct then it's gonna delete cache anyway
         invalid_attempt_timestamps.append(now)

@@ -17,7 +17,7 @@ p > span:first-letter {
 <div class="uk-section">
     <div class="uk-container uk-container-small">
         <p class="uk-text-lead">{{ task.title }}</p>
-        <p>{{ task.text | safe | linebreaks }}</p>
+        <div class="uk-text-justify">{{ task.text | safe | linebreaks }}</div>
 
         {% if task.sound_file %}
         <!-- AUDIO -->

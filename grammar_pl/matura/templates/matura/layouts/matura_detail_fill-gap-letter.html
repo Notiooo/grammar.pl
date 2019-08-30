@@ -31,7 +31,7 @@
         <form method="post">
         {{ formset.management_form }}
         {% csrf_token %}
-            <div id="text">
+            <div id="text" class="uk-text-justify">
                 {% for text, anwser in task.text_fill_blank_list_split|zip_longest:task.list_of_anwsers %}
                     {% with text_field=anwsers|next_field:"text" %}
                         {{ text | safe | linebreaksbr }}

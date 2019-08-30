@@ -8,6 +8,9 @@
     #text{
         line-height: 40px;
     }
+    #text, b{
+        line-height: normal;
+    }
 </style>
 
 <div class="uk-section">
@@ -31,7 +34,7 @@
         <form method="post">
         {{ formset.management_form }}
         {% csrf_token %}
-            <div id="text">
+            <div id="text" class="uk-text-justify">
                 {% for text, question in task.text_fill_blank_list_split|zip_longest:task.question.all %}
                     {% with text_field=anwsers|next_field:"text" %}
                         {{ text | safe | linebreaksbr }}
@@ -47,6 +50,21 @@
                     {% endwith %}
                 {% endfor %}
             </div>
+            {% if formset.is_valid %}
+            <h3>Sugerowane odpowiedzi:</h3>
+            <ul uk-accordion>
+                {% for question in task.question.all %}
+                <li>
+                    <a class="uk-accordion-title" href="#">Pole {{ forloop.counter }}</a>
+                    <div class="uk-accordion-content">
+                        {% for text in question.slice_questions %}
+                            <p>{{ text }}</p>
+                        {% endfor %}
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+            {% endif %}
             <div class="uk-section">
                 <button class="uk-button uk-button-primary uk-float-right uk-width-medium@s" type="submit">Zatwierdź odpowiedzi</button>
                 {% include 'matura/go_back_button.html' %}

@@ -7,19 +7,19 @@
 			<a href="#" uk-icon="icon: facebook; ratio: 2"></a>
 		</div>
 		<div>
-			<ul class="uk-list">
-				<li href="#">Strona Główna</li>
-				<li href="#">Czasy</li>
-				<li href="#">Tryby warunkowe</li>
-				<li href="#">Zadania maturalne</li>
+			<ul class="uk-list uk-link-muted">
+				<li><a href="{% url 'home' %}">Strona Główna</a></li>
+				<li><a href="{% url 'home' %}#czasy">Czasy</a></li>
+				<li><a href="{% url 'home' %}#tryby">Tryby warunkowe</a></li>
+				<li><a href="{% url 'matura_home' %}">Zadania maturalne</a></li>
 			</ul>
 		</div>
 		<div>
-			<ul class="uk-list">
-				<li href="#">O mnie</li>
-				<li href="#">Kontakt</li>
-				<li href="#">Regulamin</li>
-				<li href="#">FAQ</li>
+			<ul class="uk-list uk-link-muted">
+				<li><a href="{% url 'contact' %}">O mnie</a></li>
+				<li><a href="{% url 'contact' %}">Kontakt</a></li>
+				<li><a href="#">Regulamin</a></li>
+				<li><a href="#">FAQ</a></li>
 			</ul>
 		</div>
 	</div>
@@ -44,7 +44,7 @@
 					<div id='newsletter-img' class="uk-position-top-center"></div>
 				</a>
 			</div>
-			<p class="uk-text-uppercase uk-text-meta">100% wpłat zostaje użytych do opłacenia kosztów związanych ze stroną! :3</p>
+			<p class="uk-text-uppercase uk-text-meta">100% wpłat zostanie przeznaczone na zakup hostingu! :3</p>
 		</div>
 	</div>
 </div>

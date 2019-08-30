@@ -98,3 +98,12 @@ class MaturaReportSuccess(TemplateView):
 def matura_random(request):
     random = models.Matura_Task.objects.order_by('?').first()
     return HttpResponseRedirect(reverse('matura_detail', kwargs={'pk': random.pk, 'year': random.get_year()}))
+
+class Matura_Search(ListView):
+    template_name = 'matura/matura_list.html'
+    model = models.Matura_Task
+    context_object_name = 'tasks'
+    paginate_by = 15
+
+    def get_queryset(self):
+        return models.Matura_Task.objects.filter(title__contains=self.request.GET.get('search'))
