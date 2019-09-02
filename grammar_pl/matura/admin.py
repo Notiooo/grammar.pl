@@ -7,6 +7,7 @@ from . import models
 
 class Matura_Anwser_Inline(admin.TabularInline):
     model = models.Matura_Anwser
+    extra = 4
 
 
 class Matura_Question_Inline(admin.TabularInline):
@@ -53,6 +54,7 @@ class MaturaQuestion(admin.ModelAdmin):
     ]
 @admin.register(models.Matura_Category)
 class MaturaCategory(admin.ModelAdmin):
+    ordering = ('-year',)
     prepopulated_fields = {'slug_url': ('year', 'level', 'month')}
     inlines = [
         Matura_Task_Inline,

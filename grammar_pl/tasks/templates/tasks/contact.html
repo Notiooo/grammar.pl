@@ -4,6 +4,20 @@
 {% load widget_tweaks %}
 
 {% block content %}
+<script src="https://www.google.com/recaptcha/api.js?render=6LcZIrYUAAAAAEmg1RAirfwtWHfh_3rs0W6PBwy-"></script>
+<script>
+    grecaptcha.ready(function() {
+        grecaptcha.execute('6LcZIrYUAAAAAEmg1RAirfwtWHfh_3rs0W6PBwy-', {action: 'login'})
+        .then(function(token) {
+            input = document.createElement("INPUT");
+            input.setAttribute("type", "hidden");
+            input.setAttribute("name", "g-recaptcha-response");
+            input.setAttribute("value", token);
+            document.getElementById("form").appendChild(input);
+        });
+    });
+</script>
+
 <div style="background-image: linear-gradient(#8e9eab, #eef2f3); border-radius: 0 0 100% 0; z-index: -1; padding-bottom: 36%;" class="uk-width-2-3@s uk-width-1-3@m uk-position-absolute uk-visible@s"></div>
 <div class="uk-section">
     <div class="uk-container">
@@ -19,7 +33,7 @@
                 <p>Przez to, że jest to moja pierwsza strona chciałbym z miejsca przeprosić za wszelkie błędy i niedociągnięcia. Włożyłem w pracę nad stroną całe swoje serce, ale nawet ono nie jest w stanie zastąpić potrzebnego mi doświadczenia, które dopiero nabywam razem z pracą. Bardzo proszę o wyrozumiałość, a wszelkie uwagi <span class="uk-text-muted">(w szczególności senior developerów)</span> chętnie przeczytam! 😁</p>
                 <p>Wszystkich chętnych zapraszam do kontaktu 😊</p>
                 <div class="uk-padding uk-padding-remove-vertical" uk-scrollspy="target: > form, div; cls: uk-animation-slide-bottom; delay: 100;">
-                    <form method="POST">
+                    <form id="form" method="POST">
                         {% csrf_token %}
                         {% with WIDGET_ERROR_CLASS='uk-form-danger' %}
                         {% for field in form %}

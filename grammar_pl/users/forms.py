@@ -2,6 +2,8 @@ from django.contrib.auth.forms import UserCreationForm, UserChangeForm, Authenti
 from django import forms
 from .models import CustomUser
 import time
+import requests
+from django.conf import settings
 
 from django.core.cache import cache
 
@@ -48,6 +50,23 @@ class CustomAuthenticationForm(AuthenticationForm):
     # 4 login attempts -> login on prepared account -> logout -> 4 login attempts and so on
     # def confirm_login_allowed(self, user):
     #     InvalidLoginAttemptsCache.delete(self.request.META['REMOTE_ADDR'])
+
+    def confirm_login_allowed(self, user):
+        secret_key = settings.RECAPTCHA_SECRET_KEY
+
+        # captcha verification
+        data = {
+            'response': self.request.POST.get('g-recaptcha-response'),
+            'secret': secret_key
+        }
+        resp = requests.post('https://www.google.com/recaptcha/api/siteverify', data=data)
+        result_json = resp.json()
+
+        print(result_json)
+
+        if not result_json.get('success'):
+            raise forms.ValidationError('Wystąpił problem z RECAPTCHA. Spróbuj jeszcze raz... chyba, że jesteś robotem 🤔',
+                                        code='invalid_login')
 
 
 class InvalidLoginAttemptsCache:

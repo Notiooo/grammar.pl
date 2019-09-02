@@ -26,3 +26,5 @@ grammar_pl/uploads/sound_files/
 grammar_pl/uploads/
 
 grammar_pl/db — kopia.sqlite3
+
+grammar_pl/cache/
