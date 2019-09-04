@@ -3,7 +3,7 @@
 {% load static %}
 
 {% block content %}
-<div class="" uk-grid>
+<div class="uk-grid-collapse" uk-grid>
 	<!-- Promotion screen -->
     <div class="uk-width-expand@s">
         <div class="uk-background-cover uk-height-large uk-panel uk-flex uk-flex-center uk-flex-middle uk-flex-column" style="background-image: url({% static 'tasks/img/background-cover.jpg' %});">
@@ -21,7 +21,7 @@
         </div>
     </div>
 	{% if not user.is_authenticated %}
-    <div class="uk-section-default uk-width-1-2@s">
+    <div class="uk-section-default uk-width-1-2@m">
     	<!-- Login panel -->
     	<div class="uk-flex uk-flex-center uk-flex-middle uk-flex-column uk-height-large uk-text-center">
     		<div class="uk-h1">Zaloguj sie aby dodawać zadania</div>

@@ -2,6 +2,9 @@
 {% load widget_tweaks %}
 {% load next_field %}
 
+{% block title %}{{ task.title|truncatechars:40 | striptags }} - Grammar.pl{% endblock title %}
+{% block description %}{{ task.text|truncatechars:120 | striptags }} - zadanie maturalne{% endblock description %}
+
 {% block content %}
 
 <div class="uk-section">

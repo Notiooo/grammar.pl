@@ -22,7 +22,7 @@
                 </div>
                 <hr/>
             {% endif %}
-            <table class="uk-table uk-table-striped uk-table-hover">
+            <table class="uk-table uk-table-striped uk-table-hover" uk-toggle="cls: uk-table-responsive; mode: media; media: (max-width: 500px);">
                 <thead>
                     <tr>
                         <th>Tytuł zadania</th>
@@ -35,7 +35,7 @@
                 {% for task in object_list %}
                     <tr>
                         <td class="uk-table-link">
-                            <a class="uk-link-reset" href="{% url 'matura_detail' task.get_year task.pk %}">{{ task.title }}</a>
+                            <a class="uk-link-text" href="{% url 'matura_detail' task.get_year task.pk %}">{{ task.title }}</a>
                         </td>
                         <td>{{ task.get_year }}</td>
                         <td>

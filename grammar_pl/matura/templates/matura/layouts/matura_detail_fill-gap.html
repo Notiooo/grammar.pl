@@ -3,13 +3,13 @@
 {% load zip_longest %}
 {% load next_field %}
 
+{% block title %}{{ task.title|truncatechars:40 | striptags }} - Grammar.pl{% endblock title %}
+{% block description %}{{ task.text|truncatechars:120 | striptags }} - zadanie maturalne{% endblock description %}
+
 {% block content %}
 <style>
     #text{
-        line-height: 40px;
-    }
-    #text, b{
-        line-height: normal;
+        line-height: 30px;
     }
 </style>
 
@@ -40,12 +40,12 @@
                         {{ text | safe | linebreaksbr }}
                         {% if formset.is_valid %}
                             {% if text_field.value in question.slice_questions %}
-                                {% render_field text_field class+="uk-input uk-form-width-medium uk-form-success uk-text-center uk-remove-padding" %}
+                                {% render_field text_field class+="uk-input uk-form-small uk-form-width-medium uk-form-success uk-text-center uk-remove-padding" %}
                             {% else %}
-                                {% render_field text_field class+="uk-input uk-form-width-medium uk-form-danger uk-text-center uk-remove-padding" %}
+                                {% render_field text_field class+="uk-input uk-form-small uk-form-width-medium uk-form-danger uk-text-center uk-remove-padding" %}
                             {% endif %}
                         {% else %}
-                            {% render_field text_field class+="uk-input uk-form-width-medium uk-text-center uk-remove-padding" %}
+                            {% render_field text_field class+="uk-input uk-form-small uk-form-width-medium uk-text-center uk-remove-padding" %}
                         {% endif %}
                     {% endwith %}
                 {% endfor %}

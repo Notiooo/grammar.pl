@@ -2,17 +2,10 @@
 {% load widget_tweaks %}
 {% load next_field %}
 
+{% block title %}{{ task.title|truncatechars:40 | striptags }} - Grammar.pl{% endblock title %}
+{% block description %}{{ task.text|truncatechars:120 | striptags }} - zadanie maturalne{% endblock description %}
+
 {% block content %}
-
-<style>
-p > span {
-    display: inline-block;
-}
-
-p > span:first-letter {
-    font-weight: bolder;
-}
-</style>
 
 <div class="uk-section">
     <div class="uk-container uk-container-small">
@@ -45,23 +38,23 @@ p > span:first-letter {
                                 {% if anwser.correct_anwser %}
                                     <p style="background-color: palegreen">
                                         {% render_field correct_anwser class+="uk-checkbox" type="checkbox" %}
-                                        <span>{{ anwser.text }}</span>
+                                        <b>{{ anwser.text|slice:"1" }}</b>{{ anwser.text|slice:"1:" }}
                                     </p>
                                 {% elif anwser.correct_anwser != correct_anwser.value %}
                                     <p style="background-color: pink">
                                         {% render_field correct_anwser class+="uk-checkbox" type="checkbox" %}
-                                        <span>{{ anwser.text }}</span>
+                                        <b>{{ anwser.text|slice:"1" }}</b>{{ anwser.text|slice:"1:" }}
                                     </p>
                                 {% else %}
                                     <p>
                                         {% render_field correct_anwser class+="uk-checkbox" type="checkbox" %}
-                                        <span>{{ anwser.text }}</span>
+                                        <b>{{ anwser.text|slice:"1" }}</b>{{ anwser.text|slice:"1:" }}
                                     </p>
                                 {% endif %}
                             {% else %}
                                 <p>
                                     {% render_field correct_anwser class+="uk-checkbox" type="checkbox" %}
-                                    <span>{{ anwser.text }}</span>
+                                    <b>{{ anwser.text|slice:"1" }}</b>{{ anwser.text|slice:"1:" }}
                                 </p>
                             {% endif %}
                         {% endwith %}
