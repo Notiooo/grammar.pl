@@ -11,7 +11,7 @@
             <li><a href="{% url 'home' %}">Strona Główna</a></li>
             <li><a href="{% url 'home' %}#czasy" {% if request.path == home_url %}uk-scroll{% endif %}>Czasy</a></li>
             <li><a href="{% url 'home' %}#tryby" {% if request.path == home_url %}uk-scroll{% endif %}>Tryby warunkowe</a></li>
-            <li><a href="{% url 'matura_home' %}">Zadania maturalne</a></li>
+            <li><a href="{% url 'exams_category' 'matura' %}">Zadania maturalne</a></li>
             <li><a href="{% url 'contact' %}">Kontakt</a></li>
             <li><a class="uk-navbar-toggle" uk-search-icon uk-toggle="target: .nav-overlay; animation: uk-animation-fade" href="#"></a></li>
 
@@ -42,7 +42,7 @@
     <!--- SEARCH -->
     <div class="nav-overlay uk-navbar-left uk-flex-1" hidden>
         <div class="uk-navbar-item uk-width-expand">
-            <form action="{% url 'matura_search' %}" class="uk-search uk-search-navbar uk-width-1-1">
+            <form action="{% url 'exams_search' %}" class="uk-search uk-search-navbar uk-width-1-1">
                 <input class="uk-search-input" name="search" type="search" placeholder="Szukaj..." autofocus>
             </form>
         </div><a class="uk-navbar-toggle" uk-close uk-toggle="target: .nav-overlay; animation: uk-animation-fade" href="#"></a>
@@ -66,7 +66,7 @@
             {% endif %}
             <li class="uk-padding"></li>
             <li><a href="{% url 'home' %}">Strona Główna</a></li>
-            <li><a href="{% url 'matura_home' %}">Zadania maturalne</a></li>
+            <li><a href="{% url 'exams_home' %}">Zadania maturalne</a></li>
             <li><a href="{% url 'home' %}#czasy" {% if request.path == home_url %}uk-scroll{% endif %}>Czasy</a></li>
             <li><a href="{% url 'home' %}#tryby" {% if request.path == home_url %}uk-scroll{% endif %}>Tryby warunkowe</a></li>
             <li><a href="{% url 'contact' %}">Kontakt</a></li>

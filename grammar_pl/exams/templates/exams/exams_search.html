@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="uk-section">
+    <div class="uk-container uk-container-large">
+        {% if object_list %}
+            <table class="uk-table uk-table-striped uk-table-hover" uk-toggle="cls: uk-table-responsive; mode: media; media: (max-width: 500px);">
+                <thead>
+                    <tr>
+                        <th>Tytuł zadania</th>
+                        <th>Rok</th>
+                        <th>Poziom</th>
+                        <th>Rodzaj zadania</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for task in object_list %}
+                    <tr>
+                        <td class="uk-table-link">
+                            <a class="uk-link-text" href="{% url 'exams_detail' view.kwargs.exam_category task.get_year task.id %}">{{ task.title }}</a>
+                        </td>
+                        <td>{{ task.get_year }}</td>
+                        <td>
+                            {% if task.get_level == 'roz' %}
+                                <span style="color: red;">
+                            {% elif task.get_level == 'dwu' %}
+                                <span style="color: darkred;">
+                            {% else %}
+                                <span style="color: grey;">
+                            {% endif %}
+                            {{ task.get_level_display }}
+                            </span>
+                        </td>
+                        <td>{{ task.get_type_display }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            {% include 'base/paginator.html' %}
+            {% else %}
+                <div class="uk-article-title uk-section-large">Sorcia, nie mamy czegoś takiego 😢</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block content %}
+
+<div class="uk-section">
+    <div class="uk-container uk-container-small">
+        <div class="uk-text-large">{{ question.title }}</div>
+        <div class="uk-article-meta">{{ question.text }}</div>
+
+        {% if question.sound_file %}
+        <!-- AUDIO -->
+        <p>
+            <audio id="Player" class="uk-width-1-1" controls>
+                 <source src="{{ question.sound_file.url }}"/>
+            </audio>
+        </p>
+        {% endif %}
+        <form method="post">
+        {{ management_form }}
+        {% csrf_token %}
+            <table class="uk-table uk-table-striped">
+                <thead>
+                    <tr>
+                        <th>Tekst</th>
+                        <th>Prawda/Fałsz</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for formset, anwsers in object %}
+                        <tr>
+                            {% if formset.is_valid %}
+                                {% if anwsers.correct_anwser == formset.correct_anwser.value %}
+                                    <td style="background-color: palegreen"><p class="uk-align-right uk-text-success">DOBRZE!</p>
+                                {% else %}
+                                    <td style="background-color: pink"><p class="uk-align-right uk-text-danger">ŹLE!</p>
+                                {% endif %}
+                            {% else %}
+                                <td>
+                            {% endif %}
+                            {{ anwsers.text }}
+                            </td>
+                            <td>
+                                <label>
+                                    {% render_field formset.correct_anwser class+="uk-checkbox" %}
+                                </label>
+                            </td>
+                        </td>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <button class="uk-button uk-button-primary uk-align-right" type="submit">Zatwierdź odpowiedzi</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
