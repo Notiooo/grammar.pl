@@ -23,6 +23,7 @@ class Exams_Category(models.Model):
     MONTHS = [
         ('MAJ', 'Maj'),
         ('CZE', 'Czerwiec'),
+        ('KWI', 'Kwiecień'),
         (None, '---'),
     ]
 
@@ -47,7 +48,8 @@ class Exams_Category(models.Model):
     exam_anwsers_file = models.FileField(blank=True, upload_to=rename_exam_anwser_file, storage=OverwriteStorage())
 
     def __str__(self):
-        return "{0} {1} {2} {3}".format(self.get_type_display(),self.year, self.get_level_display(), self.get_month_display())
+        return "{0} {1} {2} {3}".format(self.get_type_display(), self.year, self.get_level_display(),
+                                        self.get_month_display())
 
     @staticmethod
     def get_task_types():
@@ -61,14 +63,14 @@ class Exams_Category(models.Model):
 class Exams_Task(models.Model):
     category = models.ForeignKey(Exams_Category, on_delete=models.CASCADE, related_name='task', null=True)
     types = [
-        ('audio', 'Rozumienie ze słuchu'),
-        ('text', 'Rozumienie tekstów pisanych'),
+        ('listening', 'Rozumienie ze słuchu'),
+        ('reading', 'Rozumienie tekstów pisanych'),
         ('grammar', 'Znajomość środków językowych'),
     ]
     type = models.CharField(
-        max_length=7,
+        max_length=10,
         choices=types,
-        default='audio',
+        default='listening',
     )
     layouts = [
         ('tnf', "Prawda i Fałsz"),
@@ -93,7 +95,8 @@ class Exams_Task(models.Model):
         return self.title
 
     def get_absolute_url(self):
-        return reverse('exams_detail', kwargs={'pk': self.pk, 'year': self.get_year(), 'exam_category': self.category.type})
+        return reverse('exams_detail',
+                       kwargs={'pk': self.pk, 'year': self.get_year(), 'exam_category': self.category.type})
 
     def text_fill_blank_list_split(self):
         return self.text.split('_')
@@ -133,6 +136,7 @@ class Exams_Question(models.Model):
 
     def slice_questions(self):
         return self.text.split('/')
+
 
 class Exams_Anwser(models.Model):
     question = models.ForeignKey(Exams_Question, on_delete=models.CASCADE, related_name='anwser', null=True)

@@ -40,7 +40,6 @@ class ExamsCategory(ListView):
     model = models.Exams_Category
     template_name = 'exams/exams_category_home.html'
     paginate_by = 10
-    ordering = '-year'
 
     def get_context_data(self, **kwargs):
         "It gets a list of task types"
@@ -52,7 +51,7 @@ class ExamsCategory(ListView):
     def get_queryset(self):
         "If this exam category has any exercise/task then it's a correct one"
 
-        return get_list_or_404(self.model.objects.filter(type=self.kwargs['exam_category']).order_by('pk'))
+        return get_list_or_404(self.model.objects.filter(type=self.kwargs['exam_category']).order_by('-year'))
 
 
 class ExamsByTaskType(ListView):
@@ -74,7 +73,7 @@ class ExamsByTaskType(ListView):
 class ExamsLevel(DetailView, MultipleObjectMixin):
     """
     A list of specific exam_category tasks
-    Example: /exams/matura/2019-pod-maj/
+    Example: /exams/matura/2019-pod-maj-matura/
     """
 
     model = models.Exams_Category
@@ -92,6 +91,20 @@ class ExamsLevel(DetailView, MultipleObjectMixin):
 
 
 def ExamsDetail(request, exam_category, year, pk):
+    """
+    It shows a task
+    1. It gets the task by given ID
+    2. He needs to create needed amount of fields for user.
+    For some layouts it's equal to amount of questions, and for others it's equal to amount of anwsers
+    3. If there is a POST it'll show users the results by special template formatting
+
+    This view returns:
+    formset - so user can put his anwsers there, and later it can be checked which one are correct
+    anwsers - it's an iter, of formset. Used in template to render fields. It helps to render it
+    as many as there is the anwsers. No more, no less, easier to use inside many for loops
+    task    - it's the task user is looking at
+    opts    - used for easy-to-access admin panel button inside a template
+    """
     # gets the question
     task = models.Exams_Task.objects.get(pk=pk)
 
@@ -135,19 +148,27 @@ class ExamsReport(FormView):
 
 
 class ExamsReportSuccess(TemplateView):
+    "Simple view showing a success page if the Report form passed"
     template_name = 'exams/exams_report_success.html'
 
 
 def exams_random(request, exam_category):
+    "This view returns a random task from a given exam_category"
+
     random = models.Exams_Task.objects.filter(category__type=exam_category).order_by('?').first()
-    return HttpResponseRedirect(reverse('exams_detail', kwargs={'pk': random.pk, 'year': random.get_year(), 'exam_category': exam_category}))
+    return HttpResponseRedirect(
+        reverse('exams_detail', kwargs={'pk': random.pk, 'year': random.get_year(), 'exam_category': exam_category}))
 
 
 class Exams_Search(ListView):
-    template_name = 'exams/exams_search.html'
+    "It's a special view for displaying results of search engine"
+
     model = models.Exams_Task
+    template_name = 'exams/exams_search.html'
     context_object_name = 'tasks'
     paginate_by = 15
 
     def get_queryset(self):
-        return models.Exams_Task.objects.filter(title__contains=self.request.GET.get('search'))
+        if self.request.GET:
+            return self.model.objects.filter(title__contains=self.request.GET.get('search')).order_by('pk')
+        return self.model.objects.none()

@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 
+{% block title %}{% if category %}Zadania - {{ category.get_type_display }} {{ category.year }} Poziom {{ category.get_level_display }} {{ category.get_month_display }}{% else %}{{ block.super }}{% endif %}{% endblock title %}
+
 {% block content %}
 
 <div class="uk-section">
@@ -55,7 +57,7 @@
                 </tbody>
             </table>
             {% include 'base/paginator.html' %}
-            {% if request.META.HTTP_REFERER %}
+            {% if request.META.HTTP_REFERER|last not in "0123456789" %}
                 <a href="{{ request.META.HTTP_REFERER }}" class="uk-button uk-float-left uk-width-small@s"><span uk-icon="icon: arrow-left; ratio: 2"></span>Wróć</a>
             {% endif %}
             {% else %}

@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% load static %}
+{% block content %}
+<div class="uk-flex uk-flex-center uk-flex-middle uk-flex-column uk-text-center uk-section">
+    <div class="uk-container uk-container-small">
+        <h2>Przepraszamy, kotek-programista nie wie co sie stało</h2>
+        <h3 class="uk-margin-remove-top">Aczkolwiek mamy przypuszczenia, że to <span style="color: red;">błąd 404</span> :O</h3>
+        <img src="{% static 'img/404.gif' %}"/>
+        <p>Może ten kotek-programista wyżej jednak coś wykombinuje...</p>
+        <p>No nic... nic więcej nie mogę na to poradzić</p>
+        <p class="uk-text-meta">Tak więc dajmy mu czas...</p>
+        <a href="{% url 'home' %}"><button class="uk-button uk-button-secondary">Wróć na stronę główą</button></a>
+    </div>
+</div>
+
+{% endblock content %}

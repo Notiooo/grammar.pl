@@ -17,7 +17,7 @@
             		<a href="{% url 'exams_random' 'matura' %}"><button class="uk-button uk-button-small uk-border-rounded yellow-button">Losuj zadanie maturalne!</button></a>
             	</p>
             </div>
-			<a href="{% url 'exams_home' %}"><button class="uk-button uk-box-shadow-xlarge yellow-button" style="border-radius: 0 0 15px 15px">Wszystkie zadania maturalne</button></a>
+			<a href="{% url 'exams_category' 'matura' %}"><button class="uk-button uk-box-shadow-xlarge yellow-button" style="border-radius: 0 0 15px 15px">Wszystkie zadania maturalne</button></a>
         </div>
     </div>
 	{% if not user.is_authenticated %}
@@ -46,7 +46,7 @@
 <div id="czasy" uk-scrollspy="cls: uk-animation-fade" class="uk-section uk-section-small uk-section-muted">
 	<div class="uk-container uk-container-large">
 
-		<p class="uk-h2 uk-heading-divider">Zadania z poszczególnymi czasami</p>
+		<p class="uk-h2 uk-heading-divider">Zadania społeczności z poszczególnymi czasami</p>
 
 		<p class="uk-text-large uk-heading-bullet">Teraźniejsze</p>
 		<div uk-scrollspy="target: > a; cls: uk-animation-slide-bottom; delay: 200" class="uk-grid-small uk-flex-center uk-grid-match" uk-grid>
@@ -120,7 +120,7 @@
 </div>
 <div id="tryby" class="uk-section uk-section-muted">
 	<div class="uk-container uk-container-large">
-		<p class="uk-h2 uk-heading-divider uk-margin-medium-bottom">Zadania z trybami warunkowymi</p>
+		<p class="uk-h2 uk-heading-divider uk-margin-medium-bottom">Zadania społeczności z trybami warunkowymi</p>
 		<div uk-scrollspy="target: > a; cls: uk-animation-fade; delay: 150" class="uk-grid-small uk-flex-center uk-grid-match" uk-grid>
 			{% for category in object_list %}
 			{% if 'warunkowy' in category.title %}

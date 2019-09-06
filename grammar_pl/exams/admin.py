@@ -55,7 +55,7 @@ class ExamsQuestion(admin.ModelAdmin):
 @admin.register(models.Exams_Category)
 class ExamsCategory(admin.ModelAdmin):
     ordering = ('-year',)
-    prepopulated_fields = {'slug_url': ('year', 'level', 'month')}
+    prepopulated_fields = {'slug_url': ('year', 'type', 'month', 'level',)}
     inlines = [
         Exams_Task_Inline,
     ]

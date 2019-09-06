@@ -11,10 +11,10 @@ class MaturaHomepageTests(TestCase):
         self.assertContains(response, "Rodzaje zadań")
 
     def test_view_url_by_name(self):
-        response = self.client.get(reverse('matura_home'))
+        response = self.client.get(reverse('exams_home'))
         self.assertEqual(response.status_code, 200)
 
     def test_view_uses_correct_template(self):
-        response = self.client.get(reverse('matura_home'))
+        response = self.client.get(reverse('exams_home'))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'exams/matura_home.html')
+        self.assertTemplateUsed(response, 'exams/exams_home.html')
