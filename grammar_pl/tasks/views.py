@@ -1,5 +1,4 @@
 from django.views.generic import ListView, TemplateView, FormView, DetailView, CreateView, UpdateView, DeleteView
-from django.views.generic.edit import FormMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
 from datetime import date
 
@@ -7,7 +6,9 @@ from .models import Category, Task_Type, Task, Question, Anwser
 from .forms import ContactForm, TaskForm, QuestionForm, QuestionFormSet, AnwserFormSet
 from django.db import transaction
 from django.urls import reverse_lazy
-
+from django.forms import modelformset_factory
+from django.http import HttpResponseRedirect
+from django.shortcuts import render
 
 # Create your views here.
 
@@ -45,8 +46,30 @@ class ContactSuccessView(TemplateView):
 
 class CategoryDetailView(DetailView):
     model = Category
-    template_name = 'tasks/category.html'
+    template_name = 'tasks/category_tasks.html'
     slug_url_kwarg = 'the_slug'
+    slug_field = 'slug_url'
+
+
+def TaskDetailView(request, the_slug, pk):
+    # gets the question
+    task = Task.objects.get(pk=pk)
+
+    # gets how many anwsers every question has
+    number_of_anwsers = len(task.list_of_anwsers())
+
+    # creates a formset with as many fields as the anwsers is
+    anwsers_field = modelformset_factory(Anwser, fields=('correct',),
+                                         extra=number_of_anwsers)
+
+    if request.method == "POST":
+        # gets user anwsers by POST method
+        formset = anwsers_field(request.POST)
+    else:
+        # empty anwsers fields for user
+        formset = anwsers_field(queryset=Anwser.objects.none())
+    return render(request, 'tasks/task_detail.html',
+                  {'formset': formset, 'anwsers': iter(formset), 'task': task, })
 
 
 class AddTaskListView(LoginRequiredMixin, ListView):
@@ -163,5 +186,10 @@ class AddTaskAnwsersView(UpdateView):
     #     return reverse_lazy('add_task', kwargs={'pk': self.object.pk})
 
 
-class UserTaskList(ListView):
-    template_name = 'tasks/list_task.html'
+class MyTasksView(LoginRequiredMixin, ListView):
+    template_name = 'tasks/my_tasks.html'
+    context_object_name = 'tasks'
+    paginate_by = 15
+
+    def get_queryset(self):
+        return Task.objects.filter(author=self.request.user)

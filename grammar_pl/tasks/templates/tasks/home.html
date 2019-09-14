@@ -52,7 +52,7 @@
 		<div uk-scrollspy="target: > a; cls: uk-animation-slide-bottom; delay: 200" class="uk-grid-small uk-flex-center uk-grid-match" uk-grid>
 			{% for category in object_list %}
 			{% if 'Present' in category.title %}
-			<a href="{% url 'category' category.slug %}" class="uk-link-reset">
+			<a href="{% url 'category' category.slug_url %}" class="uk-link-reset">
 			<div>
 				<div class="uk-width-medium uk-card uk-card-hover uk-card-small uk-card-default uk-card-body">
 					<div class="block-title">{{ category.title }}</div>
@@ -75,7 +75,7 @@
 		<div uk-scrollspy="target: > a; cls: uk-animation-slide-bottom; delay: 200" class="uk-grid-small uk-flex-center uk-grid-match" uk-grid>
 			{% for category in object_list %}
 			{% if 'Past' in category.title %}
-			<a href="{% url 'category' category.slug %}" class="uk-link-reset">
+			<a href="{% url 'category' category.slug_url %}" class="uk-link-reset">
 			<div>
 				<div class="uk-width-medium uk-card uk-card-hover uk-card-small uk-card-default uk-card-body">
 					<div class="block-title">{{ category.title }}</div>
@@ -98,7 +98,7 @@
 		<div uk-scrollspy="target: > a; cls: uk-animation-slide-bottom; delay: 200" class="uk-grid-small uk-flex-center uk-grid-match" uk-grid>
 			{% for category in object_list %}
 			{% if 'Future' in category.title %}
-			<a href="{% url 'category' category.slug %}" class="uk-link-reset">
+			<a href="{% url 'category' category.slug_url %}" class="uk-link-reset">
 			<div>
 				<div class="uk-width-medium uk-card uk-card-hover uk-card-small uk-card-default uk-card-body">
 					<div class="block-title">{{ category.title }}</div>
@@ -124,7 +124,7 @@
 		<div uk-scrollspy="target: > a; cls: uk-animation-fade; delay: 150" class="uk-grid-small uk-flex-center uk-grid-match" uk-grid>
 			{% for category in object_list %}
 			{% if 'warunkowy' in category.title %}
-			<a href="{% url 'category' category.slug %}" class="uk-link-reset">
+			<a href="{% url 'category' category.slug_url %}" class="uk-link-reset">
 			<div>
 				<div class="uk-width-medium uk-card uk-card-hover uk-card-small uk-card-default uk-card-body">
 					<div class="block-title">{{ category.title }}</div>

@@ -59,7 +59,7 @@
             <div class="uk-margin">
                 {% if object.pk %}
                     <a href="{% url 'delete_task' object.pk %}" class="uk-button uk-button-danger">Usuń zadanie</a>
-                    <a href="{% url 'add_anwsers' object.pk %}" class="uk-button uk-button-secondary">Dodaj odpowiedzi</a>
+                    <a href="{% url 'add_anwsers' object.pk %}" class="uk-button uk-button-secondary">Edytuj odpowiedzi</a>
                 {% else %}
                     <button class="uk-button uk-button-secondary" name="next" value="add_anwsers">Dodaj odpowiedzi</button>
                 {% endif %}

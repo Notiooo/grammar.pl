@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+{% load next_field %}
+
+{% block title %}{{ task.title|truncatechars:40 | striptags }} - Grammar.pl{% endblock title %}
+{% block description %}{{ task.text|truncatechars:120 | striptags }} - zadanie maturalne{% endblock description %}
+
+{% block content %}
+
+<div class="uk-section">
+    <div class="uk-container uk-container-small">
+        <p class="uk-text-lead">{{ task.title }}</p>
+        <div class="uk-text-justify">{{ task.text | safe | linebreaks }}</div>
+        <form method="post">
+        {{ formset.management_form }}
+        {% csrf_token %}
+            {% for question in task.question.all %}
+            <span class="uk-text-bold"><p>{{ forloop.counter }}. {{ question.text | linebreaksbr }}</p></span>
+                <div class="uk-margin-left">
+                    {% for anwser in question.anwsers.all %}
+                        {% with correct_anwser=anwsers|next_field:"correct" %}
+                            {% if formset.is_valid %}
+                                {% if anwser.correct %}
+                                    <p style="background-color: palegreen">
+                                        {% render_field correct_anwser class+="uk-checkbox" type="checkbox" %}
+                                        {{ anwser.text }}
+                                    </p>
+                                {% elif anwser.correct != correct_anwser.value %}
+                                    <p style="background-color: pink">
+                                        {% render_field correct_anwser class+="uk-checkbox" type="checkbox" %}
+                                        {{ anwser.text }}
+                                    </p>
+                                {% else %}
+                                    <p>
+                                        {% render_field correct_anwser class+="uk-checkbox" type="checkbox" %}
+                                        {{ anwser.text }} - valid
+                                    </p>
+                                {% endif %}
+                            {% else %}
+                                <p>
+                                    {% render_field correct_anwser class+="uk-checkbox" type="checkbox" %}
+                                    {{ anwser.text }} - not valid
+                                </p>
+                            {% endif %}
+                        {% endwith %}
+                    {% endfor %}
+                </div>
+            {% endfor %}
+            <div>
+                <button class="uk-button uk-button-primary uk-float-right uk-width-medium@s" type="submit">Zatwierdź odpowiedzi</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

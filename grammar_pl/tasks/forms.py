@@ -40,10 +40,10 @@ QuestionFormSet = inlineformset_factory(
 
 AnwserFormSet = inlineformset_factory(
     models.Question, models.Anwser, form=AnwserForm,
-    fields=['anwser', 'correct'],
-    widgets={'anwser': forms.TextInput(attrs={'class': 'uk-input'}),
+    fields=['text', 'correct'],
+    widgets={'text': forms.TextInput(attrs={'class': 'uk-input'}),
              'correct': forms.CheckboxInput(attrs={'class': 'uk-checkbox uk-padding-small'})},
-    labels={'anwser': 'Odpowiedź',
+    labels={'text': 'Odpowiedź',
             'correct': 'Czy to poprawna odpowiedź?'},
     extra=1, max_num=3,
     min_num=0, can_delete=True)

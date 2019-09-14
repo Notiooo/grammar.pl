@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="uk-section">
+    <div class="uk-container uk-container-large">
+
+        <h1>Moje zadania</h1>
+
+        <table class="uk-table uk-table-striped uk-table-hover" uk-toggle="cls: uk-table-responsive; mode: media; media: (max-width: 500px);">
+            <thead>
+                <tr>
+                    <th>Tytuł</th>
+                    <th>Kategoria</th>
+                    <th>Głosy</th>
+                    <th>Data dodania</th>
+                    <th>Widoczność</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for task in tasks %}
+                <tr>
+                    <td class="uk-table-link">
+                        <a class="uk-link-reset" href="{% url 'task_detail' task.category.slug_url task.id %}">{{ task.title }}</a>
+                    </td>
+                    <td>{{ task.category.title }}</td>
+                    <td>miejsce na głosy</td>
+                    <td>{{ task.date|date:"D d M Y" }}</td>
+                    {% if task.public %}
+                    <td style="color: palegreen;">Publiczne</td>
+                    {% else %}
+                    <td style="color: darkgrey;">Niepubliczne</td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% include 'base/paginator.html' %}
+    </div>
+</div>
+{% endblock %}

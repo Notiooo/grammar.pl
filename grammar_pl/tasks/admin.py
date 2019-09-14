@@ -6,7 +6,7 @@ from . import models
 
 @admin.register(models.Category)
 class CategoryAdmin(admin.ModelAdmin):
-    prepopulated_fields = {'slug': ('title',)}
+    prepopulated_fields = {'slug_url': ('title',)}
 
 
 @admin.register(models.Task_Type)

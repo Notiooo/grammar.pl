@@ -10,7 +10,7 @@ from django.urls.base import reverse
 
 class Category(models.Model):
     title = models.CharField(max_length=100)
-    slug = models.SlugField(unique=True)
+    slug_url = models.SlugField(unique=True)
     description = models.TextField()
 
     def __str__(self):
@@ -45,9 +45,10 @@ class Task_Type(models.Model):
     def __str__(self):
         return self.title
 
+
 class Task(models.Model):
     task_type = models.ForeignKey(Task_Type, on_delete=models.CASCADE, related_name='task_type', null=True)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='questions', null=True)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='task', null=True)
     title = models.CharField(max_length=80)
     text = models.TextField(max_length=450)
     votes = GenericRelation(Activity, related_name='votes')
@@ -64,6 +65,15 @@ class Task(models.Model):
     def get_absolute_url(self):
         return reverse('edit_task', kwargs={'pk': self.pk})
 
+    def list_of_anwsers(self):
+        "Gets all anwsers from queryset of questions"
+        anwsers = []
+        for question in self.question.all():
+            for anwser in question.anwsers.all():
+                anwsers.append(anwser)
+        return anwsers
+
+
 class Question(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='question', null=True)
     text = models.CharField(max_length=200)
@@ -74,11 +84,11 @@ class Question(models.Model):
 
 class Anwser(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='anwsers')
-    anwser = models.CharField(max_length=100)
+    text = models.CharField(max_length=100, blank=True)
     correct = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.anwser
+        return self.text
 
 
 class Comment(models.Model):
