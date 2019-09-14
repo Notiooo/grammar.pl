@@ -1,9 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}{% if category %}Zadania - {{ category.get_type_display }} {{ category.year }} Poziom {{ category.get_level_display }} {{ category.get_month_display }}{% elif view.kwargs.task_type %}{{ object_list.0.category.get_type_display }} - {{ object_list.0.get_type_display|title }} - Zadania{% else %}{{ block.super }}{% endif %}{% endblock title %}
-
 {% block content %}
-
 <div class="uk-section">
     <div class="uk-container uk-container-large">
         {% if object_list %}

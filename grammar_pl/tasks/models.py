@@ -3,6 +3,7 @@ from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericRelation
+from django.urls.base import reverse
 
 
 # Create your models here.
@@ -36,23 +37,22 @@ class Activity(models.Model):
 
 
 class Task_Type(models.Model):
-    image = models.ImageField()
+    image = models.ImageField(blank=True)
     title = models.CharField(max_length=40)
     description = models.CharField(max_length=150)
-    create_layout = models.SlugField(unique=True, null=True)
-    display_layout = models.SlugField(unique=True, null=True)
+    slug_url = models.SlugField(null=True)
 
     def __str__(self):
         return self.title
 
-
-class Question(models.Model):
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='questions', null=True)
+class Task(models.Model):
     task_type = models.ForeignKey(Task_Type, on_delete=models.CASCADE, related_name='task_type', null=True)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='questions', null=True)
     title = models.CharField(max_length=80)
     text = models.TextField(max_length=450)
-    date = models.DateTimeField(auto_now_add=True)
     votes = GenericRelation(Activity, related_name='votes')
+    date = models.DateTimeField(auto_now_add=True)
+    public = models.BooleanField(default=False)
     author = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -60,6 +60,16 @@ class Question(models.Model):
 
     def __str__(self):
         return self.title
+
+    def get_absolute_url(self):
+        return reverse('edit_task', kwargs={'pk': self.pk})
+
+class Question(models.Model):
+    task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='question', null=True)
+    text = models.CharField(max_length=200)
+
+    def __str__(self):
+        return self.text[:60] + "..."
 
 
 class Anwser(models.Model):

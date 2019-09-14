@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="uk-section uk-section-small uk-text-center">
+    <form method="post">{% csrf_token %}
+        <p>Jesteś pewien, że chcesz usunąć "{{ object }}"?</p>
+        <input class="uk-button uk-button-danger" type="submit" value="Usuń">
+    </form>
+</div>
+
+{% endblock content %}

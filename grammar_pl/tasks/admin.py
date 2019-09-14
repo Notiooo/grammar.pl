@@ -10,24 +10,28 @@ class CategoryAdmin(admin.ModelAdmin):
 
 
 @admin.register(models.Task_Type)
-class TaskTypeAdmin(admin.ModelAdmin):
+class TaskType(admin.ModelAdmin):
+    prepopulated_fields = {'slug_url': ('title',)}
+
+@admin.register(models.Anwser)
+class Anwser(admin.ModelAdmin):
     pass
-
-
-class CommentInline(admin.TabularInline):
-    model = models.Comment
-
 
 class AnwserInline(admin.TabularInline):
     model = models.Anwser
 
-
-class QuestionAdmin(admin.ModelAdmin):
+@admin.register(models.Question)
+class Question(admin.ModelAdmin):
     inlines = [
-        CommentInline,
         AnwserInline,
     ]
 
+class QuestionInline(admin.TabularInline):
+    show_change_link = True
+    model = models.Question
 
-admin.site.register(models.Question, QuestionAdmin)
-admin.site.register(models.Comment)
+@admin.register(models.Task)
+class TaskAdmin(admin.ModelAdmin):
+    inlines = [
+        QuestionInline,
+    ]

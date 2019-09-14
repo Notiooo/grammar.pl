@@ -21,7 +21,7 @@
                     <ul class="uk-nav uk-navbar-dropdown-nav uk-list-divider">
                         {% if user.is_authenticated %}
                         <p>Hej, {{ user.username }}</p>
-                        <li><a uk-tooltip="title: Prace wciąż trwają 😥; pos: left">Dodaj zadanie</a></li>
+                        <li><a href="{% url 'add_task_list' %}">Dodaj zadanie</a></li>
                         <li><a href="{% url 'profile' user.pk %}">Twój profil</a></li>
                         <li><a uk-tooltip="title: Prace wciąż trwają 😥; pos: left">Ulubione</a></li>
                         <li><a href="{% url 'logout' %}?next={% firstof request.path '/' %}">Wyloguj się</a></li>
@@ -57,7 +57,7 @@
             <li class="uk-padding"><img src="{% if user.is_authenticated %} {{ user.avatar.url }} {% else %} {% static 'img/avatar.png' %} {% endif %}" class="uk-border-circle" alt="avatar"></li>
             {% if user.is_authenticated %}
             <li><a href="{% url 'profile' user.pk %}">Twój profil</li></li>
-            <li><a uk-tooltip="Prace wciąż trwają 😥">Dodaj zadanie</a></li>
+            <li><a href="{% url 'add_task_list' %}">Dodaj zadanie</a></li>
             <li><a uk-tooltip="Prace wciąż trwają 😥">Ulubione</a></li>
             <li><a href="{% url 'logout' %}?next={% firstof request.path '/' %}">Wyloguj się</a></li>
             {% else %}

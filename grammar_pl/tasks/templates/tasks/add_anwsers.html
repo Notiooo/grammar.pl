@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% load zip %}
+
+{% block content %}
+<style>
+    .intend{
+        margin-left: 50px;
+    }
+</style>
+<div class="uk-section">
+    <div class="uk-container uk-container-small">
+        <form method="POST">
+            {% csrf_token %}
+            {{ object.management_form }}
+            <div class="uk-margin">
+                <h4>Kategoria</h4>
+                {{ object.category }}
+            </div>
+            <div class="uk-margin">
+                <h4>Tytuł Zadania</h4>
+                {{ object.title }}
+            </div>
+            <div class="uk-margin">
+                <h4>Treść zadania</h4>
+                {{ object.text | linebreaksbr }}
+            </div>
+            <h4 class="uk-heading-line uk-text-center"><span>Odpowiedzi</span></h4>
+            {% if anwsers_list %}
+                {% for question, anwser_formset in object.question.all|zip:anwsers_list %}
+                {{ anwser_formset.management_form }}
+                <h3>{{ question.text }}</h3>
+                    <table class="uk-table uk-table-middle uk-table-small" uk-toggle="cls: uk-table-responsive; mode: media; media: (max-width: 500px);">
+                        <thead>
+                            <tr>
+                                {% with anwsers=anwser_formset.0 %}
+                                    {% for field in anwsers.visible_fields %}
+                                        {% if field.field.widget.input_type == "checkbox" %}
+                                        <th class="uk-table-shrink uk-text-center">{{ field.label|capfirst }}</th>
+                                        {% else %}
+                                        <th>{{ field.label|capfirst }}</th>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endwith %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for anwsers in anwser_formset %}
+                                {% for error in anwsers.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            <tr class="formset_row-anwser-{{ forloop.parentloop.counter0 }}">
+                                {% for anwser in anwsers.visible_fields %}
+                                    {% if anwser.field.widget.input_type == "checkbox" %}
+                                    <td class="uk-text-center uk-table-shrink">
+                                    {% else %}
+                                    <td class="uk-table-expand">
+                                    {% endif %}
+                                        {% if forloop.first %}
+                                            {% for hidden in anwsers.hidden_fields %}
+                                                {{ hidden }}
+                                            {% endfor %}
+                                        {% endif %}
+                                        {% for error in anwser.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                        {% render_field anwser %}
+                                    </td>
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <hr/>
+                {% endfor %}
+            {% else %}
+                <h3>Nie dodałeś żadnych pytań</h3>
+                <p>Dodaj pytania do zadania i wróć tutaj aby dodać odpowiedzi</p>
+            {% endif %}
+            <div class="uk-margin">
+                <button class="uk-button uk-button-primary uk-float-right" type="submit">Zapisz odpowiedzi</button>
+                <a href="{% url 'edit_task' object.pk %}" class="uk-button uk-float-left"><span uk-icon="icon: arrow-left; ratio: 2"></span>Wróć do zadania</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% for anwser in anwsers_list %}
+    {% if anwser.non_field_errors %}
+        <div class="uk-alert-danger" uk-alert>
+            {% for error in anwser.non_field_errors %}
+                {{ error }}
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endfor %}
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script src="{% static 'js/jquery.formset.js' %}"></script>
+<script type="text/javascript">
+{% for number in anwsers_range %}
+    $('.formset_row-anwser-{{number}}').formset({
+        addText: 'Dodaj kolejną odpowiedź',
+        deleteText: 'Usuń odpowiedź',
+        prefix: 'anwsers_list{{number}}',
+        addCssClass: 'uk-button uk-button-secondary',
+        deleteCssClass: 'uk-button uk-button-default',
+    });
+{% endfor %}
+</script>
+{% endblock content %}
