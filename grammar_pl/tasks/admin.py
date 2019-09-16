@@ -35,3 +35,7 @@ class TaskAdmin(admin.ModelAdmin):
     inlines = [
         QuestionInline,
     ]
+
+@admin.register(models.Activity)
+class ActivityAdmin(admin.ModelAdmin):
+    pass

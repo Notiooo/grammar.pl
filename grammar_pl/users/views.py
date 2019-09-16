@@ -5,6 +5,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .forms import CustomUserCreationForm, CustomUserChangeForm, CustomAuthenticationForm
 from .models import CustomUser
+from tasks.models import Task, Activity
 
 from django.contrib.auth import views as auth_views
 
@@ -31,3 +32,11 @@ class CustomLoginView(auth_views.LoginView):
 class ProfileDetailView(generic.DetailView):
     model = CustomUser
     template_name = 'users/profile.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(ProfileDetailView, self).get_context_data(**kwargs)
+        user = self.get_object()
+        context['tasks_activity'] = Task.objects.filter(author=user).order_by('-id')[:3]
+        user_activity = Activity.objects.filter(user=user)
+        context['gained_points'] = user_activity.filter(activity_type=Activity.UP_VOTE).count() - user_activity.filter(activity_type=Activity.DOWN_VOTE).count()
+        return context

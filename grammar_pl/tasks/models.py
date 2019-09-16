@@ -16,24 +16,29 @@ class Category(models.Model):
     def __str__(self):
         return self.title
 
+    def get_public_tasks(self):
+        return self.task.all().filter(public=True)
+
 
 class Activity(models.Model):
     UP_VOTE = 'U'
     DOWN_VOTE = 'D'
     ACTIVITY_TYPES = (
-        (UP_VOTE, 'Up Vote'),
-        (DOWN_VOTE, 'Down Vote'),
+        (UP_VOTE, 'upvote'),
+        (DOWN_VOTE, 'downvote'),
     )
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
     )
     activity_type = models.CharField(max_length=1, choices=ACTIVITY_TYPES)
-    date = models.DateTimeField(auto_now_add=True)
 
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey()
+
+    class Meta:
+        unique_together = ('object_id', 'user', 'content_type')
 
 
 class Task_Type(models.Model):
@@ -73,6 +78,11 @@ class Task(models.Model):
                 anwsers.append(anwser)
         return anwsers
 
+    def sum_votes(self):
+        upvotes = self.votes.filter(activity_type=Activity.UP_VOTE).count()
+        downvotes = self.votes.filter(activity_type=Activity.DOWN_VOTE).count()
+        return upvotes - downvotes
+
 
 class Question(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='question', null=True)
@@ -92,8 +102,8 @@ class Anwser(models.Model):
 
 
 class Comment(models.Model):
-    question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='comments')
-    comment = models.CharField(max_length=140)
+    task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='comments', null=True)
+    text = models.CharField(max_length=140)
     date = models.DateTimeField(auto_now_add=True)
     author = models.ForeignKey(
         settings.AUTH_USER_MODEL,

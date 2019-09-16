@@ -20,6 +20,15 @@
                 <div class="uk-text-meta">Imie: {% if object.first_name %} {{ object.first_name }} {% else %} brak :c {% endif %}</div>
                 <div class="uk-text-meta">Data urodzenia: {% if object.birth %} {{ object.birth }} {% else %} nie urodził się :c {% endif %}
                 </div>
+                {% if gained_points < 0 %}
+                    <div class="uk-text-danger uk-text-meta">Suma zdobytch punktów: {{ gained_points }}</div>
+                {% elif gained_points > 100 %}
+                    <div class="uk-text-success uk-text-meta">Suma zdobytch punktów: {{ gained_points }}</div>
+                (% elif gained_points > 1000 %}
+                    <div class="uk-text-warning uk-text-meta">Suma zdobytch punktów: {{ gained_points }}</div>
+                {% else %}
+                    <div class="uk-text-meta">Suma zdobytch punktów: {{ gained_points }}</div>
+                {% endif %}
                 {% if user == object %}
                 <p class="uk-text-center">
                     <a href="{% url 'changeprofile' %}"><button class="uk-button uk-button-primary">Edytuj swoje dane</button></a>
@@ -37,6 +46,7 @@
         <!-- ACTIVITY TAB -->
         <div class="uk-width-expand@s">
             <h3>Ostatnia aktywność</h3>
+            <h3 class="uk-heading-line uk-text-center"><span>Ostatnie komentarze</span></h3>
             <div class="uk-comment uk-background-default uk-padding uk-margin-bottom">
                 <header class="uk-comment-header uk-grid-medium uk-flex-middle" uk-grid>
                     <div class="uk-width-expand">
@@ -52,22 +62,27 @@
                     <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam non sed diam non... <span class="uk-title-lead">czytaj więcej</span></p>
                 </div>
             </div>
-            <div class="uk-comment uk-background-default uk-padding">
+            <h4 class="uk-text-right">Zobacz więcej</h4>
+            <h3 class="uk-heading-line uk-text-center"><span>Ostatnie zadania</span></h3>
+            {% for task in tasks_activity %}
+            <div class="uk-comment uk-background-default uk-padding uk-margin-bottom">
                 <header class="uk-comment-header uk-grid-medium uk-flex-middle" uk-grid>
                     <div class="uk-width-expand">
                         <span uk-icon="icon: file-text; ratio: 2" class="uk-float-right"></span>
-                        <h4 class="uk-comment-title uk-margin-remove"><a class="uk-link-reset" href="#">Tytuł zadania</a></h4>
+                        <h4 class="uk-comment-title uk-margin-remove"><a class="uk-link-reset" href="#">{{ task.title }}</a></h4>
                         <ul class="uk-comment-meta uk-subnav uk-subnav-divider uk-margin-remove-top">
                             <li><a href="#">15 dni temu</a></li>
-                            <li><a href="#">Zadanie</a></li>
-                            <li><a href="#">Past Simple</a></li>
+                            <li><a href="{% url 'task_detail' task.category.slug_url task.id %}" class="uk-link-text uk-title-lead uk-float-right">Zadanie</a></li>
+                            <li><a href="#">{{ task.category }}</a></li>
                         </ul>
                     </div>
                 </header>
                 <div class="uk-comment-body">
-                    <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam non sed diam non... <span class="uk-title-lead">czytaj więcej</span></p>
+                    <p>{{ task.text|truncatechars:80 }}<a href="{% url 'task_detail' task.category.slug_url task.id %}" class="uk-link-text uk-title-lead uk-float-right">Wyświetl zadanie</a></p>
                 </div>
             </div>
+            {% endfor %}
+            <h4 class="uk-text-right">Zobacz więcej</h4>
         </div>
 
     </div>

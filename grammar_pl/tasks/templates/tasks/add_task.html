@@ -14,7 +14,7 @@
         <form method="POST">
             {% csrf_token %}
             {% if object %}
-            <div class="uk-margin"><h3>{% if object.public %}Publiczne{% else %}Niepubliczne{% endif %}</h3></div>
+            <div class="uk-margin">{% if object.public %}<h3 style="color: #50f072">Publiczne</h3>{% else %}<h3 style="color: #405075">Niepubliczne</h3>{% endif %}</div>
             {% endif %}
             <div class="uk-margin">
                 <h5>Kategoria</h5>
@@ -69,6 +69,11 @@
                     <button class="uk-button uk-float-right" name="next" value="public" style="color: white; background-color: #50f072" type="submit">Publikuj</button>
                 {% endif %}
                 <button type="submit" class="uk-button uk-button-primary">Zapisz</button>
+            </div>
+            <div class="uk-margin">
+                {% if object.pk %}
+                    <a href="{% url 'task_detail' object.category.slug_url object.pk %}" class="uk-button uk-button-default">Wyswietl zadanie</a>
+                {% endif %}
             </div>
         </form>
     </div>

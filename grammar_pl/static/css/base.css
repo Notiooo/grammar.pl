@@ -22,6 +22,36 @@ html{
     background-color: pink;
 }
 
+/*  BUTTONS   */
+
+.button-danger-transparent
+{
+    background-color: transparent;
+    color: #f0506e;
+    border: 2px solid #f0506e;
+    font-weight: 500;
+}
+
+.yellow-button
+{
+	background-color: #FFC96C;
+	color: white;
+}
+
+.yellow-button-transparent
+{
+    background-color: transparent;
+    color: #FFC96C;
+	border: 2px solid #FFC96C;
+	font-weight: 500;
+}
+
+.yellow-button-transparent:hover
+{
+    background-color: #FFC96C;
+    color: white;
+}
+
 
 body {
   position: relative;
@@ -43,11 +73,6 @@ body {
 .promote-text{
 	color: white;
     text-shadow: 0px 0px 4px #656565;
-}
-
-.yellow-button{
-	background-color: #FFC96C;
-	color: white;
 }
 
 .block-title{

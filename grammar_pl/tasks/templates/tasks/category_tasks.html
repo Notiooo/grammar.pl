@@ -18,12 +18,20 @@
                 </tr>
             </thead>
             <tbody>
-            {% for task in object.task.all %}
+            {% for task in object.get_public_tasks %}
                 <tr>
                     <td class="uk-table-link">
                         <a class="uk-link-reset" href="{% url 'task_detail' object.slug_url task.id %}">{{ task.title }}</a>
                     </td>
-                    <td>miejsce na głosy</td>
+                    {% with votes=task.sum_votes %}
+                        {% if votes < 0 %}
+                        <td class="uk-text-danger">{{ votes }}</td>
+                        {% elif votes > 0 %}
+                        <td class="uk-text-success">{{ votes }}</td>
+                        {% else %}
+                        <td>{{ votes }}</td>
+                        {% endif %}
+                    {% endwith %}
                     <td>{{ task.date|date:"D d M Y" }}</td>
                     <td>{{ task.author }}</td>
                     <td><img class="uk-preserve-width uk-border-circle" src="{{ task.author.avatar.url }}" width="40" alt=""></td>

@@ -2,13 +2,15 @@ from django.views.generic import ListView, TemplateView, FormView, DetailView, C
 from django.contrib.auth.mixins import LoginRequiredMixin
 from datetime import date
 
-from .models import Category, Task_Type, Task, Question, Anwser
+from .models import Category, Task_Type, Task, Anwser, Activity
 from .forms import ContactForm, TaskForm, QuestionForm, QuestionFormSet, AnwserFormSet
 from django.db import transaction
 from django.urls import reverse_lazy
 from django.forms import modelformset_factory
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
+from .helpers import save_user_vote, get_votes, user_activity
+
 
 # Create your views here.
 
@@ -63,13 +65,14 @@ def TaskDetailView(request, the_slug, pk):
                                          extra=number_of_anwsers)
 
     if request.method == "POST":
-        # gets user anwsers by POST method
+        save_user_vote(request, task)
         formset = anwsers_field(request.POST)
     else:
         # empty anwsers fields for user
         formset = anwsers_field(queryset=Anwser.objects.none())
     return render(request, 'tasks/task_detail.html',
-                  {'formset': formset, 'anwsers': iter(formset), 'task': task, })
+                  {'formset': formset, 'anwsers': iter(formset), 'task': task, 'votes': get_votes(task),
+                   'user_activity': user_activity(request, task)})
 
 
 class AddTaskListView(LoginRequiredMixin, ListView):

@@ -7,48 +7,110 @@
 
 {% block content %}
 
+<style>
+    .paper {
+        background: #fff;
+        padding: 30px;
+        position: relative;
+    }
+
+    .paper,
+    .paper::before,
+    .paper::after {
+        /* Styles to distinguish sheets from one another */
+        box-shadow: 1px 1px 1px rgba(0,0,0,0.25);
+        border: 1px solid #bbb;
+    }
+
+    .paper::before,
+    .paper::after {
+        content: "";
+        position: absolute;
+        height: 95%;
+        width: 99%;
+        background-color: #eee;
+    }
+
+    .paper::before {
+        right: 15px;
+        top: 0;
+        transform: rotate(-1deg);
+        z-index: -1;
+    }
+
+    .paper::after {
+        top: 5px;
+        right: -5px;
+        transform: rotate(1deg);
+        z-index: -2;
+    }
+
+    .task-menu
+    {
+        background-color: #f5f5f5;
+        margin-left: 15px;
+        margin-right: -20px;
+        margin-top: -20%;
+        padding-top: 22%;
+        border: 2px solid lightgrey;
+    }
+</style>
+
 <div class="uk-section">
     <div class="uk-container uk-container-small">
-        <p class="uk-text-lead">{{ task.title }}</p>
-        <div class="uk-text-justify">{{ task.text | safe | linebreaks }}</div>
-        <form method="post">
-        {{ formset.management_form }}
-        {% csrf_token %}
-            {% for question in task.question.all %}
-            <span class="uk-text-bold"><p>{{ forloop.counter }}. {{ question.text | linebreaksbr }}</p></span>
-                <div class="uk-margin-left">
-                    {% for anwser in question.anwsers.all %}
-                        {% with correct_anwser=anwsers|next_field:"correct" %}
-                            {% if formset.is_valid %}
-                                {% if anwser.correct %}
-                                    <p style="background-color: palegreen">
-                                        {% render_field correct_anwser class+="uk-checkbox" type="checkbox" %}
-                                        {{ anwser.text }}
-                                    </p>
-                                {% elif anwser.correct != correct_anwser.value %}
-                                    <p style="background-color: pink">
-                                        {% render_field correct_anwser class+="uk-checkbox" type="checkbox" %}
-                                        {{ anwser.text }}
-                                    </p>
+        <div style="background-color: white; border: 2px solid lightgrey;" class="paper uk-border-rounded uk-padding uk-box-shadow-medium">
+            <div class="uk-float-right" style="font-weight: 500;"><a class="uk-link-reset" href="{% url 'profile' task.author.id %}">{{ task.author }} <img class="uk-preserve-width uk-border-circle" src="{{ task.author.avatar.url }}" width="40" alt=""></a></div>
+            <p class="uk-text-lead">{{ task.title }}</p>
+            <div class="uk-text-justify">{{ task.text | safe | linebreaks }}</div>
+            <form method="post">
+            {{ formset.management_form }}
+            {% csrf_token %}
+                {% for question in task.question.all %}
+                <span class="uk-text-bold"><p>{{ forloop.counter }}. {{ question.text | linebreaksbr }}</p></span>
+                    <div class="uk-margin-left">
+                        {% for anwser in question.anwsers.all %}
+                            {% with correct_anwser=anwsers|next_field:"correct" %}
+                                {% if formset.is_valid and 'vote' not in request.POST %}
+                                    {% if anwser.correct %}
+                                        <p style="background-color: palegreen">
+                                            {% render_field correct_anwser class+="uk-checkbox" type="checkbox" %}
+                                            {{ anwser.text }}
+                                        </p>
+                                    {% elif anwser.correct != correct_anwser.value %}
+                                        <p style="background-color: pink">
+                                            {% render_field correct_anwser class+="uk-checkbox" type="checkbox" %}
+                                            {{ anwser.text }}
+                                        </p>
+                                    {% else %}
+                                        <p>
+                                            {% render_field correct_anwser class+="uk-checkbox" type="checkbox" %}
+                                            {{ anwser.text }}
+                                        </p>
+                                    {% endif %}
                                 {% else %}
                                     <p>
                                         {% render_field correct_anwser class+="uk-checkbox" type="checkbox" %}
-                                        {{ anwser.text }} - valid
+                                        {{ anwser.text }}
                                     </p>
                                 {% endif %}
-                            {% else %}
-                                <p>
-                                    {% render_field correct_anwser class+="uk-checkbox" type="checkbox" %}
-                                    {{ anwser.text }} - not valid
-                                </p>
-                            {% endif %}
-                        {% endwith %}
-                    {% endfor %}
-                </div>
-            {% endfor %}
-            <div>
-                <button class="uk-button uk-button-primary uk-float-right uk-width-medium@s" type="submit">Zatwierdź odpowiedzi</button>
+                            {% endwith %}
+                        {% endfor %}
+                    </div>
+                {% endfor %}
             </div>
+            <div class="uk-border-rounded uk-padding-small task-menu">
+                <div uk-grid>
+                    <div class="uk-text-left uk-width-1-1 uk-width-2-3@s">
+                        <button class="uk-button uk-button-primary uk-border-rounded" type="submit">Sprawdź odpowiedzi</button>
+                    </div>
+                    <div class="uk-text-right uk-width-1-1 uk-width-1-3@s">
+                        <button type="submit" name="vote" value="upvote" class="{% if user_activity.upvote %}uk-text-success{% endif %} uk-icon-link" uk-icon="icon: arrow-up; ratio: 1.5">{{ votes.upvotes }} Lubie!</button>
+                        <button type="submit" name="vote" value="downvote" class="{% if user_activity.downvote %}uk-text-danger{% endif %} uk-icon-link" uk-icon="icon: arrow-down; ratio: 1.5">{{ votes.downvotes }} Nie lubie</button>
+                    </div>
+                </div>
+            </div>
+            {% include 'tasks/go_back_button.html' %}
+            {% include 'tasks/tasks_help_menu.html' %}
         </form>
     </div>
 </div>
