@@ -8,7 +8,7 @@
         <div class="uk-width-medium@s uk-text-break">
             <img src="{{ object.avatar.url }}" class="uk-width-2-3 uk-align-center uk-border-circle">
             <div class="uk-card-body uk-card-default uk-card-small" style="padding-top: 80px; border-radius: 80px 80px 0px 0px; margin-top: -90px; border-bottom: 4px solid grey;">
-                <h3 class="uk-card-title uk-margin-remove-bottom">{{ object.username }}</h3>
+                <h3 class="uk-card-title uk-margin-remove-bottom">{{ object.username }} {% if object.is_staff %}<span class="uk-text-meta" style="color: red">(Administrator)</span>{% endif %}</h3>
                 <p class="uk-text-meta uk-margin-remove-top">Dołączył: {{ object.date_joined }}</p>
                 <hr>
                 <!-- O SOBIE -->
@@ -18,17 +18,29 @@
                 <!-- DANE -->
                 <p class="uk-margin-remove-bottom">Informacje:</p>
                 <div class="uk-text-meta">Imie: {% if object.first_name %} {{ object.first_name }} {% else %} brak :c {% endif %}</div>
-                <div class="uk-text-meta">Data urodzenia: {% if object.birth %} {{ object.birth }} {% else %} nie urodził się :c {% endif %}
-                </div>
+                <div class="uk-text-meta">Data urodzenia: {% if object.birth %} {{ object.birth }} {% else %} nie urodził się :c {% endif %}</div>
+                <!-- OSIĄGNIĘCIA -->
+                <p class="uk-margin-remove-bottom">Osiągnięcia:</p>
                 {% if gained_points < 0 %}
-                    <div class="uk-text-danger uk-text-meta">Suma zdobytch punktów: {{ gained_points }}</div>
+                    <div class="uk-text-danger uk-text-meta"
                 {% elif gained_points > 100 %}
-                    <div class="uk-text-success uk-text-meta">Suma zdobytch punktów: {{ gained_points }}</div>
+                    <div class="uk-text-success uk-text-meta"
                 (% elif gained_points > 1000 %}
-                    <div class="uk-text-warning uk-text-meta">Suma zdobytch punktów: {{ gained_points }}</div>
+                    <div class="uk-text-warning uk-text-meta"
                 {% else %}
-                    <div class="uk-text-meta">Suma zdobytch punktów: {{ gained_points }}</div>
+                    <div class="uk-text-meta"
                 {% endif %}
+                          uk-tooltip="title: Punkty za autorskie zadania; pos: right">Suma zdobytch punktów: {{ gained_points }}</div>
+                {% if gained_likes < 0 %}
+                    <div class="uk-text-danger uk-text-meta"
+                {% elif gained_likes > 100 %}
+                    <div class="uk-text-success uk-text-meta"
+                (% elif gained_likes > 1000 %}
+                    <div class="uk-text-warning uk-text-meta"
+                {% else %}
+                    <div class="uk-text-meta"
+                {% endif %}
+                        uk-tooltip="title: Punkty za polubione komentarze; pos: right">Suma zdobytch polubień: {{ gained_likes }}</div>
                 {% if user == object %}
                 <p class="uk-text-center">
                     <a href="{% url 'changeprofile' %}"><button class="uk-button uk-button-primary">Edytuj swoje dane</button></a>
@@ -47,21 +59,23 @@
         <div class="uk-width-expand@s">
             <h3>Ostatnia aktywność</h3>
             <h3 class="uk-heading-line uk-text-center"><span>Ostatnie komentarze</span></h3>
-            <div class="uk-comment uk-background-default uk-padding uk-margin-bottom">
+            {% for comment in comments_activity %}
+            <div class="uk-comment uk-background-default uk-padding uk-margin-bottom uk-width-xxlarge@s">
                 <header class="uk-comment-header uk-grid-medium uk-flex-middle" uk-grid>
                     <div class="uk-width-expand">
                         <span uk-icon="icon: comment; ratio: 2" class="uk-float-right"></span>
-                        <h4 class="uk-comment-title uk-margin-remove"><a class="uk-link-reset" href="#">Tytuł zadania</a></h4>
+                        <h4 class="uk-comment-title uk-margin-remove"><a class="uk-link-reset" href="#">{{ comment.task.title }}</a></h4>
                         <ul class="uk-comment-meta uk-subnav uk-subnav-divider uk-margin-remove-top">
-                            <li><a href="#">12 dni temu</a></li>
+                            <li><a href="#">{{ comment.date }}</a></li>
                             <li><a href="#">Komentarz</a></li>
                         </ul>
                     </div>
                 </header>
                 <div class="uk-comment-body">
-                    <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam non sed diam non... <span class="uk-title-lead">czytaj więcej</span></p>
+                    <p>{{ comment.text|truncatechars:150 }}<a href="{% url 'task_detail' comment.task.category.slug_url comment.task.id %}#{{ comment.id }}" class="uk-link-text uk-title-lead uk-float-right">Wyświetl komentarz</a></p>
                 </div>
             </div>
+            {% endfor %}
             <h4 class="uk-text-right">Zobacz więcej</h4>
             <h3 class="uk-heading-line uk-text-center"><span>Ostatnie zadania</span></h3>
             {% for task in tasks_activity %}
@@ -78,7 +92,7 @@
                     </div>
                 </header>
                 <div class="uk-comment-body">
-                    <p>{{ task.text|truncatechars:80 }}<a href="{% url 'task_detail' task.category.slug_url task.id %}" class="uk-link-text uk-title-lead uk-float-right">Wyświetl zadanie</a></p>
+                    <p>{{ task.text|truncatechars:150 }}<a href="{% url 'task_detail' task.category.slug_url task.id %}" class="uk-link-text uk-title-lead uk-float-right">Wyświetl zadanie</a></p>
                 </div>
             </div>
             {% endfor %}

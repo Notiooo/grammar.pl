@@ -5,9 +5,10 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .forms import CustomUserCreationForm, CustomUserChangeForm, CustomAuthenticationForm
 from .models import CustomUser
-from tasks.models import Task, Activity
 
 from django.contrib.auth import views as auth_views
+
+from tasks.models import Task, Votes, Likes, Comment
 
 
 class SignUpView(generic.CreateView):
@@ -33,10 +34,25 @@ class ProfileDetailView(generic.DetailView):
     model = CustomUser
     template_name = 'users/profile.html'
 
+    @staticmethod
+    def get_user_gained_points(user):
+        gained_points = 0
+        for task in Task.objects.filter(author=user):
+            gained_points += task.get_sum_votes()
+        return gained_points
+
+    @staticmethod
+    def get_user_gained_likes(user):
+        gained_likes = 0
+        for comment in Comment.objects.filter(author=user):
+            gained_likes += comment.likes.count()
+        return gained_likes
+
     def get_context_data(self, **kwargs):
         context = super(ProfileDetailView, self).get_context_data(**kwargs)
         user = self.get_object()
         context['tasks_activity'] = Task.objects.filter(author=user).order_by('-id')[:3]
-        user_activity = Activity.objects.filter(user=user)
-        context['gained_points'] = user_activity.filter(activity_type=Activity.UP_VOTE).count() - user_activity.filter(activity_type=Activity.DOWN_VOTE).count()
+        context['comments_activity'] = Comment.objects.filter(author=user).order_by('-id')[:3]
+        context['gained_points'] = self.get_user_gained_points(user)
+        context['gained_likes'] = self.get_user_gained_likes(user)
         return context

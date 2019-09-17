@@ -1,8 +1,5 @@
 from django.db import models
 from django.conf import settings
-from django.contrib.contenttypes.fields import GenericForeignKey
-from django.contrib.contenttypes.models import ContentType
-from django.contrib.contenttypes.fields import GenericRelation
 from django.urls.base import reverse
 
 
@@ -17,28 +14,7 @@ class Category(models.Model):
         return self.title
 
     def get_public_tasks(self):
-        return self.task.all().filter(public=True)
-
-
-class Activity(models.Model):
-    UP_VOTE = 'U'
-    DOWN_VOTE = 'D'
-    ACTIVITY_TYPES = (
-        (UP_VOTE, 'upvote'),
-        (DOWN_VOTE, 'downvote'),
-    )
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-    )
-    activity_type = models.CharField(max_length=1, choices=ACTIVITY_TYPES)
-
-    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-    object_id = models.PositiveIntegerField()
-    content_object = GenericForeignKey()
-
-    class Meta:
-        unique_together = ('object_id', 'user', 'content_type')
+        return self.task.all().filter(public=True).order_by('-pk')
 
 
 class Task_Type(models.Model):
@@ -56,7 +32,6 @@ class Task(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='task', null=True)
     title = models.CharField(max_length=80)
     text = models.TextField(max_length=450)
-    votes = GenericRelation(Activity, related_name='votes')
     date = models.DateTimeField(auto_now_add=True)
     public = models.BooleanField(default=False)
     author = models.ForeignKey(
@@ -78,10 +53,14 @@ class Task(models.Model):
                 anwsers.append(anwser)
         return anwsers
 
-    def sum_votes(self):
-        upvotes = self.votes.filter(activity_type=Activity.UP_VOTE).count()
-        downvotes = self.votes.filter(activity_type=Activity.DOWN_VOTE).count()
-        return upvotes - downvotes
+    def get_upvotes(self):
+        return self.votes.filter(activity_type=Votes.UP_VOTE).count()
+
+    def get_downvotes(self):
+        return self.votes.filter(activity_type=Votes.DOWN_VOTE).count()
+
+    def get_sum_votes(self):
+        return self.get_upvotes() - self.get_upvotes()
 
 
 class Question(models.Model):
@@ -103,12 +82,54 @@ class Anwser(models.Model):
 
 class Comment(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='comments', null=True)
-    text = models.CharField(max_length=140)
+    reply = models.ForeignKey('self', on_delete=models.CASCADE, null=True)
+    text = models.TextField(max_length=300)
     date = models.DateTimeField(auto_now_add=True)
+    visible = models.BooleanField(default=True)
     author = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
     )
 
     def __str__(self):
-        return self.comment
+        return self.text
+
+
+class Votes(models.Model):
+    task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='votes', null=True)
+    UP_VOTE = 'U'
+    DOWN_VOTE = 'D'
+    ACTIVITY_TYPES = (
+        (UP_VOTE, 'upvote'),
+        (DOWN_VOTE, 'downvote'),
+    )
+    activity_type = models.CharField(max_length=1, choices=ACTIVITY_TYPES)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+    )
+
+    class Meta:
+        unique_together = ('task', 'user')
+
+    def get_upvotes(self):
+        return self.objects.filter(activity_type=self.UP_VOTE).count()
+
+    def get_downvotes(self):
+        return self.objects.filter(activity_type=self.DOWN_VOTE).count()
+
+    def get_sum_votes(self):
+        print("HERE")
+        print(self.get_upvotes() - self.get_upvotes())
+        return self.get_upvotes() - self.get_upvotes()
+
+
+class Likes(models.Model):
+    comment = models.ForeignKey(Comment, on_delete=models.CASCADE, related_name='likes', null=True)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+    )
+
+    class Meta:
+        unique_together = ('comment', 'user')

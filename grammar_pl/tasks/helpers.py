@@ -1,5 +1,6 @@
 from django.db import IntegrityError
-from .models import Activity
+from django.core.exceptions import ObjectDoesNotExist
+from .models import Votes, Likes
 
 
 def save_user_vote(request, object):
@@ -20,34 +21,36 @@ def save_user_vote(request, object):
     if 'vote' in request.POST:
         if request.POST['vote'] == 'upvote':
             try:
-                object.votes.create(activity_type=Activity.UP_VOTE, user=request.user)
+                object.votes.create(activity_type=Votes.UP_VOTE, user=request.user)
             except IntegrityError:
-                object.votes.get(user=request.user).delete()
-                object.votes.create(activity_type=Activity.UP_VOTE, user=request.user)
+                object.votes.get(user=request.user).activity_type = Votes.UP_VOTE
         else:
             try:
-                object.votes.create(activity_type=Activity.DOWN_VOTE, user=request.user)
+                object.votes.create(activity_type=Votes.DOWN_VOTE, user=request.user)
             except IntegrityError:
-                object.votes.get(user=request.user).delete()
-                object.votes.create(activity_type=Activity.DOWN_VOTE, user=request.user)
+                object.votes.get(user=request.user).activity_type = Votes.DOWN_VOTE
 
 
-def get_votes(object):
-    """
-    It gets a number of upvotes, and downvotes of specific object
-    Then it returns is as a dictionary dict['upvote'] = number_of_upvotes
-    """
-    votes = dict(upvotes=object.votes.filter(activity_type=Activity.UP_VOTE).count(),
-                 downvotes=object.votes.filter(activity_type=Activity.DOWN_VOTE).count())
-    return votes
-
-
-def user_activity(request, object):
+def user_vote(request, object):
     """
     Checks activity of specific user to specific task
     """
-    activities = object.votes.filter(user=request.user)
-    dictionary = dict()
-    for activity in activities:
-        dictionary[activity.get_activity_type_display()] = True
-    return dictionary
+    # votes = object.votes.filter(user=request.user)
+    # return {vote.get_activity_type_display(): True for vote in votes}
+    try:
+        return object.votes.get(user=request.user).get_activity_type_display()
+    except ObjectDoesNotExist:
+        return None
+
+
+def user_likes(request, object):
+    """
+    Checks activity of specific user to specific task
+    """
+    likes = []
+    for comment in object.comments.all():
+        try:
+            likes.append(comment.likes.get(user=request.user).comment.id)
+        except ObjectDoesNotExist:
+            pass
+    return likes

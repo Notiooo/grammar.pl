@@ -1,0 +1,23 @@
+<ul class="uk-pagination uk-flex-center" uk-margin>
+    {% if comments.has_previous %}
+        <li><a href="?page={{ comments.previous_page_number }}#comments"><span class="uk-margin-small-right" uk-pagination-previous></span> Poprzednia</a></li>
+        {% if comments.number > 3 %}
+            <li><a href="?page=1#comments">1</a></li>
+            <li class="uk-disabled"><span>...</span></li>
+        {% endif %}
+    {% endif %}
+    {% for i in comments.paginator.page_range %}
+        {% if comments.number == i %}
+            <li class="uk-active"><span>{{ i }}</span></li>
+        {% elif i > comments.number|add:'-3' and i < comments.number|add:'3' %}
+            <li><a href="?page={{ i }}#comments">{{ i }}</a></li>
+        {% endif %}
+    {% endfor %}
+    {% if comments.has_next %}
+        {% if comments.number <= comments.paginator.num_pages|add:'-3' %}
+            <li class="uk-disabled"><span>...</span></li>
+            <li><a href="?page={{ comments.paginator.num_pages }}#comments">{{ comments.paginator.num_pages }}</a></li>
+        {% endif %}
+        <li><a href="?page={{ comments.next_page_number }}#comments">Następna <span class="uk-margin-small-left" uk-pagination-next></span></a></li>
+    {% endif %}
+</ul>

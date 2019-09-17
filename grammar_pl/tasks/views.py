@@ -2,14 +2,17 @@ from django.views.generic import ListView, TemplateView, FormView, DetailView, C
 from django.contrib.auth.mixins import LoginRequiredMixin
 from datetime import date
 
-from .models import Category, Task_Type, Task, Anwser, Activity
-from .forms import ContactForm, TaskForm, QuestionForm, QuestionFormSet, AnwserFormSet
+from .models import Category, Task_Type, Task, Anwser
+from .forms import ContactForm, TaskForm, QuestionForm, QuestionFormSet, AnwserFormSet, CommentForm
 from django.db import transaction
 from django.urls import reverse_lazy
 from django.forms import modelformset_factory
-from django.http import HttpResponseRedirect
-from django.shortcuts import render
-from .helpers import save_user_vote, get_votes, user_activity
+from django.shortcuts import render, get_object_or_404
+from .helpers import save_user_vote, user_vote, user_likes
+from django.core.exceptions import ObjectDoesNotExist
+from django.db import IntegrityError
+from django.core.paginator import Paginator
+from django.http import Http404
 
 
 # Create your views here.
@@ -55,7 +58,7 @@ class CategoryDetailView(DetailView):
 
 def TaskDetailView(request, the_slug, pk):
     # gets the question
-    task = Task.objects.get(pk=pk)
+    task = get_object_or_404(Task, pk=pk)
 
     # gets how many anwsers every question has
     number_of_anwsers = len(task.list_of_anwsers())
@@ -64,15 +67,41 @@ def TaskDetailView(request, the_slug, pk):
     anwsers_field = modelformset_factory(Anwser, fields=('correct',),
                                          extra=number_of_anwsers)
 
-    if request.method == "POST":
+    if request.method == 'POST' and 'add_comment' in request.POST:
+        formset = anwsers_field(queryset=Anwser.objects.none())
+        comment_form = CommentForm(request.POST)
+        if comment_form.is_valid():
+            comment = comment_form.save(commit=False)
+            comment.author = request.user
+            comment.task = task
+            comment.save()
+    elif request.method == 'POST' and 'like' in request.POST:
+        formset = anwsers_field(queryset=Anwser.objects.none())
+        comment_form = CommentForm(request.POST)
+        try:
+            task.comments.get(id=request.POST['like']).likes.create(user=request.user)
+        except IntegrityError:
+            task.comments.get(id=request.POST['like']).likes.get(user=request.user).delete()
+        except ObjectDoesNotExist:
+            pass
+    elif request.method == "POST":
         save_user_vote(request, task)
+        comment_form = CommentForm()
         formset = anwsers_field(request.POST)
     else:
         # empty anwsers fields for user
+        comment_form = CommentForm()
         formset = anwsers_field(queryset=Anwser.objects.none())
+
+    # paginator-----
+    comments_list = task.comments.all().order_by('-id')
+    paginator = Paginator(comments_list, 10)
+    page = request.GET.get('page')
+    comments = paginator.get_page(page)
     return render(request, 'tasks/task_detail.html',
-                  {'formset': formset, 'anwsers': iter(formset), 'task': task, 'votes': get_votes(task),
-                   'user_activity': user_activity(request, task)})
+                  {'formset': formset, 'anwsers': iter(formset), 'task': task,
+                   'user_vote': user_vote(request, task), 'user_likes': user_likes(request, task),
+                   'comment_form': comment_form, 'comments': comments})
 
 
 class AddTaskListView(LoginRequiredMixin, ListView):
@@ -118,6 +147,12 @@ class EditTaskView(LoginRequiredMixin, UpdateView):
     model = Task
     form_class = TaskForm
 
+    def dispatch(self, request, *args, **kwargs):
+        obj = self.get_object()
+        if obj.author != self.request.user:
+            raise Http404("Wybacz, ale to niedozwolone. To nie twoje dzieło!")
+        return super(EditTaskView, self).dispatch(request, *args, **kwargs)
+
     def get_context_data(self, **kwargs):
         data = super(EditTaskView, self).get_context_data(**kwargs)
         if self.request.POST:
@@ -147,16 +182,28 @@ class EditTaskView(LoginRequiredMixin, UpdateView):
         return super(EditTaskView, self).get_success_url()
 
 
-class DeleteTaskView(DeleteView):
+class DeleteTaskView(LoginRequiredMixin, DeleteView):
     template_name = 'tasks/delete_task.html'
     model = Task
     success_url = '/'
 
+    def dispatch(self, request, *args, **kwargs):
+        obj = self.get_object()
+        if obj.author != self.request.user:
+            raise Http404("Wybacz, ale to niedozwolone. To nie twoje dzieło!")
+        return super(DeleteTaskView, self).dispatch(request, *args, **kwargs)
 
-class AddTaskAnwsersView(UpdateView):
+
+class AddTaskAnwsersView(LoginRequiredMixin, UpdateView):
     template_name = 'tasks/add_anwsers.html'
     model = Task
     fields = []
+
+    def dispatch(self, request, *args, **kwargs):
+        obj = self.get_object()
+        if obj.author != self.request.user:
+            raise Http404("Wybacz, ale to niedozwolone. To nie twoje dzieło!")
+        return super(AddTaskAnwsersView, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         data = super(AddTaskAnwsersView, self).get_context_data(**kwargs)
@@ -195,4 +242,4 @@ class MyTasksView(LoginRequiredMixin, ListView):
     paginate_by = 15
 
     def get_queryset(self):
-        return Task.objects.filter(author=self.request.user)
+        return Task.objects.filter(author=self.request.user).order_by('-pk')

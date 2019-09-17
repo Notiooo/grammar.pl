@@ -36,6 +36,14 @@ class TaskAdmin(admin.ModelAdmin):
         QuestionInline,
     ]
 
-@admin.register(models.Activity)
-class ActivityAdmin(admin.ModelAdmin):
+@admin.register(models.Votes)
+class VotesAdmin(admin.ModelAdmin):
+    pass
+
+@admin.register(models.Likes)
+class LikesAdmin(admin.ModelAdmin):
+    pass
+
+@admin.register(models.Comment)
+class CommentsAdmin(admin.ModelAdmin):
     pass
