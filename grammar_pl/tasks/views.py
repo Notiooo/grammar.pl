@@ -2,17 +2,18 @@ from django.views.generic import ListView, TemplateView, FormView, DetailView, C
 from django.contrib.auth.mixins import LoginRequiredMixin
 from datetime import date
 
-from .models import Category, Task_Type, Task, Anwser
+from .models import Category, Task_Type, Task, Anwser, Comment, Votes
 from .forms import ContactForm, TaskForm, QuestionForm, QuestionFormSet, AnwserFormSet, CommentForm
 from django.db import transaction
 from django.urls import reverse_lazy
 from django.forms import modelformset_factory
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, reverse
 from .helpers import save_user_vote, user_vote, user_likes
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
 from django.core.paginator import Paginator
-from django.http import Http404
+from django.http import Http404, HttpResponseRedirect
+from django.views.generic.list import MultipleObjectMixin
 
 
 # Create your views here.
@@ -56,52 +57,44 @@ class CategoryDetailView(DetailView):
     slug_field = 'slug_url'
 
 
-def TaskDetailView(request, the_slug, pk):
-    # gets the question
-    task = get_object_or_404(Task, pk=pk)
+class TaskDetailView(DetailView, MultipleObjectMixin):
+    template_name = 'tasks/task_detail.html'
+    model = Task
+    context_object_name = 'task'
+    paginate_by = 10
 
-    # gets how many anwsers every question has
-    number_of_anwsers = len(task.list_of_anwsers())
-
-    # creates a formset with as many fields as the anwsers is
-    anwsers_field = modelformset_factory(Anwser, fields=('correct',),
-                                         extra=number_of_anwsers)
-
-    if request.method == 'POST' and 'add_comment' in request.POST:
-        formset = anwsers_field(queryset=Anwser.objects.none())
-        comment_form = CommentForm(request.POST)
-        if comment_form.is_valid():
-            comment = comment_form.save(commit=False)
-            comment.author = request.user
-            comment.task = task
-            comment.save()
-    elif request.method == 'POST' and 'like' in request.POST:
-        formset = anwsers_field(queryset=Anwser.objects.none())
-        comment_form = CommentForm(request.POST)
-        try:
-            task.comments.get(id=request.POST['like']).likes.create(user=request.user)
-        except IntegrityError:
-            task.comments.get(id=request.POST['like']).likes.get(user=request.user).delete()
-        except ObjectDoesNotExist:
-            pass
-    elif request.method == "POST":
-        save_user_vote(request, task)
-        comment_form = CommentForm()
-        formset = anwsers_field(request.POST)
-    else:
-        # empty anwsers fields for user
-        comment_form = CommentForm()
+    def get_context_data(self, **kwargs):
+        obj = self.get_object()
+        number_of_anwsers = len(obj.list_of_anwsers())
+        anwsers_field = modelformset_factory(Anwser, fields=('correct',),
+                                             extra=number_of_anwsers)
+        comments_list = obj.comments.all().order_by('-id')
         formset = anwsers_field(queryset=Anwser.objects.none())
 
-    # paginator-----
-    comments_list = task.comments.all().order_by('-id')
-    paginator = Paginator(comments_list, 10)
-    page = request.GET.get('page')
-    comments = paginator.get_page(page)
-    return render(request, 'tasks/task_detail.html',
-                  {'formset': formset, 'anwsers': iter(formset), 'task': task,
-                   'user_vote': user_vote(request, task), 'user_likes': user_likes(request, task),
-                   'comment_form': comment_form, 'comments': comments})
+        return super(TaskDetailView, self).get_context_data(number_of_anwsers=number_of_anwsers,
+                                                            anwsers_field=anwsers_field,
+                                                            object_list=comments_list,
+                                                            user_vote=user_vote(self.request, obj),
+                                                            user_likes=user_likes(self.request, obj),
+                                                            comment_form=CommentForm(),
+                                                            formset=formset,
+                                                            anwsers=iter(formset), **kwargs)
+
+    def post(self, request, **kwargs):
+        user = request.user
+        self.object = self.get_object()
+        if 'add_comment' in request.POST:
+            comment_form = CommentForm(request.POST)
+            if comment_form.is_valid():
+                comment = comment_form.save(commit=False)
+                comment.author = user
+                comment.task = self.object
+                comment.save()
+            return HttpResponseRedirect("#comments")
+        context = self.get_context_data(**kwargs)
+        context['formset'] = context['anwsers_field'](request.POST)
+        context['anwsers'] = iter(context['formset'])
+        return self.render_to_response(context)
 
 
 class AddTaskListView(LoginRequiredMixin, ListView):
@@ -176,9 +169,9 @@ class EditTaskView(LoginRequiredMixin, UpdateView):
     def get_success_url(self):
         if self.request.POST.get('next'):
             if self.request.POST['next'] == 'add_anwser':
-                return reverse_lazy('add_anwsers', kwargs={'pk': self.object.id})
+                return reverse('add_anwsers', kwargs={'pk': self.object.id})
             elif self.request.POST['next'] == 'public' or 'unpublic':
-                return reverse_lazy('edit_task', kwargs={'pk': self.object.id})
+                return reverse('edit_task', kwargs={'pk': self.object.id})
         return super(EditTaskView, self).get_success_url()
 
 
@@ -192,6 +185,25 @@ class DeleteTaskView(LoginRequiredMixin, DeleteView):
         if obj.author != self.request.user:
             raise Http404("Wybacz, ale to niedozwolone. To nie twoje dzieło!")
         return super(DeleteTaskView, self).dispatch(request, *args, **kwargs)
+
+
+class DeleteCommentView(LoginRequiredMixin, DeleteView):
+    template_name = 'tasks/delete_comment.html'
+    model = Comment
+
+    def dispatch(self, request, *args, **kwargs):
+        obj = self.get_object()
+        if obj.author != self.request.user:
+            raise Http404("Wybacz, ale to niedozwolone. To nie twoje dzieło!")
+        return super(DeleteCommentView, self).dispatch(request, *args, **kwargs)
+
+    def get_success_url(self):
+        task_id = self.request.POST.get('task-id')
+        the_slug = self.request.POST.get('the_slug')
+        if task_id and the_slug:
+            return reverse('task_detail', kwargs={'pk': task_id, 'the_slug': the_slug})
+        else:
+            return reverse('home')
 
 
 class AddTaskAnwsersView(LoginRequiredMixin, UpdateView):
@@ -243,3 +255,44 @@ class MyTasksView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         return Task.objects.filter(author=self.request.user).order_by('-pk')
+
+
+# ------- AJAX VIEWS ----------
+from django.http import JsonResponse
+
+def add_like(request, pk):
+    liked = False
+    try:
+        Comment.objects.get(id=pk).likes.create(user=request.user)
+        liked = True
+    except IntegrityError:
+        Comment.objects.get(id=pk).likes.get(user=request.user).delete()
+    except ObjectDoesNotExist:
+        pass
+    data = {
+        'liked': liked,
+        'count': Comment.objects.get(id=pk).likes.count()
+    }
+    return JsonResponse(data)
+
+def add_vote(request, pk, vote_type):
+    object = Task.objects.get(id=pk)
+    if vote_type == 'upvote':
+        try:
+            object.votes.create(activity_type=Votes.UP_VOTE, user=request.user)
+        except IntegrityError:
+            obj = object.votes.get(user=request.user)
+            obj.activity_type = Votes.UP_VOTE
+            obj.save()
+    else:
+        try:
+            object.votes.create(activity_type=Votes.DOWN_VOTE, user=request.user)
+        except IntegrityError:
+            obj = object.votes.get(user=request.user)
+            obj.activity_type = Votes.DOWN_VOTE
+            obj.save()
+    data = {
+        'upvotes': object.votes.filter(activity_type=Votes.UP_VOTE).count(),
+        'downvotes': object.votes.filter(activity_type=Votes.DOWN_VOTE).count(),
+    }
+    return JsonResponse(data)

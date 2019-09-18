@@ -7,55 +7,6 @@
 
 {% block content %}
 
-<style>
-    .paper {
-        background: #fff;
-        padding: 30px;
-        position: relative;
-    }
-
-    .paper,
-    .paper::before,
-    .paper::after {
-        /* Styles to distinguish sheets from one another */
-        box-shadow: 1px 1px 1px rgba(0,0,0,0.25);
-        border: 1px solid #bbb;
-    }
-
-    .paper::before,
-    .paper::after {
-        content: "";
-        position: absolute;
-        height: 95%;
-        width: 99%;
-        background-color: #eee;
-    }
-
-    .paper::before {
-        right: 15px;
-        top: 0;
-        transform: rotate(-1deg);
-        z-index: -1;
-    }
-
-    .paper::after {
-        top: 5px;
-        right: -5px;
-        transform: rotate(1deg);
-        z-index: -2;
-    }
-
-    .task-menu
-    {
-        background-color: #f5f5f5;
-        margin-left: 15px;
-        margin-right: -20px;
-        margin-top: -20%;
-        padding-top: 22%;
-        border: 2px solid lightgrey;
-    }
-</style>
-
 <div class="uk-section">
     <div class="uk-container uk-container-small">
         <div style="background-color: white; border: 2px solid lightgrey;" class="paper uk-border-rounded uk-padding uk-box-shadow-medium">
@@ -104,58 +55,71 @@
                         <button class="uk-button uk-button-primary uk-border-rounded" type="submit">Sprawdź odpowiedzi</button>
                     </div>
                     <div class="uk-text-right uk-width-1-1 uk-width-1-3@s">
-                        <button type="submit" name="vote" value="upvote" class="{% if user_vote == 'upvote' %}uk-text-success{% endif %} uk-icon-link" uk-icon="icon: arrow-up; ratio: 1.5">{{ task.get_upvotes }} Lubie!</button>
-                        <button type="submit" name="vote" value="downvote" class="{% if user_vote == 'downvote' %}uk-text-danger{% endif %} uk-icon-link" uk-icon="icon: arrow-down; ratio: 1.5">{{ task.get_downvotes }} Nie lubie</button>
+                        <a data-vote-task="{% url 'add_vote' task.id 'upvote' %}" id="upvote" class="{% if user_vote == 'upvote' %}uk-text-success{% endif %} uk-icon-link js-add-vote" uk-icon="icon: arrow-up; ratio: 1.5">{{ task.get_upvotes }} Lubie!</a>
+                        <a data-vote-task="{% url 'add_vote' task.id 'downvote' %}" id="downvote" class="{% if user_vote == 'downvote' %}uk-text-danger{% endif %} uk-icon-link js-add-vote" uk-icon="icon: arrow-down; ratio: 1.5">{{ task.get_downvotes }} Nie lubie</a>
                     </div>
                 </div>
             </div>
             {% include 'tasks/go_back_button.html' %}
             {% include 'tasks/tasks_help_menu.html' %}
         </form>
-        <div>
-            <h1>Dodaj komentarz</h1>
-            <form method="POST" action="#comments">
-                {{ comment_form.management_form }}
-                {% csrf_token %}
-                <p>{% render_field comment_form.text|attr:"style:resize: none" rows="3" class+="uk-textarea" %}</p>
-                <div class="uk-text-right" uk-margin><button type="submit" name="add_comment" class="uk-button uk-button-primary uk-text-right">Dodaj komentarz</button></div>
-            </form>
-        </div>
-        <ul id="comments" class="uk-comment-list uk-list-striped">
-            {% for comment in comments %}
-            <li>
-                <article class="uk-comment uk-visible-toggle uk-animation-toggle" id="{{ comment.id }}" tabindex="-1">
-                    <header class="uk-comment-header uk-position-relative">
-                        <div class="uk-grid-medium uk-flex-middle" uk-grid>
-                            <div class="uk-width-auto">
-                                <img class="uk-comment-avatar uk-border-circle" src="{{ comment.author.avatar.url }}" width="65" height="65" alt="">
-                            </div>
-                            <div class="uk-width-expand">
-                                <h4 class="uk-comment-title uk-margin-remove"><a class="uk-link-reset"{% if comment.author.is_staff %}style="color: red!important"{% endif %} href="{% url 'profile' comment.author.id %}">{{ comment.author }}</a></h4>
-                                <p class="uk-comment-meta uk-margin-remove-top"><a class="uk-link-reset" href="#">{{ comment.date }}</a></p>
-                            </div>
-                        </div>
-                        <form method="POST" action="#{{ comment.id }}">
-                            {% csrf_token %}
-                            <div class="uk-position-top-right uk-position-small">
-                                {% if comment.id in user_likes %}
-                                    <button type="submit" name="like" style="color: pink;" value="{{ comment.id }}" class="uk-icon-link" uk-icon="icon: heart; ratio: 1.2">{{ comment.likes.count }} Lubie! </button>
-                                {% elif comment.likes.count %}
-                                    <button type="submit" name="like" value="{{ comment.id }}" class="uk-icon-link" uk-icon="icon: heart; ratio: 1.2">{{ comment.likes.count }} Lubie! </button>
-                                {% else %}
-                                    <button type="submit" name="like" value="{{ comment.id }}" class="uk-icon-link uk-hidden-hover uk-animation-slide-right-small" uk-icon="icon: heart; ratio: 1.2">Lubie! </button>
-                                {% endif %}
-                            </div>
-                        </form>
-                    </header>
-                    <div class="uk-comment-body">
-                        <p>{{ comment.text }}</p>
-                    </div>
-                </article>
-            </li>
-            {% endfor %}
-        </ul>
-        {% include 'tasks/comments_paginator.html' %}
+        {% include 'tasks/task_comments.html' %}
+        {% include 'base/paginator.html' %}
     </div>
 </div>
+{% endblock %}
+
+{% block javascript %}
+    <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+    <script>
+    $(".js-add-like").click(function() {
+        var comment = $(this);
+        $.ajax({
+            url: comment.attr("data-like-comment"),
+            data: comment.serialize(),
+            dataType: 'json',
+            success: function(data) {
+                if (data.liked) {
+                    comment.css("color", "pink");
+                    comment.text(data.count + " Lubie! ");
+                    comment.removeClass("uk-hidden-hover uk-animation-slide-right-small");
+                } else {
+                    comment.css("color", "");
+                    if(data.count == 0)
+                    {
+                        comment.text("Lubie! ");
+                        comment.addClass("uk-hidden-hover uk-animation-slide-right-small");
+                    }
+                    else
+                    {
+                        comment.text(data.count + " Lubie! ");
+                        comment.removeClass("uk-hidden-hover uk-animation-slide-right-small");
+                    }
+                }
+            }
+        });
+
+    });
+    $(".js-add-vote").click(function() {
+        var vote = $(this);
+        $.ajax({
+            url: vote.attr("data-vote-task"),
+            data: vote.serialize(),
+            dataType: 'json',
+            success: function(data) {
+                $("#upvote").text(data.upvotes + " Lubie!");
+                $("#downvote").text(data.downvotes + " Nie lubie");
+                if(vote.attr('id') == 'upvote'){
+                    vote.addClass("uk-text-success");
+                    $("#downvote").removeClass("uk-text-danger");
+                }
+                else{
+                    vote.addClass("uk-text-danger");
+                    $("#upvote").removeClass("uk-text-success");
+                }
+            }
+        });
+
+    });
+    </script>
 {% endblock %}

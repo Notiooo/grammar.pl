@@ -60,7 +60,7 @@ class Task(models.Model):
         return self.votes.filter(activity_type=Votes.DOWN_VOTE).count()
 
     def get_sum_votes(self):
-        return self.get_upvotes() - self.get_upvotes()
+        return self.get_upvotes() - self.get_downvotes()
 
 
 class Question(models.Model):

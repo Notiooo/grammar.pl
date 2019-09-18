@@ -18,17 +18,20 @@ def save_user_vote(request, object):
 
     object: it should be a variable with object we want to upvote/downvote
     """
-    if 'vote' in request.POST:
-        if request.POST['vote'] == 'upvote':
-            try:
-                object.votes.create(activity_type=Votes.UP_VOTE, user=request.user)
-            except IntegrityError:
-                object.votes.get(user=request.user).activity_type = Votes.UP_VOTE
-        else:
-            try:
-                object.votes.create(activity_type=Votes.DOWN_VOTE, user=request.user)
-            except IntegrityError:
-                object.votes.get(user=request.user).activity_type = Votes.DOWN_VOTE
+    if request.POST['vote'] == 'upvote':
+        try:
+            object.votes.create(activity_type=Votes.UP_VOTE, user=request.user)
+        except IntegrityError:
+            obj = object.votes.get(user=request.user)
+            obj.activity_type = Votes.UP_VOTE
+            obj.save()
+    else:
+        try:
+            object.votes.create(activity_type=Votes.DOWN_VOTE, user=request.user)
+        except IntegrityError:
+            obj = object.votes.get(user=request.user)
+            obj.activity_type = Votes.DOWN_VOTE
+            obj.save()
 
 
 def user_vote(request, object):

@@ -1,0 +1,44 @@
+{% load widget_tweaks %}
+
+<div>
+    <h1>Dodaj komentarz</h1>
+    <form method="POST" action="#comments">
+        {{ comment_form.management_form }}
+        {% csrf_token %}
+        <p>{% render_field comment_form.text|attr:"style:resize: none" rows="3" class+="uk-textarea" %}</p>
+        <div class="uk-text-right" uk-margin><button type="submit" name="add_comment" class="uk-button uk-button-primary uk-text-right">Dodaj komentarz</button></div>
+    </form>
+</div>
+<ul id="comments" class="uk-comment-list uk-list-striped">
+    {% for comment in object_list %}
+    <li>
+        <article class="uk-comment uk-visible-toggle uk-animation-toggle" id="{{ comment.id }}" tabindex="-1">
+            <header class="uk-comment-header uk-position-relative">
+                <div class="uk-grid-medium uk-flex-middle" uk-grid>
+                    <div class="uk-width-auto">
+                        <img class="uk-comment-avatar uk-border-circle" src="{{ comment.author.avatar.url }}" width="65" height="65" alt="">
+                    </div>
+                    <div class="uk-width-expand">
+                        <h4 class="uk-comment-title uk-margin-remove"><a class="uk-link-reset"{% if comment.author.is_staff %}style="color: red!important"{% endif %} href="{% url 'profile' comment.author.id %}">{{ comment.author }}</a></h4>
+                        <p class="uk-comment-meta uk-margin-remove-top"><a class="uk-link-reset" href="#">{{ comment.date }}</a></p>
+                    </div>
+                </div>
+                <div class="uk-position-top-right uk-position-small">
+                    {% if comment.author == request.user %}
+                        <a href="{% url 'delete_comment' comment.id %}" class="uk-icon-link uk-hidden-hover uk-animation-slide-right-small" uk-icon="icon: trash; ratio: 1.2">Usuń </a>
+                    {% elif comment.id in user_likes %}
+                        <a data-like-comment="{% url 'add_like' comment.id %}" style="color: pink;" value="{{ comment.id }}" class="uk-icon-link js-add-like" uk-icon="icon: heart; ratio: 1.2">{{ comment.likes.count }} Lubie! </a>
+                    {% elif comment.likes.count %}
+                        <a data-like-comment="{% url 'add_like' comment.id %}" value="{{ comment.id }}" class="uk-icon-link js-add-like" uk-icon="icon: heart; ratio: 1.2">{{ comment.likes.count }} Lubie! </a>
+                    {% else %}
+                        <a data-like-comment="{% url 'add_like' comment.id %}" value="{{ comment.id }}" class="uk-icon-link uk-hidden-hover uk-animation-slide-right-small js-add-like" uk-icon="icon: heart; ratio: 1.2">Lubie! </a>
+                    {% endif %}
+                </div>
+            </header>
+            <div class="uk-comment-body">
+                <p>{{ comment.text }}</p>
+            </div>
+        </article>
+    </li>
+    {% endfor %}
+</ul>

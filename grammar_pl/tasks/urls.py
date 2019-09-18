@@ -11,6 +11,9 @@ urlpatterns = [
     path('delete_task/<int:pk>', views.DeleteTaskView.as_view(), name='delete_task'),
     path('add_anwsers/<int:pk>', views.AddTaskAnwsersView.as_view(), name='add_anwsers'),
     path('my_tasks/', views.MyTasksView.as_view(), name='my_tasks'),
+    path('comment/delete/<int:pk>', views.DeleteCommentView.as_view(), name='delete_comment'),
+    path('comment/like/<int:pk>', views.add_like, name="add_like"),
+    path('task/vote/<int:pk>/<slug:vote_type>/', views.add_vote, name="add_vote"),
     path('<slug:the_slug>/', views.CategoryDetailView.as_view(), name='category'),
-    path('<slug:the_slug>/<int:pk>', views.TaskDetailView, name='task_detail'),
+    path('<slug:the_slug>/<int:pk>', views.TaskDetailView.as_view(), name='task_detail'),
 ]
