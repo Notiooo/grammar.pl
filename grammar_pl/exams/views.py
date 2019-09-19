@@ -161,11 +161,14 @@ def exams_random(request, exam_category):
 
 
 class Exams_Search(ListView):
-    "It's a special view for displaying results of search engine"
+    """
+    It's a special view for displaying results of search engine
+    Now it also displays users
+    """
 
     model = models.Exams_Task
     template_name = 'exams/exams_search.html'
-    context_object_name = 'tasks'
+    context_object_name = 'found'
     paginate_by = 15
 
     def get_queryset(self):

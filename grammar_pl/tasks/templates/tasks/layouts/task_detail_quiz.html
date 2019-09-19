@@ -55,7 +55,7 @@
                         <button class="uk-button uk-button-primary uk-border-rounded" type="submit">Sprawdź odpowiedzi</button>
                     </div>
                     <div class="uk-text-right uk-width-1-1 uk-width-1-3@s">
-                        <a data-add-fav="{% url 'add_favourite' task.id %}" id="favourite" class="{% if is_favourite %}uk-text-danger{% endif %} uk-icon-link js-add-fav" uk-icon="icon: heart; ratio: 1.5"></a>
+                        <a data-add-fav="{% url 'add_favourite' task.id %}" id="favourite" class="{% if is_favourite %}uk-text-danger{% endif %} uk-icon-link js-add-fav" uk-icon="icon: heart; ratio: 1.5" uk-tooltip="title: Dodaj do ulubionych; pos: left"></a>
                         <a data-vote-task="{% url 'add_vote' task.id 'upvote' %}" id="upvote" class="{% if user_vote == 'upvote' %}uk-text-success{% endif %} uk-icon-link js-add-vote" uk-icon="icon: arrow-up; ratio: 1.5"><span>{{ task.get_upvotes }}</span> Lubie!</a>
                         <a data-vote-task="{% url 'add_vote' task.id 'downvote' %}" id="downvote" class="{% if user_vote == 'downvote' %}uk-text-danger{% endif %} uk-icon-link js-add-vote" uk-icon="icon: arrow-down; ratio: 1.5"><span>{{ task.get_downvotes }}</span> Nie lubie</a>
                     </div>

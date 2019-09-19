@@ -22,6 +22,7 @@ class Task_Type(models.Model):
     title = models.CharField(max_length=40)
     description = models.CharField(max_length=150)
     slug_url = models.SlugField(null=True)
+    layout_name = models.CharField(max_length=50, blank=True)
 
     def __str__(self):
         return self.title
@@ -82,7 +83,6 @@ class Anwser(models.Model):
 
 class Comment(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='comments', null=True)
-    reply = models.ForeignKey('self', on_delete=models.CASCADE, null=True)
     text = models.TextField(max_length=300)
     date = models.DateTimeField(auto_now_add=True)
     visible = models.BooleanField(default=True)
@@ -119,7 +119,6 @@ class Votes(models.Model):
         return self.objects.filter(activity_type=self.DOWN_VOTE).count()
 
     def get_sum_votes(self):
-        print("HERE")
         print(self.get_upvotes() - self.get_upvotes())
         return self.get_upvotes() - self.get_upvotes()
 

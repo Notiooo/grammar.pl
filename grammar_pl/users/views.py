@@ -7,6 +7,7 @@ from .forms import CustomUserCreationForm, CustomUserChangeForm, CustomAuthentic
 from .models import CustomUser
 
 from django.contrib.auth import views as auth_views
+from django.shortcuts import get_object_or_404
 
 from tasks.models import Task, Votes, Likes, Comment
 
@@ -56,3 +57,21 @@ class ProfileDetailView(generic.DetailView):
         context['gained_points'] = self.get_user_gained_points(user)
         context['gained_likes'] = self.get_user_gained_likes(user)
         return context
+
+class ProfileCommentsActivity(generic.ListView):
+    model = Comment
+    template_name = 'users/activity_comments_list.html'
+    context_object_name = 'comments'
+    paginate_by = 8
+
+    def get_queryset(self):
+        return self.model.objects.filter(author=get_object_or_404(CustomUser, pk=self.kwargs['pk'])).order_by('-pk')
+
+class ProfileTasksActivity(generic.ListView):
+    model = Task
+    template_name = 'users/activity_tasks_list.html'
+    context_object_name = 'tasks'
+    paginate_by = 8
+
+    def get_queryset(self):
+        return self.model.objects.filter(author=get_object_or_404(CustomUser, pk=self.kwargs['pk'])).order_by('-pk')

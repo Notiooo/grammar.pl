@@ -5,7 +5,7 @@ from django.db import transaction, IntegrityError
 from django.core.exceptions import ObjectDoesNotExist
 from django.urls import reverse_lazy
 from django.forms import modelformset_factory
-from django.shortcuts import reverse
+from django.shortcuts import reverse, get_object_or_404
 from django.http import Http404, HttpResponseRedirect
 from django.contrib import messages
 
@@ -85,10 +85,12 @@ class TaskDetailView(DetailView, MultipleObjectMixin):
     anwsers           -> An iter of formset. Used for single iteration, with no repeat. One call -> one anwser
     """
 
-    template_name = 'tasks/task_detail.html'
     model = Task
     context_object_name = 'task'
     paginate_by = 10
+
+    def get_template_names(self):
+        return 'tasks/layouts/task_detail_{}.html'.format(self.get_object().task_type.layout_name)
 
     def get_context_data(self, **kwargs):
         obj = self.get_object()
@@ -132,7 +134,7 @@ class TaskDetailView(DetailView, MultipleObjectMixin):
 class EditTaskView(LoginRequiredMixin, UpdateView):
     "A page where user can edit his own task"
 
-    template_name = 'tasks/add_task.html'
+    template_name = 'tasks/actions/add_task.html'
     login_url = 'login'
     model = Task
     form_class = TaskUpdateForm
@@ -199,7 +201,7 @@ class MyFavouritesView(LoginRequiredMixin, ListView):
 class DeleteTaskView(LoginRequiredMixin, DeleteView):
     "A page where user can confirm deleting his own task"
 
-    template_name = 'tasks/delete_task.html'
+    template_name = 'tasks/actions/delete_task.html'
     model = Task
     login_url = 'login'
 
@@ -223,7 +225,7 @@ class AddTaskListView(LoginRequiredMixin, ListView):
     - Fill empty fields
     """
 
-    template_name = 'tasks/add_task_list.html'
+    template_name = 'tasks/actions/add_task_list.html'
     model = Task_Type
     login_url = 'login'
     context_object_name = 'tasks_types'
@@ -232,13 +234,15 @@ class AddTaskListView(LoginRequiredMixin, ListView):
 class AddTaskView(LoginRequiredMixin, CreateView):
     "A page where user can create his own task"
 
-    template_name = 'tasks/add_task.html'
+    template_name = 'tasks/actions/add_task.html'
     login_url = 'login'
     model = Task
     form_class = TaskCreateForm
 
     def get_context_data(self, **kwargs):
         data = super(AddTaskView, self).get_context_data(**kwargs)
+        print(self.request)
+        data['task_type'] = get_object_or_404(Task_Type, slug_url=self.kwargs['task_name'])
         if self.request.POST:
             data['questions'] = QuestionFormSet(self.request.POST, prefix="questions")
         else:
@@ -250,6 +254,7 @@ class AddTaskView(LoginRequiredMixin, CreateView):
         questions = context['questions']
         with transaction.atomic():
             form.instance.author = self.request.user
+            form.instance.task_type = context['task_type']
             self.object = form.save()
             if questions.is_valid():
                 questions.instance = self.object
@@ -266,7 +271,7 @@ class AddTaskView(LoginRequiredMixin, CreateView):
 class AddTaskAnwsersView(LoginRequiredMixin, UpdateView):
     "A page where user can add anwsers to questions he created in AddTaskView"
 
-    template_name = 'tasks/add_anwsers.html'
+    template_name = 'tasks/actions/add_anwsers.html'
     login_url = 'login'
     model = Task
     fields = []
@@ -310,7 +315,7 @@ class AddTaskAnwsersView(LoginRequiredMixin, UpdateView):
 class DeleteCommentView(LoginRequiredMixin, DeleteView):
     "A page where user can fonfirm deleting his own comment"
 
-    template_name = 'tasks/delete_comment.html'
+    template_name = 'tasks/actions/delete_comment.html'
     login_url = 'login'
     model = Comment
 

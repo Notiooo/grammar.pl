@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="uk-section uk-section-muted uk-flex uk-flex-center">
+    <div class="uk-container uk-padding" uk-grid>
+        <!-- ACTIVITY TAB -->
+        <div class="uk-width-xlarge@s">
+            <h3 class="uk-heading-line uk-text-center"><span>Komentarze użytkownika {{ comments.0.author }}</span></h3>
+            {% for comment in comments %}
+            <div class="uk-comment uk-background-default uk-padding uk-margin-bottom uk-width-xxlarge@s">
+                <header class="uk-comment-header uk-grid-medium uk-flex-middle" uk-grid>
+                    <div class="uk-width-expand">
+                        <span uk-icon="icon: comment; ratio: 2" class="uk-float-right"></span>
+                        <h4 class="uk-comment-title uk-margin-remove"><a class="uk-link-reset" href="#">{{ comment.task.title }}</a></h4>
+                        <ul class="uk-comment-meta uk-subnav uk-subnav-divider uk-margin-remove-top">
+                            <li><a href="#">{{ comment.date }}</a></li>
+                            <li><a href="#">Komentarz</a></li>
+                        </ul>
+                    </div>
+                </header>
+                <div class="uk-comment-body">
+                    <p>{{ comment.text|truncatechars:150 }}<a href="{% url 'task_detail' comment.task.category.slug_url comment.task.id %}#{{ comment.id }}" class="uk-link-text uk-title-lead uk-float-right">Wyświetl komentarz</a></p>
+                </div>
+            </div>
+            {% endfor %}
+            {% include 'base/paginator.html' %}
+            <div class="uk-text-center">
+                <a href="{% url 'profile' comments.0.author.id %}" class="uk-button "><span uk-icon="icon: arrow-left; ratio: 2"></span>Wróć do profilu</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

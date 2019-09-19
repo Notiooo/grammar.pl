@@ -64,10 +64,10 @@
                 <header class="uk-comment-header uk-grid-medium uk-flex-middle" uk-grid>
                     <div class="uk-width-expand">
                         <span uk-icon="icon: comment; ratio: 2" class="uk-float-right"></span>
-                        <h4 class="uk-comment-title uk-margin-remove"><a class="uk-link-reset" href="#">{{ comment.task.title }}</a></h4>
-                        <ul class="uk-comment-meta uk-subnav uk-subnav-divider uk-margin-remove-top">
-                            <li><a href="#">{{ comment.date }}</a></li>
-                            <li><a href="#">Komentarz</a></li>
+                        <h4 class="uk-comment-title uk-margin-remove"><a class="uk-link-reset" href="{% url 'task_detail' comment.task.category.slug_url comment.task.id %}#{{ comment.id }}">{{ comment.task.title }}</a></h4>
+                        <ul class="uk-comment-meta uk-subnav uk-subnav-divider uk-margin-remove-top uk-link-reset">
+                            <li><a>{{ comment.date }}</a></li>
+                            <li><a>Komentarz</a></li>
                         </ul>
                     </div>
                 </header>
@@ -76,18 +76,18 @@
                 </div>
             </div>
             {% endfor %}
-            <h4 class="uk-text-right">Zobacz więcej</h4>
+            <h4 class="uk-text-right"><a class="uk-link-text" href="{% url 'profile_comments' object.pk %}">Zobacz więcej</a></h4>
             <h3 class="uk-heading-line uk-text-center"><span>Ostatnie zadania</span></h3>
             {% for task in tasks_activity %}
             <div class="uk-comment uk-background-default uk-padding uk-margin-bottom">
                 <header class="uk-comment-header uk-grid-medium uk-flex-middle" uk-grid>
                     <div class="uk-width-expand">
                         <span uk-icon="icon: file-text; ratio: 2" class="uk-float-right"></span>
-                        <h4 class="uk-comment-title uk-margin-remove"><a class="uk-link-reset" href="#">{{ task.title }}</a></h4>
-                        <ul class="uk-comment-meta uk-subnav uk-subnav-divider uk-margin-remove-top">
-                            <li><a href="#">15 dni temu</a></li>
-                            <li><a href="{% url 'task_detail' task.category.slug_url task.id %}" class="uk-link-text uk-title-lead uk-float-right">Zadanie</a></li>
-                            <li><a href="#">{{ task.category }}</a></li>
+                        <h4 class="uk-comment-title uk-margin-remove"><a class="uk-link-reset" href="{% url 'task_detail' task.category.slug_url task.id %}">{{ task.title }}</a></h4>
+                        <ul class="uk-comment-meta uk-subnav uk-subnav-divider uk-margin-remove-top uk-link-reset">
+                            <li><a>{{ task.date }}</a></li>
+                            <li><a>Zadanie</a></li>
+                            <li><a>{{ task.category }}</a></li>
                         </ul>
                     </div>
                 </header>
@@ -96,7 +96,7 @@
                 </div>
             </div>
             {% endfor %}
-            <h4 class="uk-text-right">Zobacz więcej</h4>
+            <h4 class="uk-text-right"><a class="uk-link-text" href="{% url 'profile_tasks' object.pk %}">Zobacz więcej</a></h4>
         </div>
 
     </div>

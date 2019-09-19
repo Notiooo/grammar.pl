@@ -6,7 +6,9 @@
     <div class="uk-container uk-container-large">
 
         <h1>{{ object.title }}</h1>
-
+        {% if user.is_authenticated %}
+        <a href="{% url 'add_task_list' %}" class="uk-button uk-button-secondary">Dodaj swoje własne zadanie</a>
+        {% endif %}
         <table class="uk-table uk-table-striped uk-table-hover">
             <thead>
                 <tr>
