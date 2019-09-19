@@ -55,8 +55,9 @@
                         <button class="uk-button uk-button-primary uk-border-rounded" type="submit">Sprawdź odpowiedzi</button>
                     </div>
                     <div class="uk-text-right uk-width-1-1 uk-width-1-3@s">
-                        <a data-vote-task="{% url 'add_vote' task.id 'upvote' %}" id="upvote" class="{% if user_vote == 'upvote' %}uk-text-success{% endif %} uk-icon-link js-add-vote" uk-icon="icon: arrow-up; ratio: 1.5">{{ task.get_upvotes }} Lubie!</a>
-                        <a data-vote-task="{% url 'add_vote' task.id 'downvote' %}" id="downvote" class="{% if user_vote == 'downvote' %}uk-text-danger{% endif %} uk-icon-link js-add-vote" uk-icon="icon: arrow-down; ratio: 1.5">{{ task.get_downvotes }} Nie lubie</a>
+                        <a data-add-fav="{% url 'add_favourite' task.id %}" id="favourite" class="{% if is_favourite %}uk-text-danger{% endif %} uk-icon-link js-add-fav" uk-icon="icon: heart; ratio: 1.5"></a>
+                        <a data-vote-task="{% url 'add_vote' task.id 'upvote' %}" id="upvote" class="{% if user_vote == 'upvote' %}uk-text-success{% endif %} uk-icon-link js-add-vote" uk-icon="icon: arrow-up; ratio: 1.5"><span>{{ task.get_upvotes }}</span> Lubie!</a>
+                        <a data-vote-task="{% url 'add_vote' task.id 'downvote' %}" id="downvote" class="{% if user_vote == 'downvote' %}uk-text-danger{% endif %} uk-icon-link js-add-vote" uk-icon="icon: arrow-down; ratio: 1.5"><span>{{ task.get_downvotes }}</span> Nie lubie</a>
                     </div>
                 </div>
             </div>
@@ -81,18 +82,18 @@
             success: function(data) {
                 if (data.liked) {
                     comment.css("color", "pink");
-                    comment.text(data.count + " Lubie! ");
+                    comment.children("span").text(data.count);
                     comment.removeClass("uk-hidden-hover uk-animation-slide-right-small");
                 } else {
                     comment.css("color", "");
                     if(data.count == 0)
                     {
-                        comment.text("Lubie! ");
+                        comment.children("span").text("");
                         comment.addClass("uk-hidden-hover uk-animation-slide-right-small");
                     }
                     else
                     {
-                        comment.text(data.count + " Lubie! ");
+                        comment.children("span").text(data.count);
                         comment.removeClass("uk-hidden-hover uk-animation-slide-right-small");
                     }
                 }
@@ -107,8 +108,8 @@
             data: vote.serialize(),
             dataType: 'json',
             success: function(data) {
-                $("#upvote").text(data.upvotes + " Lubie!");
-                $("#downvote").text(data.downvotes + " Nie lubie");
+                $("#upvote span").text(data.upvotes);
+                $("#downvote span").text(data.downvotes);
                 if(vote.attr('id') == 'upvote'){
                     vote.addClass("uk-text-success");
                     $("#downvote").removeClass("uk-text-danger");
@@ -117,6 +118,21 @@
                     vote.addClass("uk-text-danger");
                     $("#upvote").removeClass("uk-text-success");
                 }
+            }
+        });
+
+    });
+    $(".js-add-fav").click(function() {
+        var favourite = $(this);
+        $.ajax({
+            url: favourite.attr("data-add-fav"),
+            data: favourite.serialize(),
+            dataType: 'json',
+            success: function(data) {
+                if(data.is_favourite)
+                    favourite.addClass("uk-text-danger");
+                else
+                    favourite.removeClass("uk-text-danger");
             }
         });
 

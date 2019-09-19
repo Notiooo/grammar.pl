@@ -26,7 +26,6 @@ class CustomAuthenticationForm(AuthenticationForm):
     invalid_attempt_time = 5  # in minutes
 
     def clean(self):
-        # username = self.cleaned_data.get('username')
         ip_address = self.request.META['REMOTE_ADDR']
         cache_results = InvalidLoginAttemptsCache.get(ip_address)
         now = time.time()
@@ -46,11 +45,6 @@ class CustomAuthenticationForm(AuthenticationForm):
         InvalidLoginAttemptsCache.set(ip_address, invalid_attempt_timestamps, now)
         return super(CustomAuthenticationForm, self).clean()
 
-    # deleting an invalid attempts when correct logged in may be used for a brute force in a way:
-    # 4 login attempts -> login on prepared account -> logout -> 4 login attempts and so on
-    # def confirm_login_allowed(self, user):
-    #     InvalidLoginAttemptsCache.delete(self.request.META['REMOTE_ADDR'])
-
     def confirm_login_allowed(self, user):
         secret_key = settings.RECAPTCHA_SECRET_KEY
 
@@ -65,8 +59,9 @@ class CustomAuthenticationForm(AuthenticationForm):
         print(result_json)
 
         if not result_json.get('success'):
-            raise forms.ValidationError('Wystąpił problem z RECAPTCHA. Spróbuj jeszcze raz... chyba, że jesteś robotem 🤔',
-                                        code='invalid_login')
+            raise forms.ValidationError(
+                'Wystąpił problem z RECAPTCHA. Spróbuj jeszcze raz... chyba, że jesteś robotem 🤔',
+                code='invalid_login')
 
 
 class InvalidLoginAttemptsCache:

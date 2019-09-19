@@ -1,29 +1,43 @@
 from django.views.generic import ListView, TemplateView, FormView, DetailView, CreateView, UpdateView, DeleteView
+from django.views.generic.list import MultipleObjectMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
-from datetime import date
-
-from .models import Category, Task_Type, Task, Anwser, Comment, Votes
-from .forms import ContactForm, TaskForm, QuestionForm, QuestionFormSet, AnwserFormSet, CommentForm
-from django.db import transaction
+from django.db import transaction, IntegrityError
+from django.core.exceptions import ObjectDoesNotExist
 from django.urls import reverse_lazy
 from django.forms import modelformset_factory
-from django.shortcuts import render, get_object_or_404, reverse
-from .helpers import save_user_vote, user_vote, user_likes
-from django.core.exceptions import ObjectDoesNotExist
-from django.db import IntegrityError
-from django.core.paginator import Paginator
+from django.shortcuts import reverse
 from django.http import Http404, HttpResponseRedirect
-from django.views.generic.list import MultipleObjectMixin
+from django.contrib import messages
+
+from datetime import date
+from .models import Category, Task_Type, Task, Anwser, Comment, Votes, Favourites
+from .forms import ContactForm, TaskCreateForm, TaskUpdateForm, QuestionFormSet, AnwserFormSet, CommentForm
+from .helpers import user_vote, user_likes, is_favourite
 
 
-# Create your views here.
+# ---- CATEGORIES ----
 
 class HomePageView(ListView):
+    "The basic home ('/') view, where you can find list of Task Categories"
     model = Category
     template_name = 'tasks/home.html'
 
 
+class CategoryDetailView(DetailView):
+    """
+    A page with tasks of specific category
+    For example: Only tasks for Present Simple
+    """
+    model = Category
+    template_name = 'tasks/category_tasks.html'
+    slug_url_kwarg = 'the_slug'
+    slug_field = 'slug_url'
+
+
+# ---- CONTACT -----
+
 class ContactView(FormView):
+    "A view with Contact Form, and it contains informations about me (creator of the website)"
     form_class = ContactForm
     template_name = 'tasks/contact.html'
     success_url = 'success'
@@ -47,17 +61,30 @@ class ContactView(FormView):
 
 
 class ContactSuccessView(TemplateView):
+    "A page displaying when the Contact Form from ContactView was filled in correctly"
     template_name = 'tasks/contact_success.html'
 
 
-class CategoryDetailView(DetailView):
-    model = Category
-    template_name = 'tasks/category_tasks.html'
-    slug_url_kwarg = 'the_slug'
-    slug_field = 'slug_url'
-
+# ------- TASK VIEWS --------
 
 class TaskDetailView(DetailView, MultipleObjectMixin):
+    """
+    A page where you can actually see other user Task.
+    You can anwser to questions, check result.
+    You can post comment, upvote/downvote Task, or Like other people comments
+
+    number_of_anwsers -> Used to generate right amount of empty fields to fill in
+    anwsers_field     -> The actual fields user can fill in with his anwsers
+    object_list       -> Object used to paginate. In this example it is list of comments
+    user_vote         -> It checks if user has upvote/downvote this task before.
+                         It is used to properly display (color) user vote.
+    user_likes        -> It's a list with ID's of comments user gave a LIKE before.
+                         It is used to properly display what comment user has liked before.
+    comment_form      -> A form user can fill in to post a comment
+    formset           -> A formset made of anwsers_field user can fill in and get score/results/anwsers.
+    anwsers           -> An iter of formset. Used for single iteration, with no repeat. One call -> one anwser
+    """
+
     template_name = 'tasks/task_detail.html'
     model = Task
     context_object_name = 'task'
@@ -76,6 +103,7 @@ class TaskDetailView(DetailView, MultipleObjectMixin):
                                                             object_list=comments_list,
                                                             user_vote=user_vote(self.request, obj),
                                                             user_likes=user_likes(self.request, obj),
+                                                            is_favourite=is_favourite(self.request, obj),
                                                             comment_form=CommentForm(),
                                                             formset=formset,
                                                             anwsers=iter(formset), **kwargs)
@@ -90,55 +118,24 @@ class TaskDetailView(DetailView, MultipleObjectMixin):
                 comment.author = user
                 comment.task = self.object
                 comment.save()
-            return HttpResponseRedirect("#comments")
+                return HttpResponseRedirect("#comments")
+            else:
+                context = self.get_context_data(**kwargs)
+                context['comment_form'] = comment_form
+                return self.render_to_response(context)
         context = self.get_context_data(**kwargs)
         context['formset'] = context['anwsers_field'](request.POST)
         context['anwsers'] = iter(context['formset'])
         return self.render_to_response(context)
 
 
-class AddTaskListView(LoginRequiredMixin, ListView):
-    template_name = 'tasks/add_task_list.html'
-    model = Task_Type
-    login_url = 'login'
-    context_object_name = 'tasks_types'
-
-
-class AddTaskView(LoginRequiredMixin, CreateView):
-    template_name = 'tasks/add_task.html'
-    model = Task
-    form_class = TaskForm
-
-    def get_context_data(self, **kwargs):
-        data = super(AddTaskView, self).get_context_data(**kwargs)
-        if self.request.POST:
-            data['questions'] = QuestionFormSet(self.request.POST, prefix="questions")
-        else:
-            data['questions'] = QuestionFormSet(prefix="questions")
-        return data
-
-    def form_valid(self, form):
-        context = self.get_context_data()
-        questions = context['questions']
-        with transaction.atomic():
-            form.instance.author = self.request.user
-            self.object = form.save()
-            if questions.is_valid():
-                questions.instance = self.object
-                questions.save()
-        return super(AddTaskView, self).form_valid(form)
-
-    def get_success_url(self):
-        if self.request.POST.get('next'):
-            if self.request.POST['next'] == 'add_anwsers':
-                return reverse_lazy('add_anwsers', kwargs={'pk': self.object.pk})
-        return super(AddTaskView, self).get_success_url()
-
-
 class EditTaskView(LoginRequiredMixin, UpdateView):
+    "A page where user can edit his own task"
+
     template_name = 'tasks/add_task.html'
+    login_url = 'login'
     model = Task
-    form_class = TaskForm
+    form_class = TaskUpdateForm
 
     def dispatch(self, request, *args, **kwargs):
         obj = self.get_object()
@@ -175,10 +172,36 @@ class EditTaskView(LoginRequiredMixin, UpdateView):
         return super(EditTaskView, self).get_success_url()
 
 
+class MyTasksView(LoginRequiredMixin, ListView):
+    "A page where user can see tasks he made"
+
+    template_name = 'tasks/my_tasks.html'
+    context_object_name = 'tasks'
+    paginate_by = 15
+    login_url = 'login'
+
+    def get_queryset(self):
+        return Task.objects.filter(author=self.request.user).order_by('-pk')
+
+
+class MyFavouritesView(LoginRequiredMixin, ListView):
+    "A page where user can see his favourite tasks"
+    template_name = 'tasks/my_favourites.html'
+    context_object_name = 'tasks'
+    paginate_by = 15
+    login_url = 'login'
+
+    def get_queryset(self):
+        favourites = Favourites.objects.filter(user=self.request.user).order_by('-pk')
+        return [favourite.task for favourite in favourites]
+
+
 class DeleteTaskView(LoginRequiredMixin, DeleteView):
+    "A page where user can confirm deleting his own task"
+
     template_name = 'tasks/delete_task.html'
     model = Task
-    success_url = '/'
+    login_url = 'login'
 
     def dispatch(self, request, *args, **kwargs):
         obj = self.get_object()
@@ -186,28 +209,65 @@ class DeleteTaskView(LoginRequiredMixin, DeleteView):
             raise Http404("Wybacz, ale to niedozwolone. To nie twoje dzieło!")
         return super(DeleteTaskView, self).dispatch(request, *args, **kwargs)
 
+    def get_success_url(self):
+        return reverse('my_tasks')
 
-class DeleteCommentView(LoginRequiredMixin, DeleteView):
-    template_name = 'tasks/delete_comment.html'
-    model = Comment
 
-    def dispatch(self, request, *args, **kwargs):
-        obj = self.get_object()
-        if obj.author != self.request.user:
-            raise Http404("Wybacz, ale to niedozwolone. To nie twoje dzieło!")
-        return super(DeleteCommentView, self).dispatch(request, *args, **kwargs)
+# ------- ADD TASKS VIEWS -------
+
+class AddTaskListView(LoginRequiredMixin, ListView):
+    """
+    A page where user can choose his Type of Task he want to create.
+    For example:
+    - ABC Quiz
+    - Fill empty fields
+    """
+
+    template_name = 'tasks/add_task_list.html'
+    model = Task_Type
+    login_url = 'login'
+    context_object_name = 'tasks_types'
+
+
+class AddTaskView(LoginRequiredMixin, CreateView):
+    "A page where user can create his own task"
+
+    template_name = 'tasks/add_task.html'
+    login_url = 'login'
+    model = Task
+    form_class = TaskCreateForm
+
+    def get_context_data(self, **kwargs):
+        data = super(AddTaskView, self).get_context_data(**kwargs)
+        if self.request.POST:
+            data['questions'] = QuestionFormSet(self.request.POST, prefix="questions")
+        else:
+            data['questions'] = QuestionFormSet(prefix="questions")
+        return data
+
+    def form_valid(self, form):
+        context = self.get_context_data()
+        questions = context['questions']
+        with transaction.atomic():
+            form.instance.author = self.request.user
+            self.object = form.save()
+            if questions.is_valid():
+                questions.instance = self.object
+                questions.save()
+        return super(AddTaskView, self).form_valid(form)
 
     def get_success_url(self):
-        task_id = self.request.POST.get('task-id')
-        the_slug = self.request.POST.get('the_slug')
-        if task_id and the_slug:
-            return reverse('task_detail', kwargs={'pk': task_id, 'the_slug': the_slug})
-        else:
-            return reverse('home')
+        if self.request.POST.get('next'):
+            if self.request.POST['next'] == 'add_anwsers':
+                return reverse_lazy('add_anwsers', kwargs={'pk': self.object.pk})
+        return super(AddTaskView, self).get_success_url()
 
 
 class AddTaskAnwsersView(LoginRequiredMixin, UpdateView):
+    "A page where user can add anwsers to questions he created in AddTaskView"
+
     template_name = 'tasks/add_anwsers.html'
+    login_url = 'login'
     model = Task
     fields = []
 
@@ -244,23 +304,38 @@ class AddTaskAnwsersView(LoginRequiredMixin, UpdateView):
                     return super(AddTaskAnwsersView, self).form_invalid(form)
         return super(AddTaskAnwsersView, self).form_valid(form)
 
-    # def get_success_url(self):
-    #     return reverse_lazy('add_task', kwargs={'pk': self.object.pk})
 
+# -------- COMMENT VIEWS ----------
 
-class MyTasksView(LoginRequiredMixin, ListView):
-    template_name = 'tasks/my_tasks.html'
-    context_object_name = 'tasks'
-    paginate_by = 15
+class DeleteCommentView(LoginRequiredMixin, DeleteView):
+    "A page where user can fonfirm deleting his own comment"
 
-    def get_queryset(self):
-        return Task.objects.filter(author=self.request.user).order_by('-pk')
+    template_name = 'tasks/delete_comment.html'
+    login_url = 'login'
+    model = Comment
+
+    def dispatch(self, request, *args, **kwargs):
+        obj = self.get_object()
+        if obj.author != self.request.user:
+            raise Http404("Wybacz, ale to niedozwolone. To nie twoje dzieło!")
+        return super(DeleteCommentView, self).dispatch(request, *args, **kwargs)
+
+    def get_success_url(self):
+        task_id = self.request.POST.get('task-id')
+        the_slug = self.request.POST.get('the_slug')
+        if task_id and the_slug:
+            return reverse('task_detail', kwargs={'pk': task_id, 'the_slug': the_slug}) + "#comments"
+        else:
+            return reverse('home')
 
 
 # ------- AJAX VIEWS ----------
 from django.http import JsonResponse
 
+
 def add_like(request, pk):
+    "A page for Ajax made for giving likes to users comments"
+
     liked = False
     try:
         Comment.objects.get(id=pk).likes.create(user=request.user)
@@ -275,7 +350,10 @@ def add_like(request, pk):
     }
     return JsonResponse(data)
 
+
 def add_vote(request, pk, vote_type):
+    "A page for Ajax made for giving votes (upvote/downvote) to users tasks"
+
     object = Task.objects.get(id=pk)
     if vote_type == 'upvote':
         try:
@@ -296,3 +374,16 @@ def add_vote(request, pk, vote_type):
         'downvotes': object.votes.filter(activity_type=Votes.DOWN_VOTE).count(),
     }
     return JsonResponse(data)
+
+
+def add_favourite(request, pk):
+    "A page for Ajax adding Task to user favourite list"
+
+    object = Task.objects.get(id=pk)
+    try:
+        object.favourites.create(task=object, user=request.user)
+        favourite = True
+    except IntegrityError:
+        object.favourites.get(task=object, user=request.user).delete()
+        favourite = False
+    return JsonResponse(dict(is_favourite=favourite))

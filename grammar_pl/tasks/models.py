@@ -130,6 +130,14 @@ class Likes(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
     )
-
     class Meta:
         unique_together = ('comment', 'user')
+
+class Favourites(models.Model):
+    task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='favourites', null=True)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+    )
+    class Meta:
+        unique_together = ('task', 'user')

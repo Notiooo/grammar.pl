@@ -3,7 +3,9 @@ from django.core.mail import send_mail
 from . import models
 from django.forms.models import inlineformset_factory, BaseInlineFormSet
 
+import time
 from secret_settings import secret_email_contacts_list
+from django.core.cache import cache
 
 
 class ContactForm(forms.Form):
@@ -49,7 +51,7 @@ AnwserFormSet = inlineformset_factory(
     min_num=0, can_delete=True)
 
 
-class TaskForm(forms.ModelForm):
+class TaskUpdateForm(forms.ModelForm):
     class Meta:
         model = models.Task
         fields = ['category', 'title', 'text']
@@ -57,7 +59,80 @@ class TaskForm(forms.ModelForm):
             'text': forms.Textarea(attrs={'rows': 4}),
         }
 
+
+class TaskCreateForm(forms.ModelForm):
+    time_between_tasks = 240
+
+    class Meta:
+        model = models.Task
+        fields = ['category', 'title', 'text']
+        widgets = {
+            'text': forms.Textarea(attrs={'rows': 4}),
+        }
+
+    def clean(self):
+        action = 'add_task'
+        username = self.cleaned_data.get('username')
+        cache_results = ActionTimeout.get(action, username)
+        now = time.time()
+        last_attempt = cache_results['last_attempt'] if cache_results else False
+        if last_attempt > (now - self.time_between_tasks):
+            raise forms.ValidationError(
+                'Poczekaj chwile! Zbyt szybko dodajesz zadania. Odczekaj między nimi %(seconds)s sekund. Wykorzystaj ten czas na wymyślenie dobrego zadania. Przepraszamy za utrudnienia! 😭',
+                params={'seconds': self.time_between_tasks})
+        ActionTimeout.set(action, username, now)
+        return super(TaskCreateForm, self).clean()
+
+
 class CommentForm(forms.ModelForm):
+    time_between_comments = 30  # in seconds
+
     class Meta:
         model = models.Comment
         fields = ['text']
+
+    def clean(self):
+        action = 'add_comment'
+        username = self.cleaned_data.get('username')
+        cache_results = ActionTimeout.get(action, username)
+        now = time.time()
+        # gets last attempt or create one
+        last_attempt = cache_results['last_attempt'] if cache_results else False
+
+        if last_attempt > (now - self.time_between_comments):
+            raise forms.ValidationError(
+                'Poczekaj chwile! Zbyt szybko dodajesz komentarze. Odczekaj między nimi %(seconds)s sekund.',
+                params={'seconds': self.time_between_comments})
+        ActionTimeout.set(action, username, now)
+        return super(CommentForm, self).clean()
+
+
+class ActionTimeout:
+    """
+    It is used in situations where a certain action of a user should not be allowed to do infinite amount of times
+    So it's a kind of time block between every signle action
+    """
+    @staticmethod
+    def _key(action, username):
+        return '{}_timeout_{}'.format(action, username)
+
+    @staticmethod
+    def _value(time):
+        return {
+            'last_attempt': time,
+        }
+
+    @staticmethod
+    def delete(action, username):
+        cache.delete(ActionTimeout._key(action, username))
+
+    @staticmethod
+    def set(action, username, time):
+        key = ActionTimeout._key(action, username)
+        value = ActionTimeout._value(time)
+        cache.set(key, value)
+
+    @staticmethod
+    def get(action, username):
+        key = ActionTimeout._key(action, username)
+        return cache.get(key)

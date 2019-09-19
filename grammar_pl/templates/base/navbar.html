@@ -24,7 +24,7 @@
                         <li><a href="{% url 'add_task_list' %}">Dodaj zadanie</a></li>
                         <li><a href="{% url 'my_tasks' %}">Twoje zadania</a></li>
                         <li><a href="{% url 'profile' user.pk %}">Twój profil</a></li>
-                        <li><a uk-tooltip="title: Prace wciąż trwają 😥; pos: left">Ulubione</a></li>
+                        <li><a href="{% url 'my_favourites' %}">Ulubione</a></li>
                         <li><a href="{% url 'logout' %}?next={% firstof request.path '/' %}">Wyloguj się</a></li>
                         {% else %}
                         <li><a href="{% url 'login' %}?next={% firstof request.path '/' %}">Zaloguj się</a></li>
@@ -60,7 +60,7 @@
             <li><a href="{% url 'profile' user.pk %}">Twój profil</li></li>
             <li><a href="{% url 'add_task_list' %}">Dodaj zadanie</a></li>
             <li><a href="{% url 'my_tasks' %}">Twoje zadania</a></li>
-            <li><a uk-tooltip="Prace wciąż trwają 😥">Ulubione</a></li>
+            <li><a href="{% url 'my_favourites' %}">Ulubione</a></li>
             <li><a href="{% url 'logout' %}?next={% firstof request.path '/' %}">Wyloguj się</a></li>
             {% else %}
             <li><a href="{% url 'login' %}?next={% firstof request.path '/' %}">Zaloguj się</a></li>

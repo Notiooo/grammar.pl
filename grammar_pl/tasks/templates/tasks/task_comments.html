@@ -1,5 +1,6 @@
 {% load widget_tweaks %}
 
+{% if user.is_authenticated %}
 <div>
     <h1>Dodaj komentarz</h1>
     <form method="POST" action="#comments">
@@ -8,7 +9,15 @@
         <p>{% render_field comment_form.text|attr:"style:resize: none" rows="3" class+="uk-textarea" %}</p>
         <div class="uk-text-right" uk-margin><button type="submit" name="add_comment" class="uk-button uk-button-primary uk-text-right">Dodaj komentarz</button></div>
     </form>
+    {% if comment_form.non_field_errors %}
+    <div class="uk-alert-danger" uk-alert>
+        {% for error in comment_form.non_field_errors %}
+            {{ error }}
+        {% endfor %}
+    </div>
+    {% endif %}
 </div>
+{% endif %}
 <ul id="comments" class="uk-comment-list uk-list-striped">
     {% for comment in object_list %}
     <li>
@@ -24,14 +33,14 @@
                     </div>
                 </div>
                 <div class="uk-position-top-right uk-position-small">
-                    {% if comment.author == request.user %}
+                    {% if comment.author == user %}
                         <a href="{% url 'delete_comment' comment.id %}" class="uk-icon-link uk-hidden-hover uk-animation-slide-right-small" uk-icon="icon: trash; ratio: 1.2">Usuń </a>
                     {% elif comment.id in user_likes %}
-                        <a data-like-comment="{% url 'add_like' comment.id %}" style="color: pink;" value="{{ comment.id }}" class="uk-icon-link js-add-like" uk-icon="icon: heart; ratio: 1.2">{{ comment.likes.count }} Lubie! </a>
+                        <a data-like-comment="{% url 'add_like' comment.id %}" style="color: pink;" value="{{ comment.id }}" class="uk-icon-link js-add-like" uk-icon="icon: heart; ratio: 1.2"><span>{{ comment.likes.count }}</span> Lubie! </a>
                     {% elif comment.likes.count %}
-                        <a data-like-comment="{% url 'add_like' comment.id %}" value="{{ comment.id }}" class="uk-icon-link js-add-like" uk-icon="icon: heart; ratio: 1.2">{{ comment.likes.count }} Lubie! </a>
+                        <a data-like-comment="{% url 'add_like' comment.id %}" value="{{ comment.id }}" class="uk-icon-link js-add-like" uk-icon="icon: heart; ratio: 1.2"><span>{{ comment.likes.count }}</span> Lubie! </a>
                     {% else %}
-                        <a data-like-comment="{% url 'add_like' comment.id %}" value="{{ comment.id }}" class="uk-icon-link uk-hidden-hover uk-animation-slide-right-small js-add-like" uk-icon="icon: heart; ratio: 1.2">Lubie! </a>
+                        <a data-like-comment="{% url 'add_like' comment.id %}" value="{{ comment.id }}" class="uk-icon-link uk-hidden-hover uk-animation-slide-right-small js-add-like" uk-icon="icon: heart; ratio: 1.2"><span></span> Lubie! </a>
                     {% endif %}
                 </div>
             </header>

@@ -11,6 +11,13 @@
 </style>
 <div class="uk-section">
     <div class="uk-container uk-container-small">
+        {% if form.non_field_errors %}
+        <div class="uk-alert-danger" uk-alert>
+            {% for error in form.non_field_errors %}
+                {{ error }}
+            {% endfor %}
+        </div>
+        {% endif %}
         <form method="POST">
             {% csrf_token %}
             {% if object %}
@@ -65,7 +72,7 @@
                 {% endif %}
                 {% if object.public %}
                     <button class="uk-button uk-float-right" name="next" value="unpublic" style="color: white; background-color: #405075" type="submit">Ukryj</button>
-                {% else %}
+                {% elif object %}
                     <button class="uk-button uk-float-right" name="next" value="public" style="color: white; background-color: #50f072" type="submit">Publikuj</button>
                 {% endif %}
                 <button type="submit" class="uk-button uk-button-primary">Zapisz</button>

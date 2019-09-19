@@ -38,22 +38,33 @@ def user_vote(request, object):
     """
     Checks activity of specific user to specific task
     """
-    # votes = object.votes.filter(user=request.user)
-    # return {vote.get_activity_type_display(): True for vote in votes}
-    try:
-        return object.votes.get(user=request.user).get_activity_type_display()
-    except ObjectDoesNotExist:
+    if request.user.is_authenticated:
+        try:
+            return object.votes.get(user=request.user).get_activity_type_display()
+        except ObjectDoesNotExist:
+            return None
+    else:
         return None
 
+def is_favourite(request, object):
+    "Check if the task is in user favourites list"
+    if request.user.is_authenticated:
+        if object.favourites.filter(user=request.user).count():
+            return True
+        else:
+            return False
 
 def user_likes(request, object):
     """
     Checks activity of specific user to specific task
     """
-    likes = []
-    for comment in object.comments.all():
-        try:
-            likes.append(comment.likes.get(user=request.user).comment.id)
-        except ObjectDoesNotExist:
-            pass
-    return likes
+    if request.user.is_authenticated:
+        likes = []
+        for comment in object.comments.all():
+            try:
+                likes.append(comment.likes.get(user=request.user).comment.id)
+            except ObjectDoesNotExist:
+                pass
+        return likes
+    else:
+        return None
