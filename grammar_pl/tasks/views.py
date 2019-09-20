@@ -6,12 +6,12 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.urls import reverse_lazy
 from django.forms import modelformset_factory
 from django.shortcuts import reverse, get_object_or_404
-from django.http import Http404, HttpResponseRedirect
-from django.contrib import messages
+from django.http import Http404, HttpResponseRedirect, JsonResponse
 
 from datetime import date
 from .models import Category, Task_Type, Task, Anwser, Comment, Votes, Favourites
-from .forms import ContactForm, TaskCreateForm, TaskUpdateForm, QuestionFormSet, AnwserFormSet, CommentForm
+from .forms import ContactForm, TaskCreateForm, TaskUpdateForm, QuestionFormSet, AnwserFormSet, CommentForm, \
+    TaskReport_Form
 from .helpers import user_vote, user_likes, is_favourite
 
 
@@ -23,7 +23,7 @@ class HomePageView(ListView):
     template_name = 'tasks/home.html'
 
 
-class CategoryDetailView(DetailView):
+class CategoryDetailView(DetailView, MultipleObjectMixin):
     """
     A page with tasks of specific category
     For example: Only tasks for Present Simple
@@ -32,7 +32,15 @@ class CategoryDetailView(DetailView):
     template_name = 'tasks/category_tasks.html'
     slug_url_kwarg = 'the_slug'
     slug_field = 'slug_url'
+    paginate_by = 1
 
+    def get_context_data(self, **kwargs):
+        # if self.request.GET and 'votes' in self.request.GET:
+        #     return super(CategoryDetailView, self).get_context_data(
+        #         object_list=sorted(self.get_object().get_public_tasks().order_by('-pk'), key=lambda x: x.get_sum_votes(),
+        #                            reverse=True), **kwargs)
+        return super(CategoryDetailView, self).get_context_data(
+                object_list=self.get_object().get_public_tasks().order_by('-pk'), **kwargs)
 
 # ---- CONTACT -----
 
@@ -215,6 +223,14 @@ class DeleteTaskView(LoginRequiredMixin, DeleteView):
         return reverse('my_tasks')
 
 
+def task_random(request):
+    "This view returns a random task from a given exam_category"
+
+    random = Task.objects.order_by('?').first()
+    return HttpResponseRedirect(
+        reverse('task_detail', kwargs={'pk': random.pk, 'the_slug': random.category.slug_url}))
+
+
 # ------- ADD TASKS VIEWS -------
 
 class AddTaskListView(LoginRequiredMixin, ListView):
@@ -334,9 +350,33 @@ class DeleteCommentView(LoginRequiredMixin, DeleteView):
             return reverse('home')
 
 
-# ------- AJAX VIEWS ----------
-from django.http import JsonResponse
+# ------- REPORT VIEWS ---------
 
+class TaskReport(FormView):
+    "It allows users to report (send email) describing a problem with a task"
+
+    form_class = TaskReport_Form
+    template_name = 'report/report.html'
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(TaskReport, self).get_context_data(*args, **kwargs)
+        context['obj'] = get_object_or_404(Task, pk=self.kwargs['task_id'])
+        return context
+
+    def form_valid(self, form):
+        form.send_email(self.kwargs['task_id'])
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return 'success' + "?next={}".format(self.request.GET['next'])
+
+
+class TaskReportSuccess(TemplateView):
+    "Simple view showing a success page if the Report form passed"
+    template_name = 'report/report_success.html'
+
+
+# ------- AJAX VIEWS ----------
 
 def add_like(request, pk):
     "A page for Ajax made for giving likes to users comments"

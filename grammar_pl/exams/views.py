@@ -132,7 +132,7 @@ class ExamsReport(FormView):
     "It allows users to report (send email) describing a problem with a task"
 
     form_class = forms.ExamsReport_Form
-    template_name = 'exams/exams_report.html'
+    template_name = 'report/report.html'
 
     def get_context_data(self, *args, **kwargs):
         context = super(ExamsReport, self).get_context_data(*args, **kwargs)
@@ -149,7 +149,7 @@ class ExamsReport(FormView):
 
 class ExamsReportSuccess(TemplateView):
     "Simple view showing a success page if the Report form passed"
-    template_name = 'exams/exams_report_success.html'
+    template_name = 'report/report_success.html'
 
 
 def exams_random(request, exam_category):

@@ -13,7 +13,7 @@
             <a href="" class="uk-button uk-border-rounded yellow-button-transparent">Losuj kolejne zadanie</a>
         </div>
         <div>
-            <a href="?next={% firstof request.path '/' %}" class="uk-button uk-border-rounded uk-button-danger button-danger-transparent">Zgłoś zadanie</a>
+            <a href="{% url 'task_report' task.id %}?next={% firstof request.path '/' %}" class="uk-button uk-border-rounded uk-button-danger button-danger-transparent">Zgłoś zadanie</a>
         </div>
         {% if task.author == user %}
         <div>

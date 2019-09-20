@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block content %}
+<div class="uk-section">
+    <div class="uk-container uk-container-small uk-width-xlarge">
+        <h3>{{ obj.title }} - zgłaszanie błędu</h3>
+        <form method="POST">
+            {% csrf_token %}
+            {% with WIDGET_ERROR_CLASS='uk-form-danger' %}
+            {% for field in form %}
+            <div class="uk-margin">
+                {% render_field field class+="uk-textarea" placeholder=field.label %}
+            </div>
+            <div class="uk-text-meta uk-margin">{{ field.help_text }}</div>
+            <div class="uk-form-danger uk-text-small">
+                {% for error in field.errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endfor %}
+            <input type="hidden" name="next" value="{{ request.GET.next }}">
+            <div class="uk-text-center"><button class="uk-button uk-button-primary" type="submit">Wyślij wiadomość</button></div>
+            {% endwith %}
+        </form>
+    </div>
+</div>
+{% endblock content %}

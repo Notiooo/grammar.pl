@@ -20,7 +20,7 @@
                 </tr>
             </thead>
             <tbody>
-            {% for task in object.get_public_tasks %}
+            {% for task in object_list %}
                 <tr>
                     <td class="uk-table-link">
                         <a class="uk-link-reset" href="{% url 'task_detail' object.slug_url task.id %}">{{ task.title }}</a>
@@ -41,6 +41,7 @@
             {% endfor %}
             </tbody>
         </table>
+        {% include 'base/paginator.html' %}
     </div>
 </div>
 {% endblock %}

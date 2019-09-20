@@ -2,7 +2,6 @@ from django.db import IntegrityError
 from django.core.exceptions import ObjectDoesNotExist
 from .models import Votes, Likes
 
-
 def save_user_vote(request, object):
     """
     It looks for "vote" named button in POST method

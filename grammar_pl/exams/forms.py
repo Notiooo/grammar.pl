@@ -21,7 +21,7 @@ class ExamsReport_Form(forms.Form):
 
     def send_email(self, id):
         send_mail(
-            '[PROBLEM] ID: {0}'.format(id),
+            '[PROBLEM] ID: {0} - zadania maturalne'.format(id),
             self.cleaned_data['message'],
             self.cleaned_data['email'],
             secret_email_contacts_list,

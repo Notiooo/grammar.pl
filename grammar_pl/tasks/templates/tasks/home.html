@@ -13,7 +13,7 @@
             	<h3 class="uk-card-title">Śpieszy ci się?</h3>
             	<p>Skorzystaj z opcji losowania zadań. Daj sie zaskoczyć! Jest to przede wszystkim szybka opcja, ale równie efektywna a do tego zaskakująca!</p>
             	<p class="uk-text-center" uk-margin>
-            		<button class="uk-button uk-button-small uk-border-rounded uk-button-primary" uk-tooltip="Prace wciąż trwają 😅" disabled>Losuj zadanie</button>
+            		<a href="{% url 'task_random' %}" class="uk-button uk-button-small uk-border-rounded uk-button-default">Losuj zadanie</a>
             		<a href="{% url 'exams_random' 'matura' %}"><button class="uk-button uk-button-small uk-border-rounded yellow-button">Losuj zadanie maturalne!</button></a>
             	</p>
             </div>
@@ -56,7 +56,7 @@
 			<div>
 				<div class="uk-width-medium uk-card uk-card-hover uk-card-small uk-card-default uk-card-body">
 					<div class="block-title">{{ category.title }}</div>
-					<p class="uk-text-meta">{{ category.description }}</p>
+					<p class="uk-text-meta">{{ category.description|linebreaksbr }}</p>
 				</div>
 			</div>
 			</a>
@@ -72,7 +72,7 @@
 			<div>
 				<div class="uk-width-medium uk-card uk-card-hover uk-card-small uk-card-default uk-card-body">
 					<div class="block-title">{{ category.title }}</div>
-					<p class="uk-text-meta">{{ category.description }}</p>
+					<p class="uk-text-meta">{{ category.description|linebreaksbr }}</p>
 				</div>
 			</div>
 			</a>
@@ -88,7 +88,7 @@
 			<div>
 				<div class="uk-width-medium uk-card uk-card-hover uk-card-small uk-card-default uk-card-body">
 					<div class="block-title">{{ category.title }}</div>
-					<p class="uk-text-meta">{{ category.description }}</p>
+					<p class="uk-text-meta">{{ category.description|linebreaksbr }}</p>
 				</div>
 			</div>
 			</a>
@@ -107,7 +107,7 @@
 			<div>
 				<div class="uk-width-medium uk-card uk-card-hover uk-card-small uk-card-default uk-card-body">
 					<div class="block-title">{{ category.title }}</div>
-					<p class="uk-text-meta">{{ category.description }}</p>
+					<p class="uk-text-meta">{{ category.description|linebreaksbr }}</p>
 				</div>
 			</div>
 			</a>

@@ -35,6 +35,7 @@ class Task(models.Model):
     text = models.TextField(max_length=450)
     date = models.DateTimeField(auto_now_add=True)
     public = models.BooleanField(default=False)
+    source = models.CharField(max_length=150, blank=True)
     author = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -119,7 +120,6 @@ class Votes(models.Model):
         return self.objects.filter(activity_type=self.DOWN_VOTE).count()
 
     def get_sum_votes(self):
-        print(self.get_upvotes() - self.get_upvotes())
         return self.get_upvotes() - self.get_upvotes()
 
 

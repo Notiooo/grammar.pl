@@ -17,6 +17,11 @@ urlpatterns = [
     path('my_tasks/', views.MyTasksView.as_view(), name='my_tasks'),
     path('my_favourites/', views.MyFavouritesView.as_view(), name='my_favourites'),
     path('add_anwsers/<int:pk>', views.AddTaskAnwsersView.as_view(), name='add_anwsers'),
+    path('random/', views.task_random, name='task_random'),
+
+    #report
+    path('report/<int:task_id>', views.TaskReport.as_view(), name='task_report'),
+    path('report/success', views.TaskReportSuccess.as_view(), name='task_report_success'),
 
     #comments
     path('comment/delete/<int:pk>', views.DeleteCommentView.as_view(), name='delete_comment'),

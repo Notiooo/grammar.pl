@@ -35,8 +35,17 @@
                 <h5>Treść zadania</h5>
                 {% render_field form.text class+="uk-textarea" %}
             </div>
-            <hr/>
-            <table class="uk-table">
+            <div class="uk-margin">
+                <h5>Źródło <span class="uk-text-meta">(Inaczej link, jeśli zadanie zostało skądś zaczerpnięte / przekopiowane. W przeciwnym razie zostawić puste.)</span> - niewymagane</h5>
+                {% render_field form.source class+="uk-input" %}
+            </div>
+            <h4 class="uk-heading-line uk-text-center"><span>Pytania</span></h4>
+            <table class="uk-table" uk-toggle="cls: uk-table-responsive uk-text-center; mode: media; media: (max-width: 500px);">
+                {% if object %}
+                <p>Tutaj możesz dodawać, usuwać, lub zmieniać aktualnie pytania znajdujące się w twoim zadaniu.</p>
+                {% else %}
+                <p>Dodaj wszystkie pytania jakie chcesz by znalazły się w twoim zadaniu, a potem przejdź do zakładki <b>"Dodaj odpowiedzi"</b>.</p>
+                {% endif %}
                 {{ questions.management_form }}
                 {% for questions in questions.forms %}
                     {% if forloop.first %}
@@ -57,7 +66,7 @@
                                     {% endfor %}
                                 {% endif %}
                                 {{ question.errors.as_ul }}
-                                {% render_field question class+="uk-input uk-form-width-large" %}
+                                {% render_field question class+="uk-input" %}
                             </td>
                         {% endfor %}
                     </tr>
@@ -65,21 +74,21 @@
             </table>
             <div class="uk-margin">
                 {% if object.pk %}
-                    <a href="{% url 'delete_task' object.pk %}" class="uk-button uk-button-danger">Usuń zadanie</a>
-                    <a href="{% url 'add_anwsers' object.pk %}" class="uk-button uk-button-secondary">Edytuj odpowiedzi</a>
+                    <a href="{% url 'delete_task' object.pk %}" class="uk-button uk-button-danger uk-width-auto@s">Usuń zadanie</a>
+                    <a href="{% url 'add_anwsers' object.pk %}" class="uk-button uk-button-secondary uk-width-auto@s">Edytuj odpowiedzi</a>
                 {% else %}
-                    <button class="uk-button uk-button-secondary" name="next" value="add_anwsers">Dodaj odpowiedzi</button>
+                    <button class="uk-button uk-button-secondary uk-width-auto@s" name="next" value="add_anwsers">Dodaj odpowiedzi</button>
                 {% endif %}
                 {% if object.public %}
-                    <button class="uk-button uk-float-right" name="next" value="unpublic" style="color: white; background-color: #405075" type="submit">Ukryj</button>
+                    <button class="uk-button uk-float-right uk-width-auto@s" name="next" value="unpublic" style="color: white; background-color: #405075" type="submit">Ukryj</button>
                 {% elif object %}
-                    <button class="uk-button uk-float-right" name="next" value="public" style="color: white; background-color: #50f072" type="submit">Publikuj</button>
+                    <button class="uk-button uk-float-right uk-width-auto@s" name="next" value="public" style="color: white; background-color: #50f072" type="submit">Publikuj</button>
                 {% endif %}
-                <button type="submit" class="uk-button uk-button-primary">Zapisz</button>
+                <button type="submit" class="uk-button uk-button-primary uk-width-auto@s">Zapisz</button>
             </div>
             <div class="uk-margin">
                 {% if object.pk %}
-                    <a href="{% url 'task_detail' object.category.slug_url object.pk %}" class="uk-button uk-button-default">Wyswietl zadanie</a>
+                    <a href="{% url 'task_detail' object.category.slug_url object.pk %}" class="uk-button uk-button-default uk-width-auto@s">Wyswietl zadanie</a>
                 {% endif %}
             </div>
         </form>
@@ -93,7 +102,7 @@
         addText: 'Dodaj kolejne pytanie',
         deleteText: 'Usuń pytanie',
         prefix: 'questions',
-        addCssClass: 'uk-button uk-button-secondary uk-form-width-large',
+        addCssClass: 'uk-button uk-button-secondary',
         deleteCssClass: 'uk-button uk-button-default',
     });
 </script>

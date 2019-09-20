@@ -39,7 +39,7 @@
                     {% with text_field=anwsers|next_field:"text" %}
                         {{ text | safe | linebreaksbr }}
                         {% if formset.is_valid %}
-                            {% if text_field.value|upper in anwser.slice_anwsers|upper %}
+                            {% if text_field.value and text_field.value|upper in anwser.slice_anwsers|upper %}
                                 {% render_field text_field class="uk-input uk-form-width-xsmall uk-form-small uk-form-success uk-text-center uk-text-uppercase uk-remove-padding" maxlength="1" %}
                             {% else %}
                                 {% render_field text_field class="uk-input uk-form-width-xsmall uk-form-small uk-form-danger uk-text-center uk-text-uppercase uk-remove-padding" maxlength="1" %}

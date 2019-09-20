@@ -1,11 +1,12 @@
 from django import forms
 from django.core.mail import send_mail
 from . import models
-from django.forms.models import inlineformset_factory, BaseInlineFormSet
-
+from django.forms.models import inlineformset_factory
 import time
 from secret_settings import secret_email_contacts_list
 from django.core.cache import cache
+from django.conf import settings
+import requests
 
 
 class ContactForm(forms.Form):
@@ -22,6 +23,20 @@ class ContactForm(forms.Form):
             secret_email_contacts_list,
         )
         pass
+
+    def clean(self):
+        # captcha verification
+        secret_key = settings.RECAPTCHA_SECRET_KEY
+        data = {
+            'response': self.data.get('g-recaptcha-response'),
+            'secret': secret_key
+        }
+        resp = requests.post('https://www.google.com/recaptcha/api/siteverify', data=data)
+        result_json = resp.json()
+        if not result_json.get('success'):
+            raise forms.ValidationError(
+                'Wystąpił problem z RECAPTCHA. Spróbuj jeszcze raz... chyba, że jesteś robotem 🤔')
+        return super(ContactForm, self).clean()
 
 
 class QuestionForm(forms.ModelForm):
@@ -54,7 +69,7 @@ AnwserFormSet = inlineformset_factory(
 class TaskUpdateForm(forms.ModelForm):
     class Meta:
         model = models.Task
-        fields = ['category', 'title', 'text']
+        fields = ['category', 'title', 'text', 'source']
         widgets = {
             'text': forms.Textarea(attrs={'rows': 4}),
         }
@@ -65,7 +80,7 @@ class TaskCreateForm(forms.ModelForm):
 
     class Meta:
         model = models.Task
-        fields = ['category', 'title', 'text']
+        fields = ['category', 'title', 'text', 'source']
         widgets = {
             'text': forms.Textarea(attrs={'rows': 4}),
         }
@@ -136,3 +151,18 @@ class ActionTimeout:
     def get(action, username):
         key = ActionTimeout._key(action, username)
         return cache.get(key)
+
+
+class TaskReport_Form(forms.Form):
+    message = forms.CharField(widget=forms.Textarea(attrs={'rows': '10', 'style': 'resize:none;'}), required=True,
+                              help_text="Opisz szczegółowo problem", max_length=600, label="Wpisz swoją wiadomość")
+    email = forms.EmailField(required=False, help_text="Opcjonalnie, jeżeli spodziewasz otrzymać się odpowiedź",
+                             label="Adres email")
+
+    def send_email(self, id):
+        send_mail(
+            '[PROBLEM] ID: {0} - zadania społeczności'.format(id),
+            self.cleaned_data['message'],
+            self.cleaned_data['email'],
+            secret_email_contacts_list,
+        )
