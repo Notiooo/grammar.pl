@@ -2,13 +2,16 @@ from django.contrib.auth.forms import UserCreationForm, UserChangeForm, Authenti
 from django import forms
 from .models import CustomUser
 import time
-import requests
-from django.conf import settings
+from captcha.fields import ReCaptchaField
+from captcha.widgets import ReCaptchaV3
 
 from django.core.cache import cache
 
 
 class CustomUserCreationForm(UserCreationForm):
+    captcha = ReCaptchaField(widget=ReCaptchaV3, error_messages={
+        'required': 'Wystąpił problem z RECAPTCHA. Spróbuj jeszcze raz... chyba, że jesteś robotem 🤔', })
+
     class Meta(UserCreationForm):
         model = CustomUser
         fields = ('username', 'email')
@@ -23,6 +26,8 @@ class CustomUserChangeForm(UserChangeForm):
 
 
 class CustomAuthenticationForm(AuthenticationForm):
+    captcha = ReCaptchaField(widget=ReCaptchaV3, error_messages={
+        'required': 'Wystąpił problem z RECAPTCHA. Spróbuj jeszcze raz... chyba, że jesteś robotem 🤔', })
     invalid_attempt_time = 5  # in minutes
 
     def clean(self):
@@ -44,21 +49,6 @@ class CustomAuthenticationForm(AuthenticationForm):
                                         code='invalid_login')
         InvalidLoginAttemptsCache.set(ip_address, invalid_attempt_timestamps, now)
         return super(CustomAuthenticationForm, self).clean()
-
-    def confirm_login_allowed(self, user):
-        secret_key = settings.RECAPTCHA_SECRET_KEY
-
-        # captcha verification
-        data = {
-            'response': self.request.POST.get('g-recaptcha-response'),
-            'secret': secret_key
-        }
-        resp = requests.post('https://www.google.com/recaptcha/api/siteverify', data=data)
-        result_json = resp.json()
-        if not result_json.get('success'):
-            raise forms.ValidationError(
-                'Wystąpił problem z RECAPTCHA. Spróbuj jeszcze raz... chyba, że jesteś robotem 🤔',
-                code='invalid_login')
 
 
 class InvalidLoginAttemptsCache:

@@ -39,6 +39,7 @@ INSTALLED_APPS = [
 
     # 3rd parties
     'widget_tweaks',
+    'captcha',
 
     # local
     'users.apps.UsersConfig',
@@ -132,8 +133,8 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
 ]
 
-RECAPTCHA_SITE_KEY = "6LcZIrYUAAAAAEmg1RAirfwtWHfh_3rs0W6PBwy-"
-RECAPTCHA_SECRET_KEY = secrets['RECAPTCHA']
+RECAPTCHA_PUBLIC_KEY = "6LcZIrYUAAAAAEmg1RAirfwtWHfh_3rs0W6PBwy-"
+RECAPTCHA_PRIVATE_KEY = secrets['RECAPTCHA']
 
 STATIC_URL = '/static/'
 AUTH_USER_MODEL = 'users.CustomUser'

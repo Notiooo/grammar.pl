@@ -5,11 +5,14 @@ from django.forms.models import inlineformset_factory
 import time
 from secret_settings import secret_email_contacts_list
 from django.core.cache import cache
-from django.conf import settings
-import requests
+from captcha.fields import ReCaptchaField
+from captcha.widgets import ReCaptchaV3
 
 
 class ContactForm(forms.Form):
+    captcha = ReCaptchaField(widget=ReCaptchaV3, error_messages={
+        'required': 'Wystąpił problem z RECAPTCHA. Spróbuj jeszcze raz... chyba, że jesteś robotem 🤔', })
+
     from_email = forms.EmailField(required=True, label="Podaj swój email")
     title = forms.CharField(required=True, max_length=60, label="Tytuł wiadomości")
     message = forms.CharField(widget=forms.Textarea(attrs={'rows': '10', 'style': 'resize:none;'}), required=True,
@@ -22,21 +25,6 @@ class ContactForm(forms.Form):
             self.cleaned_data['from_email'],
             secret_email_contacts_list,
         )
-        pass
-
-    def clean(self):
-        # captcha verification
-        secret_key = settings.RECAPTCHA_SECRET_KEY
-        data = {
-            'response': self.data.get('g-recaptcha-response'),
-            'secret': secret_key
-        }
-        resp = requests.post('https://www.google.com/recaptcha/api/siteverify', data=data)
-        result_json = resp.json()
-        if not result_json.get('success'):
-            raise forms.ValidationError(
-                'Wystąpił problem z RECAPTCHA. Spróbuj jeszcze raz... chyba, że jesteś robotem 🤔')
-        return super(ContactForm, self).clean()
 
 
 class QuestionForm(forms.ModelForm):

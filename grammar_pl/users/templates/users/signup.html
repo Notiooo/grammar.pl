@@ -1,21 +1,10 @@
 {% extends 'base.html' %}
 {% load widget_tweaks %}
 
+{% block title %}Zarejestruj się - Grammar.pl{% endblock title %}
 {% block content %}
 
 <script src="https://www.google.com/recaptcha/api.js?render=6LcZIrYUAAAAAEmg1RAirfwtWHfh_3rs0W6PBwy-"></script>
-<script>
-    grecaptcha.ready(function() {
-        grecaptcha.execute('6LcZIrYUAAAAAEmg1RAirfwtWHfh_3rs0W6PBwy-', {action: 'login'})
-        .then(function(token) {
-            input = document.createElement("INPUT");
-            input.setAttribute("type", "hidden");
-            input.setAttribute("name", "g-recaptcha-response");
-            input.setAttribute("value", token);
-            document.getElementById("form").appendChild(input);
-        });
-    });
-</script>
 
 <div class="uk-flex uk-flex-center uk-flex-middle uk-flex-column uk-height-auto uk-padding-large uk-text-center">
 
@@ -80,6 +69,13 @@
                 {% endfor %}
             </div>
         </div>
+            <div class="uk-margin">
+                {% render_field form.captcha %}
+
+                {% for error in form.captcha.errors %}
+                <div class="uk-alert-danger" uk-alert>{{ error }}</div>
+                {% endfor %}
+            </div>
         <button type="submit" class="uk-button uk-button-primary uk-border-rounded" value="login">Zarejestruj sie</button>
     </div>
 </form>
@@ -91,8 +87,6 @@
             {{ error }}
         {% endfor %}
     </div>
-{% endif %}
-
-
 </div>
+{% endif %}
 {% endblock content %}

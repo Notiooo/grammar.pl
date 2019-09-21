@@ -4,19 +4,6 @@
 {% load widget_tweaks %}
 
 {% block content %}
-<script src="https://www.google.com/recaptcha/api.js?render=6LcZIrYUAAAAAEmg1RAirfwtWHfh_3rs0W6PBwy-"></script>
-<script>
-    grecaptcha.ready(function() {
-        grecaptcha.execute('6LcZIrYUAAAAAEmg1RAirfwtWHfh_3rs0W6PBwy-', {action: 'login'})
-        .then(function(token) {
-            input = document.createElement("INPUT");
-            input.setAttribute("type", "hidden");
-            input.setAttribute("name", "g-recaptcha-response");
-            input.setAttribute("value", token);
-            document.getElementById("form").appendChild(input);
-        });
-    });
-</script>
 
 <div style="background-image: linear-gradient(#8e9eab, #eef2f3); border-radius: 0 0 100% 0; z-index: -1; padding-bottom: 36%;" class="uk-width-2-3@s uk-width-1-3@m uk-position-absolute uk-visible@s"></div>
 <div class="uk-section">
@@ -41,11 +28,9 @@
                             {% render_field field class+="uk-textarea" placeholder=field.label %}
                         </div>
                         <div class="uk-text-meta uk-margin">{{ field.help_text }}</div>
-                        <div class="uk-form-danger uk-text-small">
-                            {% for error in field.errors %}
-                                <p>{{ error }}</p>
-                            {% endfor %}
-                        </div>
+                        {% for error in field.errors %}
+                            <div class="uk-alert-danger" uk-alert>{{ error }}</div>
+                        {% endfor %}
                         {% endfor %}
                         <div class="uk-text-center"><button class="uk-button uk-button-primary" type="submit">Wyślij wiadomość</button></div>
                         {% endwith %}

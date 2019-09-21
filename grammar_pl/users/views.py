@@ -58,6 +58,7 @@ class ProfileDetailView(generic.DetailView):
         context['gained_likes'] = self.get_user_gained_likes(user)
         return context
 
+
 class ProfileCommentsActivity(generic.ListView):
     model = Comment
     template_name = 'users/activity_comments_list.html'
@@ -66,6 +67,7 @@ class ProfileCommentsActivity(generic.ListView):
 
     def get_queryset(self):
         return self.model.objects.filter(author=get_object_or_404(CustomUser, pk=self.kwargs['pk'])).order_by('-pk')
+
 
 class ProfileTasksActivity(generic.ListView):
     model = Task
