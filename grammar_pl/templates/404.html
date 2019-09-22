@@ -8,6 +8,9 @@
         <h3 class="uk-margin-remove-top">Aczkolwiek mamy przypuszczenia, że to <span style="color: red;">błąd 404</span> :O</h3>
         <img src="{% static 'img/404.gif' %}"/>
         <p>Może ten kotek-programista wyżej jednak coś wykombinuje...</p>
+        {% if exception %}
+        <p>Póki co stwierdził, że... "{{ exception }}"</p>
+        {% endif %}
         <p>No nic... nic więcej nie mogę na to poradzić</p>
         <p class="uk-text-meta">Tak więc dajmy mu czas...</p>
         <a href="{% url 'home' %}"><button class="uk-button uk-button-secondary">Wróć na stronę główą</button></a>

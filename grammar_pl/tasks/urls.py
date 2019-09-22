@@ -10,6 +10,7 @@ urlpatterns = [
     path('contact/success', views.ContactSuccessView.as_view(), name='contact_success'),
 
     #tasks
+    path('tasks/', views.PublicTasksView.as_view(), name='tasks_list'),
     path('add_task/', views.AddTaskListView.as_view(), name='add_task_list'),
     path('add_task/<slug:task_name>', views.AddTaskView.as_view(), name='add_task'),
     path('edit_task/<int:pk>', views.EditTaskView.as_view(), name='edit_task'),

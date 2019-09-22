@@ -4,9 +4,8 @@
 
 <div class="uk-section">
     <div class="uk-container uk-container-large">
-
-        <h1>Moje zadania</h1>
         {% if tasks %}
+        <h1>Moje zadania</h1>
         <table class="uk-table uk-table-striped uk-table-hover" uk-toggle="cls: uk-table-responsive; mode: media; media: (max-width: 500px);">
             <thead>
                 <tr>
@@ -45,9 +44,10 @@
         </table>
         {% include 'base/paginator.html' %}
         {% else %}
-        <div>
-            <h4>Nie masz żadnych ulubionych pozycji :c</h4>
-            <p>Kliknij serduszko obok swojego ulubionego zadania by go dodać</p>
+        <div class="uk-text-center">
+            <h1>Moje zadania</h1>
+            <h4>Nie dodałeś jeszcze żadnych zadań :c</h4>
+            <a href="{% url 'add_task_list' %}" class="uk-button uk-button-secondary">Dodaj swoje własne zadanie</a>
         </div>
         {% endif %}
     </div>

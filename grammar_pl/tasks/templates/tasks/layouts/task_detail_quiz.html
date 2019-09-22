@@ -76,6 +76,7 @@
 {% block javascript %}
     <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
     <script>
+    let error_message = "Żeby wykonać tą akcję proszę się zalogować"
     $(".js-add-like").click(function() {
         var comment = $(this);
         $.ajax({
@@ -100,6 +101,9 @@
                         comment.removeClass("uk-hidden-hover uk-animation-slide-right-small");
                     }
                 }
+            },
+            error: function(){
+                UIkit.notification(error_message, {status:'danger'})
             }
         });
 
@@ -121,6 +125,9 @@
                     vote.addClass("uk-text-danger");
                     $("#upvote").removeClass("uk-text-success");
                 }
+            },
+            error: function(){
+                UIkit.notification(error_message, {status:'danger'})
             }
         });
 
@@ -136,6 +143,9 @@
                     favourite.addClass("uk-text-danger");
                 else
                     favourite.removeClass("uk-text-danger");
+            },
+            error: function(){
+                UIkit.notification(error_message, {status:'danger'})
             }
         });
 

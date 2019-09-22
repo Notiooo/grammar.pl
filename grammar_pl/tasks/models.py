@@ -32,7 +32,7 @@ class Task(models.Model):
     task_type = models.ForeignKey(Task_Type, on_delete=models.CASCADE, related_name='task_type', null=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='task', null=True)
     title = models.CharField(max_length=80)
-    text = models.TextField(max_length=450)
+    text = models.TextField(max_length=450, blank=True)
     date = models.DateTimeField(auto_now_add=True)
     public = models.BooleanField(default=False)
     source = models.CharField(max_length=150, blank=True)
@@ -68,6 +68,7 @@ class Task(models.Model):
 class Question(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='question', null=True)
     text = models.CharField(max_length=200)
+    explanation = models.CharField(max_length=180, blank=True)
 
     def __str__(self):
         return self.text[:60] + "..."
@@ -84,7 +85,7 @@ class Anwser(models.Model):
 
 class Comment(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='comments', null=True)
-    text = models.TextField(max_length=300)
+    text = models.TextField(max_length=300, default="")
     date = models.DateTimeField(auto_now_add=True)
     visible = models.BooleanField(default=True)
     author = models.ForeignKey(

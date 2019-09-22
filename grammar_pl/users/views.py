@@ -7,7 +7,7 @@ from .forms import CustomUserCreationForm, CustomUserChangeForm, CustomAuthentic
 from .models import CustomUser
 
 from django.contrib.auth import views as auth_views
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, get_list_or_404
 
 from tasks.models import Task, Votes, Likes, Comment
 
@@ -66,7 +66,7 @@ class ProfileCommentsActivity(generic.ListView):
     paginate_by = 8
 
     def get_queryset(self):
-        return self.model.objects.filter(author=get_object_or_404(CustomUser, pk=self.kwargs['pk'])).order_by('-pk')
+        return get_list_or_404(self.model.objects.filter(author=get_object_or_404(CustomUser, pk=self.kwargs['pk'])).order_by('-pk'))
 
 
 class ProfileTasksActivity(generic.ListView):
@@ -76,4 +76,4 @@ class ProfileTasksActivity(generic.ListView):
     paginate_by = 8
 
     def get_queryset(self):
-        return self.model.objects.filter(author=get_object_or_404(CustomUser, pk=self.kwargs['pk'])).order_by('-pk')
+        return get_list_or_404(self.model.objects.filter(author=get_object_or_404(CustomUser, pk=self.kwargs['pk'])).order_by('-pk'))

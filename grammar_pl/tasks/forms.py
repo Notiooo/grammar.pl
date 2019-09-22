@@ -41,7 +41,7 @@ class AnwserForm(forms.ModelForm):
 
 QuestionFormSet = inlineformset_factory(
     models.Task, models.Question, form=QuestionForm,
-    fields=['text'], extra=0, max_num=3, min_num=1, labels={'text': 'Pytanie'}, can_delete=True)
+    fields=['text',], extra=0, max_num=16, min_num=1, labels={'text': 'Pytanie'}, can_delete=True)
 
 AnwserFormSet = inlineformset_factory(
     models.Question, models.Anwser, form=AnwserForm,
@@ -50,7 +50,7 @@ AnwserFormSet = inlineformset_factory(
              'correct': forms.CheckboxInput(attrs={'class': 'uk-checkbox uk-padding-small'})},
     labels={'text': 'Odpowiedź',
             'correct': 'Czy to poprawna odpowiedź?'},
-    extra=1, max_num=3,
+    extra=1, max_num=6,
     min_num=0, can_delete=True)
 
 

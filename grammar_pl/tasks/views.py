@@ -32,7 +32,7 @@ class CategoryDetailView(DetailView, MultipleObjectMixin):
     template_name = 'tasks/category_tasks.html'
     slug_url_kwarg = 'the_slug'
     slug_field = 'slug_url'
-    paginate_by = 1
+    paginate_by = 10
 
     def get_context_data(self, **kwargs):
         # if self.request.GET and 'votes' in self.request.GET:
@@ -40,7 +40,8 @@ class CategoryDetailView(DetailView, MultipleObjectMixin):
         #         object_list=sorted(self.get_object().get_public_tasks().order_by('-pk'), key=lambda x: x.get_sum_votes(),
         #                            reverse=True), **kwargs)
         return super(CategoryDetailView, self).get_context_data(
-                object_list=self.get_object().get_public_tasks().order_by('-pk'), **kwargs)
+            object_list=self.get_object().get_public_tasks().order_by('-pk'), **kwargs)
+
 
 # ---- CONTACT -----
 
@@ -74,6 +75,18 @@ class ContactSuccessView(TemplateView):
 
 
 # ------- TASK VIEWS --------
+
+class PublicTasksView(ListView):
+    """
+    A page with all public tasks
+    """
+    model = Task
+    template_name = 'tasks/tasks_list.html'
+    paginate_by = 10
+
+    def get_queryset(self):
+        return self.model.objects.filter(public=True).order_by('-pk')
+
 
 class TaskDetailView(DetailView, MultipleObjectMixin):
     """
@@ -142,7 +155,6 @@ class TaskDetailView(DetailView, MultipleObjectMixin):
 class EditTaskView(LoginRequiredMixin, UpdateView):
     "A page where user can edit his own task"
 
-    template_name = 'tasks/actions/add_task.html'
     login_url = 'login'
     model = Task
     form_class = TaskUpdateForm
@@ -152,6 +164,9 @@ class EditTaskView(LoginRequiredMixin, UpdateView):
         if obj.author != self.request.user:
             raise Http404("Wybacz, ale to niedozwolone. To nie twoje dzieło!")
         return super(EditTaskView, self).dispatch(request, *args, **kwargs)
+
+    def get_template_names(self):
+        return 'tasks/actions/layouts/add_task_{}.html'.format(self.get_object().task_type.layout_name)
 
     def get_context_data(self, **kwargs):
         data = super(EditTaskView, self).get_context_data(**kwargs)
@@ -227,8 +242,11 @@ def task_random(request):
     "This view returns a random task from a given exam_category"
 
     random = Task.objects.order_by('?').first()
-    return HttpResponseRedirect(
-        reverse('task_detail', kwargs={'pk': random.pk, 'the_slug': random.category.slug_url}))
+    if random:
+        return HttpResponseRedirect(
+            reverse('task_detail', kwargs={'pk': random.pk, 'the_slug': random.category.slug_url}))
+    else:
+        raise Http404('Przepraszamy, w tej chwili nie ma żadnych zadań')
 
 
 # ------- ADD TASKS VIEWS -------
@@ -250,10 +268,12 @@ class AddTaskListView(LoginRequiredMixin, ListView):
 class AddTaskView(LoginRequiredMixin, CreateView):
     "A page where user can create his own task"
 
-    template_name = 'tasks/actions/add_task.html'
     login_url = 'login'
     model = Task
     form_class = TaskCreateForm
+
+    def get_template_names(self):
+        return 'tasks/actions/layouts/add_task_{}.html'.format(get_object_or_404(Task_Type, slug_url=self.kwargs['task_name']).layout_name)
 
     def get_context_data(self, **kwargs):
         data = super(AddTaskView, self).get_context_data(**kwargs)
@@ -287,7 +307,6 @@ class AddTaskView(LoginRequiredMixin, CreateView):
 class AddTaskAnwsersView(LoginRequiredMixin, UpdateView):
     "A page where user can add anwsers to questions he created in AddTaskView"
 
-    template_name = 'tasks/actions/add_anwsers.html'
     login_url = 'login'
     model = Task
     fields = []
@@ -297,6 +316,9 @@ class AddTaskAnwsersView(LoginRequiredMixin, UpdateView):
         if obj.author != self.request.user:
             raise Http404("Wybacz, ale to niedozwolone. To nie twoje dzieło!")
         return super(AddTaskAnwsersView, self).dispatch(request, *args, **kwargs)
+
+    def get_template_names(self):
+        return 'tasks/actions/layouts/add_anwsers_{}.html'.format(self.get_object().task_type.layout_name)
 
     def get_context_data(self, **kwargs):
         data = super(AddTaskAnwsersView, self).get_context_data(**kwargs)
@@ -381,54 +403,63 @@ class TaskReportSuccess(TemplateView):
 def add_like(request, pk):
     "A page for Ajax made for giving likes to users comments"
 
-    liked = False
-    try:
-        Comment.objects.get(id=pk).likes.create(user=request.user)
-        liked = True
-    except IntegrityError:
-        Comment.objects.get(id=pk).likes.get(user=request.user).delete()
-    except ObjectDoesNotExist:
-        pass
-    data = {
-        'liked': liked,
-        'count': Comment.objects.get(id=pk).likes.count()
-    }
-    return JsonResponse(data)
+    if request.user.is_authenticated:
+        liked = False
+        try:
+            Comment.objects.get(id=pk).likes.create(user=request.user)
+            liked = True
+        except IntegrityError:
+            Comment.objects.get(id=pk).likes.get(user=request.user).delete()
+        except ObjectDoesNotExist:
+            pass
+        data = {
+            'liked': liked,
+            'count': Comment.objects.get(id=pk).likes.count()
+        }
+        return JsonResponse(data)
+    else:
+        raise Http404('test')
 
 
 def add_vote(request, pk, vote_type):
     "A page for Ajax made for giving votes (upvote/downvote) to users tasks"
 
-    object = Task.objects.get(id=pk)
-    if vote_type == 'upvote':
-        try:
-            object.votes.create(activity_type=Votes.UP_VOTE, user=request.user)
-        except IntegrityError:
-            obj = object.votes.get(user=request.user)
-            obj.activity_type = Votes.UP_VOTE
-            obj.save()
+    if request.user.is_authenticated:
+        object = Task.objects.get(id=pk)
+        if vote_type == 'upvote':
+            try:
+                object.votes.create(activity_type=Votes.UP_VOTE, user=request.user)
+            except IntegrityError:
+                obj = object.votes.get(user=request.user)
+                obj.activity_type = Votes.UP_VOTE
+                obj.save()
+        else:
+            try:
+                object.votes.create(activity_type=Votes.DOWN_VOTE, user=request.user)
+            except IntegrityError:
+                obj = object.votes.get(user=request.user)
+                obj.activity_type = Votes.DOWN_VOTE
+                obj.save()
+        data = {
+            'upvotes': object.votes.filter(activity_type=Votes.UP_VOTE).count(),
+            'downvotes': object.votes.filter(activity_type=Votes.DOWN_VOTE).count(),
+        }
+        return JsonResponse(data)
     else:
-        try:
-            object.votes.create(activity_type=Votes.DOWN_VOTE, user=request.user)
-        except IntegrityError:
-            obj = object.votes.get(user=request.user)
-            obj.activity_type = Votes.DOWN_VOTE
-            obj.save()
-    data = {
-        'upvotes': object.votes.filter(activity_type=Votes.UP_VOTE).count(),
-        'downvotes': object.votes.filter(activity_type=Votes.DOWN_VOTE).count(),
-    }
-    return JsonResponse(data)
+        raise Http404
 
 
 def add_favourite(request, pk):
     "A page for Ajax adding Task to user favourite list"
 
-    object = Task.objects.get(id=pk)
-    try:
-        object.favourites.create(task=object, user=request.user)
-        favourite = True
-    except IntegrityError:
-        object.favourites.get(task=object, user=request.user).delete()
-        favourite = False
-    return JsonResponse(dict(is_favourite=favourite))
+    if request.user.is_authenticated:
+        object = Task.objects.get(id=pk)
+        try:
+            object.favourites.create(task=object, user=request.user)
+            favourite = True
+        except IntegrityError:
+            object.favourites.get(task=object, user=request.user).delete()
+            favourite = False
+        return JsonResponse(dict(is_favourite=favourite))
+    else:
+        raise Http404

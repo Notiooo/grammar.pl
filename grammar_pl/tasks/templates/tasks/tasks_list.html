@@ -5,8 +5,7 @@
 <div class="uk-section">
     <div class="uk-container uk-container-large">
         {% if object_list %}
-            <h4 style="color: grey;">Tu może znajdować się opis i budowa dla "{{ object.title }}". Jeśli ktoś chciałby się podzielić autorskim opisem to zapraszam do kontaktu <a class="uk-link-text" href="{% url 'contact' %}">tutaj</a>.</h4>
-            <h1>{{ object.title }}</h1>
+            <h1>Zadania społeczności:</h1>
             {% if user.is_authenticated %}
             <a href="{% url 'add_task_list' %}" class="uk-button uk-button-secondary">Dodaj swoje własne zadanie</a>
             {% endif %}
@@ -14,6 +13,7 @@
                 <thead>
                     <tr>
                         <th>Tytuł</th>
+                        <th>Kategoria</th>
                         <th>Głosy</th>
                         <th>Data dodania</th>
                         <th>Autor</th>
@@ -24,7 +24,10 @@
                 {% for task in object_list %}
                     <tr>
                         <td class="uk-table-link">
-                            <a class="uk-link-text" href="{% url 'task_detail' object.slug_url task.id %}">{{ task.title }}</a>
+                            <a class="uk-link-text" href="{% url 'task_detail' task.category.slug_url task.id %}">{{ task.title }}</a>
+                        </td>
+                        <td class="uk-table-link">
+                            <a class="uk-link-text" href="{% url 'category' task.category.slug_url %}">{{ task.category }}</a>
                         </td>
                         {% with votes=task.get_sum_votes %}
                             {% if votes < 0 %}
@@ -36,7 +39,7 @@
                             {% endif %}
                         {% endwith %}
                         <td>{{ task.date|date:"D d M Y" }}</td>
-                        <td class="uk-table-link">
+                         <td class="uk-table-link">
                             <a class="uk-link-text" href="{% url 'profile' task.author.id %}">{{ task.author }}</a>
                         </td>
                         <td><img class="uk-preserve-width uk-border-circle" src="{{ task.author.avatar.url }}" width="40" alt=""></td>
@@ -46,8 +49,7 @@
             </table>
         {% else %}
         <div class="uk-text-center">
-            <h1>{{ object.title }}</h1>
-            <h4>Nikt jeszcze nie dodał zadań z tej kategorii :c</h4>
+            <h4>Nikt jeszcze nie dodał żadnych zadań :c</h4>
             <p>Bądź pierwszy!</p>
             <a href="{% url 'add_task_list' %}" class="uk-button uk-button-secondary">Dodaj swoje własne zadanie</a>
         </div>

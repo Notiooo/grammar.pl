@@ -61,6 +61,7 @@
         <div class="uk-width-expand@s">
             <h3>Ostatnia aktywność</h3>
             <h3 class="uk-heading-line uk-text-center"><span>Ostatnie komentarze</span></h3>
+            {% if comments_activity %}
             {% for comment in comments_activity %}
             <div class="uk-comment uk-background-default uk-padding uk-margin-bottom uk-width-xxlarge@s">
                 <header class="uk-comment-header uk-grid-medium uk-flex-middle" uk-grid>
@@ -79,7 +80,13 @@
             </div>
             {% endfor %}
             <h4 class="uk-text-right"><a class="uk-link-text" href="{% url 'profile_comments' object.pk %}">Zobacz więcej</a></h4>
+            {% else %}
+            <div class="uk-comment uk-background-default uk-padding uk-text-center uk-margin-bottom uk-width-xxlarge@s">
+                <p>Użytkownik {{ object }} nie dodał żadnych komentarzy :c</p>
+            </div>
+            {% endif %}
             <h3 class="uk-heading-line uk-text-center"><span>Ostatnie zadania</span></h3>
+            {% if tasks_activity %}
             {% for task in tasks_activity %}
             <div class="uk-comment uk-background-default uk-padding uk-margin-bottom">
                 <header class="uk-comment-header uk-grid-medium uk-flex-middle" uk-grid>
@@ -99,6 +106,11 @@
             </div>
             {% endfor %}
             <h4 class="uk-text-right"><a class="uk-link-text" href="{% url 'profile_tasks' object.pk %}">Zobacz więcej</a></h4>
+            {% else %}
+            <div class="uk-comment uk-background-default uk-padding uk-text-center uk-margin-bottom uk-width-xxlarge@s">
+                <p>Użytkownik {{ object }} nie dodał żadnych zadań :c</p>
+            </div>
+            {% endif %}
         </div>
 
     </div>
