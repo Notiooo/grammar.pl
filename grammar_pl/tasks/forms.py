@@ -39,9 +39,14 @@ class AnwserForm(forms.ModelForm):
         exclude = ()
 
 
+# ----- Question formsets -----
+
 QuestionFormSet = inlineformset_factory(
     models.Task, models.Question, form=QuestionForm,
     fields=['text',], extra=0, max_num=16, min_num=1, labels={'text': 'Pytanie'}, can_delete=True)
+
+
+# ------ Anwser formsets -------
 
 AnwserFormSet = inlineformset_factory(
     models.Question, models.Anwser, form=AnwserForm,
@@ -50,6 +55,14 @@ AnwserFormSet = inlineformset_factory(
              'correct': forms.CheckboxInput(attrs={'class': 'uk-checkbox uk-padding-small'})},
     labels={'text': 'Odpowiedź',
             'correct': 'Czy to poprawna odpowiedź?'},
+    extra=1, max_num=6,
+    min_num=0, can_delete=True)
+
+AnwserFormSet_FillGaps = inlineformset_factory(
+    models.Question, models.Anwser, form=AnwserForm,
+    fields=['text',],
+    widgets={'text': forms.TextInput(attrs={'class': 'uk-input'})},
+    labels={'text': 'Możliwe odpowiedzi'},
     extra=1, max_num=6,
     min_num=0, can_delete=True)
 
@@ -65,6 +78,7 @@ class TaskUpdateForm(forms.ModelForm):
 
 class TaskCreateForm(forms.ModelForm):
     time_between_tasks = 240
+    action = 'add_task'
 
     class Meta:
         model = models.Task
@@ -74,30 +88,32 @@ class TaskCreateForm(forms.ModelForm):
         }
 
     def clean(self):
-        action = 'add_task'
         username = self.cleaned_data.get('username')
-        cache_results = ActionTimeout.get(action, username)
+        cache_results = ActionTimeout.get(self.action, username)
         now = time.time()
         last_attempt = cache_results['last_attempt'] if cache_results else False
         if last_attempt > (now - self.time_between_tasks):
             raise forms.ValidationError(
                 'Poczekaj chwile! Zbyt szybko dodajesz zadania. Odczekaj między nimi %(seconds)s sekund. Wykorzystaj ten czas na wymyślenie dobrego zadania. Przepraszamy za utrudnienia! 😭',
                 params={'seconds': self.time_between_tasks})
-        ActionTimeout.set(action, username, now)
         return super(TaskCreateForm, self).clean()
+
+    def save(self, commit=True):
+        ActionTimeout.set(self.action, self.cleaned_data.get('username'), time.time())
+        return super(TaskCreateForm, self).save()
 
 
 class CommentForm(forms.ModelForm):
     time_between_comments = 30  # in seconds
+    action = 'add_comment'
 
     class Meta:
         model = models.Comment
         fields = ['text']
 
     def clean(self):
-        action = 'add_comment'
         username = self.cleaned_data.get('username')
-        cache_results = ActionTimeout.get(action, username)
+        cache_results = ActionTimeout.get(self.action, username)
         now = time.time()
         # gets last attempt or create one
         last_attempt = cache_results['last_attempt'] if cache_results else False
@@ -106,8 +122,11 @@ class CommentForm(forms.ModelForm):
             raise forms.ValidationError(
                 'Poczekaj chwile! Zbyt szybko dodajesz komentarze. Odczekaj między nimi %(seconds)s sekund.',
                 params={'seconds': self.time_between_comments})
-        ActionTimeout.set(action, username, now)
         return super(CommentForm, self).clean()
+
+    def save(self):
+        ActionTimeout.set(self.action, self.cleaned_data.get('username'), time.time())
+        return super(CommentForm, self).save()
 
 
 class ActionTimeout:

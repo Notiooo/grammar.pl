@@ -1,0 +1,21 @@
+{% extends 'tasks/actions/add_task.html' %}
+
+{% block instruction_created %}
+<p>Tutaj możesz dodawać, usuwać, lub zmieniać aktualnie pytania znajdujące się w twoim zadaniu.</p>
+{% endblock %}
+
+
+{% block instruction_not_created %}
+<p>Dodaj wszystkie pytania jakie chcesz by znalazły się w twoim zadaniu, a potem przejdź do zakładki <b>"Dodaj odpowiedzi"</b>.</p>
+<p>W miejsce luki wpisz znak _ (tak zwanej podłogi). Będzie znajdowało się w tym miejscu pole do wpisania odpowiedzi.</p>
+<p><b>Przykład: </b>It (get) _ late, let's go home.</p>
+<p><b>Wynik: </b>It (get) <input type="input" class="uk-input uk-form-width-small uk-form-small"/> late, let's go home.</p>
+{% endblock %}
+
+{% block javascript %}
+    $('.formset_row-question input').keypress(function(e) {
+        console.log(this.value);
+        if(e.which == 95 && $(this).val().indexOf('_') > -1)
+            e.preventDefault();
+    });
+{% endblock %}

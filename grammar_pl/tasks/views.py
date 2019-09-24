@@ -7,10 +7,13 @@ from django.urls import reverse_lazy
 from django.forms import modelformset_factory
 from django.shortcuts import reverse, get_object_or_404
 from django.http import Http404, HttpResponseRedirect, JsonResponse
+from django.template.exceptions import TemplateDoesNotExist
+from django.template.loader import get_template
 
 from datetime import date
 from .models import Category, Task_Type, Task, Anwser, Comment, Votes, Favourites
-from .forms import ContactForm, TaskCreateForm, TaskUpdateForm, QuestionFormSet, AnwserFormSet, CommentForm, \
+from .forms import ContactForm, TaskCreateForm, TaskUpdateForm, QuestionFormSet, AnwserFormSet, AnwserFormSet_FillGaps, \
+    CommentForm, \
     TaskReport_Form
 from .helpers import user_vote, user_likes, is_favourite
 
@@ -116,7 +119,7 @@ class TaskDetailView(DetailView, MultipleObjectMixin):
     def get_context_data(self, **kwargs):
         obj = self.get_object()
         number_of_anwsers = len(obj.list_of_anwsers())
-        anwsers_field = modelformset_factory(Anwser, fields=('correct',),
+        anwsers_field = modelformset_factory(Anwser, fields=('correct', 'text'),
                                              extra=number_of_anwsers)
         comments_list = obj.comments.all().order_by('-id')
         formset = anwsers_field(queryset=Anwser.objects.none())
@@ -129,11 +132,13 @@ class TaskDetailView(DetailView, MultipleObjectMixin):
                                                             is_favourite=is_favourite(self.request, obj),
                                                             comment_form=CommentForm(),
                                                             formset=formset,
-                                                            anwsers=iter(formset), **kwargs)
+                                                            user_anwsers=iter(formset), **kwargs)
 
     def post(self, request, **kwargs):
         user = request.user
         self.object = self.get_object()
+
+        # if user wants to add an comment (comment form submitted)
         if 'add_comment' in request.POST:
             comment_form = CommentForm(request.POST)
             if comment_form.is_valid():
@@ -146,15 +151,17 @@ class TaskDetailView(DetailView, MultipleObjectMixin):
                 context = self.get_context_data(**kwargs)
                 context['comment_form'] = comment_form
                 return self.render_to_response(context)
+
         context = self.get_context_data(**kwargs)
         context['formset'] = context['anwsers_field'](request.POST)
-        context['anwsers'] = iter(context['formset'])
+        context['user_anwsers'] = iter(context['formset'])
         return self.render_to_response(context)
 
 
 class EditTaskView(LoginRequiredMixin, UpdateView):
     "A page where user can edit his own task"
 
+    template_name = 'tasks/actions/add_task.html'
     login_url = 'login'
     model = Task
     form_class = TaskUpdateForm
@@ -165,8 +172,8 @@ class EditTaskView(LoginRequiredMixin, UpdateView):
             raise Http404("Wybacz, ale to niedozwolone. To nie twoje dzieło!")
         return super(EditTaskView, self).dispatch(request, *args, **kwargs)
 
-    def get_template_names(self):
-        return 'tasks/actions/layouts/add_task_{}.html'.format(self.get_object().task_type.layout_name)
+    # def get_template_names(self):
+    #     return 'tasks/actions/layouts/add_task_{}.html'.format(self.get_object().task_type.layout_name)
 
     def get_context_data(self, **kwargs):
         data = super(EditTaskView, self).get_context_data(**kwargs)
@@ -273,7 +280,11 @@ class AddTaskView(LoginRequiredMixin, CreateView):
     form_class = TaskCreateForm
 
     def get_template_names(self):
-        return 'tasks/actions/layouts/add_task_{}.html'.format(get_object_or_404(Task_Type, slug_url=self.kwargs['task_name']).layout_name)
+        try:
+            return get_template('tasks/actions/layouts/add_task_{}.html'.format(
+                get_object_or_404(Task_Type, slug_url=self.kwargs['task_name']).layout_name))
+        except TemplateDoesNotExist:
+            return 'tasks/actions/add_task.html'
 
     def get_context_data(self, **kwargs):
         data = super(AddTaskView, self).get_context_data(**kwargs)
@@ -288,6 +299,12 @@ class AddTaskView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         context = self.get_context_data()
         questions = context['questions']
+        print(form)
+        if get_object_or_404(Task_Type, slug_url=self.kwargs['task_name']).layout_name == 'fill-gap':
+            for question in questions:
+                if (question['text'].value().count('_') != 1):
+                    form.add_error(None, 'Jedno z twoich pytań nie zawiera luk')
+                    return super(AddTaskView, self).form_invalid(form)
         with transaction.atomic():
             form.instance.author = self.request.user
             form.instance.task_type = context['task_type']
@@ -307,6 +324,7 @@ class AddTaskView(LoginRequiredMixin, CreateView):
 class AddTaskAnwsersView(LoginRequiredMixin, UpdateView):
     "A page where user can add anwsers to questions he created in AddTaskView"
 
+    template_name = 'tasks/actions/add_anwsers.html'
     login_url = 'login'
     model = Task
     fields = []
@@ -317,10 +335,14 @@ class AddTaskAnwsersView(LoginRequiredMixin, UpdateView):
             raise Http404("Wybacz, ale to niedozwolone. To nie twoje dzieło!")
         return super(AddTaskAnwsersView, self).dispatch(request, *args, **kwargs)
 
-    def get_template_names(self):
-        return 'tasks/actions/layouts/add_anwsers_{}.html'.format(self.get_object().task_type.layout_name)
+    # def get_template_names(self):
+    #     return 'tasks/actions/layouts/add_anwsers_{}.html'.format(self.get_object().task_type.layout_name)
 
     def get_context_data(self, **kwargs):
+        formsets = {'fill-gap': AnwserFormSet_FillGaps,
+                    'quiz': AnwserFormSet}
+        CreateForm = formsets.get(self.get_object().task_type.layout_name)
+
         data = super(AddTaskAnwsersView, self).get_context_data(**kwargs)
         data['anwsers_list'] = []
         questions = self.object.question.all()
@@ -328,12 +350,12 @@ class AddTaskAnwsersView(LoginRequiredMixin, UpdateView):
         if self.request.POST:
             for anwser_number in range(questions.count()):
                 data['anwsers_list'].append(
-                    AnwserFormSet(self.request.POST, instance=questions[anwser_number],
-                                  prefix="anwsers_list{}".format(anwser_number)))
+                    CreateForm(self.request.POST, instance=questions[anwser_number],
+                               prefix="anwsers_list{}".format(anwser_number)))
         else:
             for anwser_number in range(questions.count()):
                 data['anwsers_list'].append(
-                    AnwserFormSet(instance=questions[anwser_number], prefix="anwsers_list{}".format(anwser_number)))
+                    CreateForm(instance=questions[anwser_number], prefix="anwsers_list{}".format(anwser_number)))
         return data
 
     def form_valid(self, form):

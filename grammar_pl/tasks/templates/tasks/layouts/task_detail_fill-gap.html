@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load widget_tweaks %}
 {% load next_field %}
+{% load zip_longest %}
 {% load static %}
 
 {% block title %}{{ task.title|truncatechars:40 | striptags }} - Grammar.pl{% endblock title %}
@@ -19,35 +20,20 @@
             {{ formset.management_form }}
             {% csrf_token %}
                 {% for question in task.question.all %}
-                <span class="uk-text-bold"><p>{{ forloop.counter }}. {{ question.text | linebreaksbr }}</p></span>
                     <div class="uk-margin-left">
-                        {% for anwser in question.anwsers.all %}
-                            {% with user_anwser=user_anwsers|next_field:"correct" %}
-                                {% if formset.is_valid %}
-                                    {% if anwser.correct %}
-                                        <p style="background-color: palegreen">
-                                            {% render_field user_anwser class+="uk-checkbox" type="checkbox" %}
-                                            {{ anwser.text }}
-                                        </p>
-                                    {% elif anwser.correct != user_anwser.value %}
-                                        <p style="background-color: pink">
-                                            {% render_field user_anwser class+="uk-checkbox" type="checkbox" %}
-                                            {{ anwser.text }}
-                                        </p>
-                                    {% else %}
-                                        <p>
-                                            {% render_field user_anwser class+="uk-checkbox" type="checkbox" %}
-                                            {{ anwser.text }}
-                                        </p>
-                                    {% endif %}
+                        {% with user_anwser=user_anwsers|next_field:"text" %}
+                        {% with question_split=question.text_fill_blank_list_split %}
+                            {% if formset.is_valid %}
+                                {% if user_anwser.value in question.list_of_text_anwsers %}
+                                    <p><span class="uk-text-bold">{{ forloop.counter }}. </span>{{ question_split.0 }} {% render_field user_anwser class+="uk-input uk-form-small uk-form-width-medium uk-form-success uk-text-center uk-remove-padding" %} {{ question_split.1 }}</p>
                                 {% else %}
-                                    <p>
-                                        {% render_field user_anwser class+="uk-checkbox" type="checkbox" %}
-                                        {{ anwser.text }}
-                                    </p>
+                                    <p><span class="uk-text-bold">{{ forloop.counter }}. </span>{{ question_split.0 }} {% render_field user_anwser class+="uk-input uk-form-small uk-form-width-medium uk-form-danger uk-text-center uk-remove-padding" %} {{ question_split.1 }}</p>
                                 {% endif %}
-                            {% endwith %}
-                        {% endfor %}
+                            {% else %}
+                                <p><span class="uk-text-bold">{{ forloop.counter }}. </span>{{ question_split.0 }} {% render_field user_anwser class+="uk-input uk-form-small uk-form-width-medium uk-text-center uk-remove-padding" %} {{ question_split.1 }}</p>
+                            {% endif %}
+                        {% endwith %}
+                        {% endwith %}
                     </div>
                 {% endfor %}
                 {% if task.source %}<div class="uk-text-right uk-text-meta uk-text-truncate" uk-toggle="cls: uk-text-truncate uk-text-break;"><i>Źródło: {{ task.source }}</i></div>{% endif %}

@@ -22,7 +22,11 @@ class Task_Type(models.Model):
     title = models.CharField(max_length=40)
     description = models.CharField(max_length=150)
     slug_url = models.SlugField(null=True)
-    layout_name = models.CharField(max_length=50, blank=True)
+    LAYOUT_NAMES = (
+        ('quiz', 'Quiz ABC'),
+        ('fill-gap', 'Wypełnij luki'),
+    )
+    layout_name = models.CharField(max_length=10, choices=LAYOUT_NAMES)
 
     def __str__(self):
         return self.title
@@ -55,6 +59,15 @@ class Task(models.Model):
                 anwsers.append(anwser)
         return anwsers
 
+    def list_of_correct_anwsers(self):
+        "Gets all correct anwsers from queryset of questions"
+        anwsers = []
+        for question in self.question.all():
+            for anwser in question.anwsers.all():
+                if anwser.correct:
+                    anwsers.append(anwser)
+        return anwsers
+
     def get_upvotes(self):
         return self.votes.filter(activity_type=Votes.UP_VOTE).count()
 
@@ -69,6 +82,17 @@ class Question(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='question', null=True)
     text = models.CharField(max_length=200)
     explanation = models.CharField(max_length=180, blank=True)
+
+    def text_fill_blank_list_split(self):
+        return self.text.split('_')
+
+    def list_of_text_anwsers(self):
+        "Gets all anwsers from queryset of questions"
+        anwsers = []
+        for anwser in self.anwsers.all():
+            anwsers.append(anwser.text)
+        print(anwsers)
+        return anwsers
 
     def __str__(self):
         return self.text[:60] + "..."
@@ -130,8 +154,10 @@ class Likes(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
     )
+
     class Meta:
         unique_together = ('comment', 'user')
+
 
 class Favourites(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='favourites', null=True)
@@ -139,5 +165,6 @@ class Favourites(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
     )
+
     class Meta:
         unique_together = ('task', 'user')
