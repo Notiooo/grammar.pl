@@ -59,7 +59,7 @@ AnwserFormSet = inlineformset_factory(
     min_num=0, can_delete=True)
 
 AnwserFormSet_FillGaps = inlineformset_factory(
-    models.Question, models.Anwser, form=AnwserForm,
+    models.Question, models.MutlipleTextAnwser, form=AnwserForm,
     fields=['text',],
     widgets={'text': forms.TextInput(attrs={'class': 'uk-input'})},
     labels={'text': 'Możliwe odpowiedzi'},

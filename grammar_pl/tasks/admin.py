@@ -20,10 +20,14 @@ class Anwser(admin.ModelAdmin):
 class AnwserInline(admin.TabularInline):
     model = models.Anwser
 
+class MultipleAnwserInline(admin.TabularInline):
+    model = models.MutlipleTextAnwser
+
 @admin.register(models.Question)
 class Question(admin.ModelAdmin):
     inlines = [
         AnwserInline,
+        MultipleAnwserInline,
     ]
 
 class QuestionInline(admin.TabularInline):

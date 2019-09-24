@@ -9,9 +9,10 @@ from django.shortcuts import reverse, get_object_or_404
 from django.http import Http404, HttpResponseRedirect, JsonResponse
 from django.template.exceptions import TemplateDoesNotExist
 from django.template.loader import get_template
+from django.forms import widgets
 
 from datetime import date
-from .models import Category, Task_Type, Task, Anwser, Comment, Votes, Favourites
+from .models import Category, Task_Type, Task, Anwser, Comment, Votes, Favourites, MutlipleTextAnwser
 from .forms import ContactForm, TaskCreateForm, TaskUpdateForm, QuestionFormSet, AnwserFormSet, AnwserFormSet_FillGaps, \
     CommentForm, \
     TaskReport_Form
@@ -119,10 +120,14 @@ class TaskDetailView(DetailView, MultipleObjectMixin):
     def get_context_data(self, **kwargs):
         obj = self.get_object()
         number_of_anwsers = len(obj.list_of_anwsers())
-        anwsers_field = modelformset_factory(Anwser, fields=('correct', 'text'),
-                                             extra=number_of_anwsers)
+
+        form_models = {'fill-gap': MutlipleTextAnwser,
+                       'quiz': Anwser}
+        form_model = form_models.get(self.get_object().task_type.layout_name)
+
+        anwsers_field = modelformset_factory(form_model, extra=number_of_anwsers, exclude=('question',), widgets={'text': widgets.TextInput(attrs={'class': 'uk-input'})})
         comments_list = obj.comments.all().order_by('-id')
-        formset = anwsers_field(queryset=Anwser.objects.none())
+        formset = anwsers_field(queryset=form_model.objects.none())
 
         return super(TaskDetailView, self).get_context_data(number_of_anwsers=number_of_anwsers,
                                                             anwsers_field=anwsers_field,
@@ -154,6 +159,7 @@ class TaskDetailView(DetailView, MultipleObjectMixin):
 
         context = self.get_context_data(**kwargs)
         context['formset'] = context['anwsers_field'](request.POST)
+        print(context['formset'].errors)
         context['user_anwsers'] = iter(context['formset'])
         return self.render_to_response(context)
 
@@ -299,12 +305,12 @@ class AddTaskView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         context = self.get_context_data()
         questions = context['questions']
-        print(form)
-        if get_object_or_404(Task_Type, slug_url=self.kwargs['task_name']).layout_name == 'fill-gap':
-            for question in questions:
-                if (question['text'].value().count('_') != 1):
-                    form.add_error(None, 'Jedno z twoich pytań nie zawiera luk')
-                    return super(AddTaskView, self).form_invalid(form)
+        # print(form)
+        # if get_object_or_404(Task_Type, slug_url=self.kwargs['task_name']).layout_name == 'fill-gap':
+        #     for question in questions:
+        #         if (question['text'].value().count('_') != 1):
+        #             form.add_error(None, 'Jedno z twoich pytań nie zawiera luk')
+        #             return super(AddTaskView, self).form_invalid(form)
         with transaction.atomic():
             form.instance.author = self.request.user
             form.instance.task_type = context['task_type']

@@ -52,11 +52,14 @@ class Task(models.Model):
         return reverse('edit_task', kwargs={'pk': self.pk})
 
     def list_of_anwsers(self):
-        "Gets all anwsers from queryset of questions"
+        "Gets all anwsers from queryset of questions depends on the Task_Type"
+        models = {'fill-gap': MutlipleTextAnwser,
+                  'quiz': Anwser}
+        model = models.get(self.task_type.layout_name)
+
         anwsers = []
         for question in self.question.all():
-            for anwser in question.anwsers.all():
-                anwsers.append(anwser)
+            [anwsers.append(anwser) for anwser in model.objects.filter(question=question)]
         return anwsers
 
     def list_of_correct_anwsers(self):
@@ -86,13 +89,15 @@ class Question(models.Model):
     def text_fill_blank_list_split(self):
         return self.text.split('_')
 
+    def get_list_of_anwsers(self):
+        models = {'fill-gap': MutlipleTextAnwser,
+                  'quiz': Anwser}
+        model = models.get(self.task.task_type.layout_name)
+        return model.objects.filter(question=self)
+
     def list_of_text_anwsers(self):
         "Gets all anwsers from queryset of questions"
-        anwsers = []
-        for anwser in self.anwsers.all():
-            anwsers.append(anwser.text)
-        print(anwsers)
-        return anwsers
+        return [anwser.text for anwser in self.get_list_of_anwsers()]
 
     def __str__(self):
         return self.text[:60] + "..."
@@ -105,6 +110,21 @@ class Anwser(models.Model):
 
     def __str__(self):
         return self.text
+
+class MutlipleTextAnwser(models.Model):
+    """
+    A special model of specific anwsers used for fields where can be multiple anwsers at once
+    Example: In text "He _ a pair of _"
+             There are two multiple anwser
+             Anwser 1: "took/stole"
+             Anwser 2: "glasses/jeans/shoes"
+             All are correct
+    """
+    question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='multiple_anwsers')
+    text = models.TextField(blank=True)
+
+    def get_list_of_anwsers(self):
+        return self.text.split('\n')
 
 
 class Comment(models.Model):

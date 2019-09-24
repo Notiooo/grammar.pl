@@ -21,19 +21,23 @@
             {% csrf_token %}
                 {% for question in task.question.all %}
                     <div class="uk-margin-left">
+                        <p>
+                        {% for question_split in question.text_fill_blank_list_split %}
                         {% with user_anwser=user_anwsers|next_field:"text" %}
-                        {% with question_split=question.text_fill_blank_list_split %}
+                            {{ question_split }}
                             {% if formset.is_valid %}
-                                {% if user_anwser.value in question.list_of_text_anwsers %}
-                                    <p><span class="uk-text-bold">{{ forloop.counter }}. </span>{{ question_split.0 }} {% render_field user_anwser class+="uk-input uk-form-small uk-form-width-medium uk-form-success uk-text-center uk-remove-padding" %} {{ question_split.1 }}</p>
+                            {{ user_anwser.value }} - {{ question.list_of_text_anwsers }}
+                                {% if user_anwser.value in question.multiple_anwsers.get_list_of_anwsers %}
+                                    {% render_field user_anwser class+="uk-input uk-form-small uk-form-success uk-form-width-medium uk-text-center uk-remove-padding" %}
                                 {% else %}
-                                    <p><span class="uk-text-bold">{{ forloop.counter }}. </span>{{ question_split.0 }} {% render_field user_anwser class+="uk-input uk-form-small uk-form-width-medium uk-form-danger uk-text-center uk-remove-padding" %} {{ question_split.1 }}</p>
+                                    {% render_field user_anwser class+="uk-input uk-form-small uk-form-danger uk-form-width-medium uk-text-center uk-remove-padding" %}
                                 {% endif %}
                             {% else %}
-                                <p><span class="uk-text-bold">{{ forloop.counter }}. </span>{{ question_split.0 }} {% render_field user_anwser class+="uk-input uk-form-small uk-form-width-medium uk-text-center uk-remove-padding" %} {{ question_split.1 }}</p>
+                                {% render_field user_anwser class+="uk-input uk-form-small uk-form-width-medium uk-text-center uk-remove-padding" %}
                             {% endif %}
                         {% endwith %}
-                        {% endwith %}
+                        {% endfor %}
+                        </p>
                     </div>
                 {% endfor %}
                 {% if task.source %}<div class="uk-text-right uk-text-meta uk-text-truncate" uk-toggle="cls: uk-text-truncate uk-text-break;"><i>Źródło: {{ task.source }}</i></div>{% endif %}
