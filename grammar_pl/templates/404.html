@@ -9,7 +9,7 @@
         <img src="{% static 'img/404.gif' %}"/>
         <p>Może ten kotek-programista wyżej jednak coś wykombinuje...</p>
         {% if exception %}
-        <p>Póki co stwierdził, że... "{{ exception }}"</p>
+        <p>Póki co stwierdził, że... {{ exception }}</p>
         {% endif %}
         <p>No nic... nic więcej nie mogę na to poradzić</p>
         <p class="uk-text-meta">Tak więc dajmy mu czas...</p>

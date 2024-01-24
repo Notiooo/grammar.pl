@@ -22,27 +22,27 @@
                 <span class="uk-text-bold"><p>{{ forloop.counter }}. {{ question.text | linebreaksbr }}</p></span>
                     <div class="uk-margin-left">
                         {% for anwser in question.anwsers.all %}
-                            {% with user_anwser=user_anwsers|next_field:"correct" %}
-                                {% if formset.is_valid %}
+                            {% with correct_anwser=anwsers|next_field:"correct" %}
+                                {% if formset.is_valid and 'vote' not in request.POST %}
                                     {% if anwser.correct %}
                                         <p style="background-color: palegreen">
-                                            {% render_field user_anwser class+="uk-checkbox" type="checkbox" %}
+                                            {% render_field correct_anwser class+="uk-checkbox" type="checkbox" %}
                                             {{ anwser.text }}
                                         </p>
-                                    {% elif anwser.correct != user_anwser.value %}
+                                    {% elif anwser.correct != correct_anwser.value %}
                                         <p style="background-color: pink">
-                                            {% render_field user_anwser class+="uk-checkbox" type="checkbox" %}
+                                            {% render_field correct_anwser class+="uk-checkbox" type="checkbox" %}
                                             {{ anwser.text }}
                                         </p>
                                     {% else %}
                                         <p>
-                                            {% render_field user_anwser class+="uk-checkbox" type="checkbox" %}
+                                            {% render_field correct_anwser class+="uk-checkbox" type="checkbox" %}
                                             {{ anwser.text }}
                                         </p>
                                     {% endif %}
                                 {% else %}
                                     <p>
-                                        {% render_field user_anwser class+="uk-checkbox" type="checkbox" %}
+                                        {% render_field correct_anwser class+="uk-checkbox" type="checkbox" %}
                                         {{ anwser.text }}
                                     </p>
                                 {% endif %}

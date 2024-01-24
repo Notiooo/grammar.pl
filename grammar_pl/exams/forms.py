@@ -3,7 +3,7 @@ from .models import Exams_Anwser
 from django.core.mail import send_mail
 from django.shortcuts import reverse
 
-from secret_settings import secret_email_contacts_list
+from django.conf import settings
 
 
 class Exams_Task_Anwser_Form(forms.ModelForm):
@@ -24,5 +24,5 @@ class ExamsReport_Form(forms.Form):
             '[PROBLEM] ID: {0} - zadania maturalne'.format(id),
             self.cleaned_data['message'],
             self.cleaned_data['email'],
-            secret_email_contacts_list,
+            settings.SECRET_EMAIL_CONTACTS_LIST,
         )

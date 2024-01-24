@@ -1,32 +1,14 @@
-
-grammar_pl/db\.sqlite3
-
-grammar_pl/secret_settings\.py
-
-grammar_pl/\.idea/
-
-grammar_pl/grammar_pl/__pycache__/
-
-grammar_pl/__pycache__/
-
-grammar_pl/pages/migrations/
-
+# General
+.idea/
 *.pyc
+.env
 
-grammar_pl/users/migrations/
+# Django specific
+db.sqlite3
+/__pycache__/
+grammar_pl/*/migrations/
 
-grammar_pl/tasks/migrations/
-
-grammar_pl/matura/migrations/
-
-grammar_pl/uploads/avatars/avatar_Notio\.jpg
-
-grammar_pl/uploads/sound_files/
-
-grammar_pl/uploads/
-
-grammar_pl/db — kopia.sqlite3
-
-grammar_pl/cache/
-
-grammar_pl/exams/migrations/
+# Project specific
+grammar_pl/uploads
+grammar_pl/public
+cache/

@@ -20,3 +20,17 @@ No, you do not have to register until you want to add new tasks and comment on o
 
 ### Additional note
 It's my first django project ever 😊
+
+## How to run?
+1. Fill in data in .env file
+2. Install Docker:
+   * Windows/Mac: Install Docker Desktop.
+   * Linux: Install Docker Engine and Docker Compose using your distro's package manager.
+3. You should build the image with command:
+   > docker-compose build
+4. You can run the application using command:
+   > docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+
+Default admin credentials for this key are:
+- **login**: admin
+- **password**: grammar_pl

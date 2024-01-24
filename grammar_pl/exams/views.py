@@ -168,10 +168,9 @@ class Exams_Search(ListView):
 
     model = models.Exams_Task
     template_name = 'exams/exams_search.html'
-    context_object_name = 'found'
     paginate_by = 15
 
     def get_queryset(self):
         if self.request.GET:
-            return self.model.objects.filter(title__contains=self.request.GET.get('search')).order_by('pk')
+            return self.model.objects.filter(title__icontains=self.request.GET.get('search')).order_by('pk')
         return self.model.objects.none()

@@ -1,0 +1,17 @@
+version: '3.11'
+
+services:
+  web:
+    command: bash -c "python manage.py makemigrations users &&
+             python manage.py makemigrations exams &&
+             python manage.py makemigrations tasks &&
+             python manage.py makemigrations &&
+             python manage.py migrate --run-syncdb &&
+             python manage.py loaddata data.json --exclude auth.permission --exclude contenttypes &&
+             python manage.py createsuperuser --noinput &&
+             python manage.py collectstatic --no-input &&
+             python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/grammar_pl
+    ports:
+      - "8000:8000"

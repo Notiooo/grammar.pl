@@ -24,7 +24,7 @@
                 {% for task in object_list %}
                     <tr>
                         <td class="uk-table-link">
-                            <a class="uk-link-text" href="{% url 'task_detail' object.slug_url task.id %}">{{ task.title }}</a>
+                            <a class="uk-link-reset" href="{% url 'task_detail' object.slug_url task.id %}">{{ task.title }}</a>
                         </td>
                         {% with votes=task.get_sum_votes %}
                             {% if votes < 0 %}
@@ -36,9 +36,7 @@
                             {% endif %}
                         {% endwith %}
                         <td>{{ task.date|date:"D d M Y" }}</td>
-                        <td class="uk-table-link">
-                            <a class="uk-link-text" href="{% url 'profile' task.author.id %}">{{ task.author }}</a>
-                        </td>
+                        <td>{{ task.author }}</td>
                         <td><img class="uk-preserve-width uk-border-circle" src="{{ task.author.avatar.url }}" width="40" alt=""></td>
                     </tr>
                 {% endfor %}

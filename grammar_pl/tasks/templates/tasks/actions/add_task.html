@@ -42,13 +42,10 @@
             <h4 class="uk-heading-line uk-text-center"><span>Pytania</span></h4>
             <table class="uk-table" uk-toggle="cls: uk-table-responsive uk-text-center; mode: media; media: (max-width: 500px);">
                 {% if object %}
-                    {% block instruction_created %}
-                    {% endblock %}
+                <p>Tutaj możesz dodawać, usuwać, lub zmieniać aktualnie pytania znajdujące się w twoim zadaniu.</p>
                 {% else %}
-                    {% block instruction_not_created %}
-                    {% endblock instruction_not_created %}
+                <p>Dodaj wszystkie pytania jakie chcesz by znalazły się w twoim zadaniu, a potem przejdź do zakładki <b>"Dodaj odpowiedzi"</b>.</p>
                 {% endif %}
-                <hr class="uk-divider-small uk-text-center">
                 {{ questions.management_form }}
                 {% for questions in questions.forms %}
                     {% if forloop.first %}
